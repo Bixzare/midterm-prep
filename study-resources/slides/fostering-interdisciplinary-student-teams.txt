@@ -1,0 +1,512 @@
+07 teams - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 66
+Navigating Conflicts in (Student) Teams
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 66
+Assigned �Seating �(only today)
+Find your team number
+Find your team in the room (low numbers near the front)
+Introduce yourself to the other team members
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+3 sur 66
+Now: First Short Team Meeting (10 min)
+Find your team number and seat area
+Meet your team, introduce yourself: Name, SE, ML, leadership, teamwork background? Favorite movie? Fun fact?
+Find time for first team meeting in next few days
+Agree on primary communication until team meeting
+Pick a movie-related team name (ask an LLM �if needed), post team name and tag all group �members and your mentor on slack in #social
+​
+3
+Mentor
+Team Nr
+Vedika Agarwal
+1-4
+Yubo Chen
+5-8
+Shreya Verma
+9-12
+Juan Ortega
+13-16
+Ashritha Gonuguntla
+17-20
+Ansh Mishra
+21-24
+Akshita Verma
+25-28
+Sumanth Yegurla
+29-32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+4 sur 66
+Teamwork is Inevitable
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+5 sur 66
+Teamwork is crosscutting...
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+6 sur 66
+Teams are Inevitable
+Projects too large to build for a single person (division of work)
+Projects too large to fully comprehend by a single person (divide and conquer)
+Projects need too many skills for a single person to master (division of expertise)
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+7 sur 66
+Interdisciplinary Teams are Inevitable
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+8 sur 66
+The Importance of Teamwork Skills
+Virtually all software projects are done in teams
+ML-enabled projects need to bring together different backgrounds
+Good teams make it fun to work together
+Learn from each other
+Limited influence in selecting/firing team members in most organizations
+Peer performance evaluations common in industry (e.g. Google's Process)
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+9 sur 66
+How does AI change teamwork?
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+10 sur 66
+Teams are Inevitable even with AI
+Projects too large to build for a single person (division of work)
+Ambition rises with AI capabilities
+AI shifts but does not eliminate all work; verification/control bottleneck
+Projects too large to fully comprehend by a single person (divide and conquer)
+Even without code-level comprehension, human control is likely needed
+Managing risks still requires expertise
+Projects need too many skills for a single person to master (division of expertise)
+Domain knowledge, tacit knowledge, expert judgment/taste still valuable
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+11 sur 66
+Who has had bad experiences in teams? Student teams? Teams in industry?
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+12 sur 66
+Common Team Issue:�Groupthink
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+13 sur 66
+Team issues: Groupthink
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+14 sur 66
+Groupthink
+Group minimizing conflict
+Avoid exploring alternatives
+Suppressing dissenting views
+Isolating from outside influences
+→ Irrational/dysfunctional decision making
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+15 sur 66
+HIPPO
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+16 sur 66
+Example: Time and Cost Estimation
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+17 sur 66
+Example: Use of Hype Technology
+(agile, block chain, machine learning, devops, AIOps, ...)
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+18 sur 66
+Causes of Groupthink
+High group cohesiveness, homogeneity
+Structural faults (insulation,  biased leadership, lack of methodological exploration)
+Situational context (stressful external threats, recent failures, moral dilemmas)
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+19 sur 66
+Symptoms
+Overestimation of ability: invulnerability, unquestioned believe in morality
+Closed-mindedness: ignore warnings, stereotyping; innovation averse
+Pressure toward uniformity: self-censorship, illusion of unanimity, …
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+20 sur 66
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+21 sur 66
+Diversity
+“Men and women have different viewpoints, ideas, and market insights, which enables better problem solving. A gender-diverse workforce provides easier access to resources, such as various sources of credit, multiple sources of information, and wider industry knowledge. A gender-diverse workforce allows the company to serve an increasingly diverse customer base. Gender diversity helps companies attract and retain talented women.”
+“Cultural diversity leads to process losses through task conflict and decreased social integration, but to process gains through increased creativity and satisfaction.”
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+22 sur 66
+Groupthink and AI
+Need of AI
+Selection of learning method
+Narrow view of fairness
+Missing safety requirements
+Ignoring ethics
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+23 sur 66
+Mitigation Strategies
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+24 sur 66
+Mitigation Strategies
+Diversity in team composition
+Culture of open conflicts
+Appoint devil's advocate in discussions, moderate and rotate speaker order, leaders hide opinions in discussions
+Involve outside experts
+Always request a second solution
+Monitoring and process measurement
+Agile techniques as planning poker, on-site customer
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+25 sur 66
+Common Team Issue:�Social Loafing
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+26 sur 66
+Team issues: Social loafing
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+27 sur 66
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+28 sur 66
+Social Loafing
+People exerting less effort within a group
+Reasons
+Diffusion of responsibility
+Motivation
+Dispensability of effort / missing recognition
+Avoid pulling everybody / "sucker effect"
+Submaximal goal setting
+“Evaluation potential, expectations of co-worker performance, task meaningfulness, and culture had especially strong influence”
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+29 sur 66
+Mitigation Strategies
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+30 sur 66
+Motivation
+Autonomy
+Mastery
+Purpose
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+31 sur 66
+Mitigation Strategies
+Involve all team members, physical colocation
+Assign specific tasks with individual responsibility
+Increase identifiability
+Team contracts, measurement
+Provide choices in selecting tasks
+Promote involvement, challenge developers
+Reviews and feedback
+Team cohesion, team forming exercises
+Small teams
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+32 sur 66
+Responsibilities & Buy-In
+Involve team members in decision making
+Assign responsibilities (ideally goals not tasks)
+Record decisions and commitments; make record available
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+33 sur 66
+Debugging Teamwork �in Student Teams
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+34 sur 66
+Who has had bad experiences in teams? Student teams? Teams in industry?
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+35 sur 66
+Some past complaints
+"M. was very pleasant and would contribute while in meetings.  Outside of them, he did not complete the work he said he would and did not reach out to provide an update that he was unable to.  When asked, on the night the assignment was due, he completed a portion of the task he said he would after I had completed the rest of it."
+"Procrastinated with the work till the last minute - otherwise ok."
+"He is not doing his work on time. And didnt check his own responsibilities. Left work undone for the next time."
+"D. failed to catch the latest 2 meetings. Along the commit history, he merely committed 4 and the 3 earliest commits are some setups. And the latest one commits is to add his name on the meeting log, for which we almost finished when he joined."
+"Unprepared with his deliverables, very unresponsive on WhatsApp recently, and just overall being a bad team player."
+"Consistently failed to meet deadlines. Communication improved over the course of the milestone but needed repeated prompts to get things done. Did not ask for help despite multiple offers."
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+36 sur 66
+Common Frustrations in Student Teams
+No visible progress until last minute
+Late work
+Incomplete or low quality solutions at integration
+Unresponsive team members
+Passive, uninterested team members without initiative
+Needs lots of reminding and help
+Sources?
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+37 sur 66
+Common Sources of Frustrations
+Priority differences ("10-601 is killing me, I need to work on that first", "I have dance class tonight")
+Ambition differences ("a B- is enough for graduating")
+Ability differences ("incompetent" students on teams)
+Working style differences (deadline driven vs planner)
+Communication preferences differences (avoid distraction vs always on)
+In-team competition around grades (outdoing each other, adversarial peer grading)
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+38 sur 66
+Breakout: Pre-Mortem
+Pick one of the scenarios (or another concrete problem that one team member faced in the past) and openly discuss proactive/reactive solutions
+As a group, post and follow up in #lecture, tagging present team members and @mlipbot:
+Brief problem description
+What to do to avoid it in the first place
+What to do when it occurs anyway
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+39 sur 66
+How would you handle...
+One team member has very little technical experience and is struggling with basic Python scripts and the Unix shell. It is faster for other team members to take over the task rather than helping them.
+​
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+40 sur 66
+How would you handle...
+You divide the work and but when you try to integrate on the evening before the deadline you learn that one team member has failed to complete their part. They tried the day before, but got stuck with a dependency problem.
+​
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+41 sur 66
+How would you handle...
+After last minute stress at the last assignment, you team agrees to start earlier and to integrate at a milestone days before the deadline to leave a buffer. Yet you see little progress from half the team in GitHub and hardly anybody responds in Slack. Little is done at the agreed milestone. The work gets done before the deadline, but with the same stress as in the last assignment.
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+42 sur 66
+How would you handle...
+This homework is low priority for one team member. They rarely contribute beyond the bare minimum at the last minute.
+​
+​
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+43 sur 66
+How would you handle...
+This homework is low priority for one team member. They rarely contribute beyond the bare minimum at the last minute.
+The rest of the team grudgingly compensates and achieves full points for the assignment. You do not feel comfortable criticizing the student as it may negatively affect their grade.
+​
+43
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+44 sur 66
+Summary: How would you handle...
+One team member has very little technical experience and is struggling with basic Python scripts and the Unix shell. It is faster for other team members to take over the task rather than helping them.
+You divide the work and but when you try to integrate on the evening before the deadline you learn that one team member has failed to complete their part. They tried the day before, but got stuck with a dependency problem.
+After last minute stress at the last assignment, you team agrees to start earlier and to integrate at a milestone days before the deadline to leave a buffer. Yet you see little progress from half the team in GitHub and hardly anybody responds in Slack. Little is done at the agreed milestone. The work gets done before the deadline, but with the same stress as in the last assignment.
+This homework is low priority for one team member. They rarely contribute beyond the bare minimum at the last minute. (The rest of the team grudgingly compensates and achieves full points for the assignment. You do not feel comfortable criticizing the student as it may negatively affect their grade.)
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+45 sur 66
+Difficult Conversations
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+46 sur 66
+Fixing Teamwork Problems
+Need to address problems, �conflict avoidance does not work
+Conversations can be unpleasant, �feel confrontational
+Learn how to have difficult conversations,�useful life skill
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+47 sur 66
+Three parts
+What happened. Team members often disagree about the facts. Each person thinks that they are correct. Do not try to prove who is correct. Try to learn how the other person sees the situation.
+Feelings. Frustration, anxiety, and resentment are usually below the surface. If you ignore them, they come out in other ways, for example in tone or in silence.
+Identity. A conflict can make a person ask, "Am I competent? Am I a good teammate?" This is why small disagreements can feel large. Expect this in yourself and in others.
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+48 sur 66
+Difficult Conversations: The Basics
+Focus on problem solving, not blame assignment�	mistakes happen, look to the future
+Explain the problem, but focus on “I statements”, not “You statements”�	Be specific not general�	Focus on impact, not intent (do not assume intent from impact!)�	E.g., “I noticed… and felt…” rather than “You did…”
+Recognize and accept each person’s perspectives and reality�	Let them tell their story, share their perspective�	Listen open-mindedly, without interrupting�	Active listening: repeat in your own words what you heard (even if you disagree)
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+49 sur 66
+Breakout 2: Difficult Conversation
+​
+In small groups, try role playing based on the previously discussed scenario:
+Person 1: The problem still persists, getting seriously annoyed, now confronting Person 2
+Person 2: Not a big deal, not my fault, all a misunderstanding, and who are you to tell me what to do anyway
+Person 3: Observer, provides feedback afterward
+Rotate roles and try again
+For contrast, first try these strategies (both person 1 and 2):
+Confront people about what they did wrong
+Focus on technical details of what actually happened
+Let it escalate
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+50 sur 66
+Breakout 2: Difficult Conversation
+​
+In small groups, try role playing based on the previously discussed scenario:
+Person 1: The problem still persists, getting seriously annoyed, now confronting Person 2
+Person 2: Not a big deal, not my fault, all a misunderstanding, and who are you to tell me what to do anyway
+Person 3: Observer, provides feedback afterward
+Rotate roles and try again
+Now Person 1 try these strategies:
+Focus on problem solving, not blame assignment
+Explain the problem, but focus on “I statements”, not “You statements” (be specific not general, focus on impact, not intent)
+Recognize and accept each person’s perspectives and reality (let them tell their story, share their perspective; listen open-mindedly, without interrupting; active listening: repeat in your own words what you heard)
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+51 sur 66
+Team Citizenship/Peer Grading �in this Course
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+52 sur 66
+Teamwork Policy in this Course
+Teams can set their own priorities and policies – do what works for you. Experiment.
+Not everybody will contribute equally to every assignment – that's okay
+Team members have different strength and weaknesses – that's good
+We will intervene in team citizenship issues!
+Golden rule: Try to do what you agreed to do by the time you agreed to. If you cannot, seek help and communicate clearly and early.
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+53 sur 66
+Team Citizenship
+Be responsive and responsible
+Come to meetings on time, participate actively
+Stick to commitments, work on assigned tasks
+When problems, reach out, replan, communicate early, be proactive
+(Replanning and dealing with mistakes is normal)
+We will adjust grades if complains about:
+Lack of communication
+Disrespectful or dismissive communication
+Not attending team meetings (without excuse)
+Blowing internal deadlines without communication
+Failing to complete agreed tasks without timely communication
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+54 sur 66
+Peer Grading Process and Support
+We are here to help! Teamwork is a learning goal
+TA assigned as mentor to every team, reach out for support
+Team citizenship survey after every milestone
+Debriefing with TA after every milestone, discuss how it went and how to improve
+Adjusting grades based on survey and communication with course staff
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+55 sur 66
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+56 sur 66
+Peer Grading Mechanics
+Survey with rating form and text field, explaining what the issue is
+We discard complains without explanation and those beyond team citizenship (e.g, regarding ability or effort)
+TAs can help to bring up issues during the debriefing meeting
+We will immediately adjust grade, forcing the issue in the team
+See form to preview effects
+Can lead to substantial grade adjustments (-10% to -50% common)
+Instructors listen to appeals
+If entire team agrees, this can be used to adjust grades for intentionally imbalanced contributions
+Depending on severity, TAs will escalate to instructors
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+57 sur 66
+Avoiding Adversarial Peer Grading
+Peer grading focuses only on team citizenship
+Comments are required for negative ratings and read by TAs and instructors
+Avoid avoiding conflict: Set high standards and give honest feedback before mounting frustration and spiraling problems
+Avoid academic integrity violation: Do not cover for team members who do not contribute at all. Let the instructors deal with it (including medical accommodations).
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+58 sur 66
+Beyond the comfort zone
+[...] We encourage all team members to engage with topics beyond what they are already familiar with. For example, if a team member has previously used Prometheus for monitoring, they can likely do that part easily, but other team members may benefit from doing this as a new learning opportunity (possibly with the help of the experienced team member).
+In milestone M1-M3, your team can get up to 3 bonus points each if you can convince your mentor during the debriefing meeting that you went beyond your comfort zone. We are looking for two things:
+Allocate work beyond existing strength/experience
+All team members have awareness of all parts of the project
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+59 sur 66
+Tips for Getting Started
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+60 sur 66
+Establish Communication and Meeting Patterns
+Agree on how to communicate in the team: Email? Slack? Whatsapp?
+Agree on communication expectation. Different people have different habits and expectations. Be explicit!
+Read emails daily? On weekends?
+Respond to urgent chat messages within 3h? Read old chat messages?
+Be available for chat during certain hours?
+Find meeting times. Plan ahead or meeting as needed?
+Set intermediate internal deadline for integration
+Set realistic expectations:  All have other classes and distractions; communicate availability openly
+Write down expectations!
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+61 sur 66
+Share the Work
+Team members have different strength and weaknesses – that's good
+Make use of individual strength of team members (split, pair up, help, ...)
+Usually somebody will take responsibility for team management tasks (e.g., schedule meetings, moderate, meeting notes, track work, reminders, check submission) or reporting
+Team management is work too
+Consider rotating
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+62 sur 66
+Maintain Accountability
+Write down explicit deliverables: Who does what by when
+Be explicit about expected results, should be verifiable
+Track completion, check off when done
+GitHub issues, Jira, Trello board, Miro, Google docs, Slack, ... – single source of truth, with history tracking
+Complete deliverable list during meeting: everybody writes their own deliverables, others read all deliverables to check understanding
+if not completed during meeting or team member not at meeting, email assignment after meeting to everybody; no objection within 24h counts as agreement with task assignment
+We will ask for evidence of this in assignments and during conflict resolution
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+63 sur 66
+Some Communication Tips
+Focus full-group meetings on planning and reflection, meet in smaller groups for focused work
+Use Slack/chat deliberately
+consider chat ephemeral, don't expect everybody to catch up on all old messages
+separate social communication from work comm., urgent from not urgent
+explicitly tag people if you need their input, enable notifications during "working hours"
+discuss non-urgent, long-term things outside of chat associated with topic (issue tracker, Google doc, ...)
+Reserve time for socializing and celebrating success
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+64 sur 66
+Recall: Common Sources of Conflict
+Different team members have different working patterns and communication preferences
+e.g., start early vs close to deadline; plan ahead vs try and error
+e.g., react to every notification vs reduce distractions, read email once a day
+discuss and set explicit expectations; talk about conflicts
+Different abilities, unexpected difficulties
+work in pairs, plan time for rework and integration
+replan, contribute to teams in different ways
+work around it, it's the team's responsibility
+Unreliable team members, poor team citizenship
+e.g., not starting the work in agreed time, not responding, not attending
+have written clear deliverables with deadlines
+talk about it within team, talk to course staff, peer grading
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+65 sur 66
+Summary
+Teamwork is unavoidable, teams rarely fully self-selected, good teams are fun
+Teamwork is hard, skills to be learned
+Many well known teamwork issues, including groupthink and social loafing
+Set explicit expectations for communication and work allocation
+We focus on team citizenship and apply peer grading
+65
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+66 sur 66
+Further Readings
+Stone, Douglas, Bruce Patton, and Sheila Heen. Difficult conversations: How to discuss what matters most. Penguin, 2023.
+Mantle, Mickey W., and Ron Lichty. Managing the unmanageable: rules, tools, and insights for managing software people and teams. Addison-Wesley Professional, 2019.
+DeMarco, Tom, and Tim Lister. Peopleware: productive projects and teams. Addison-Wesley, 2013.
+Brooks Jr, Frederick P. The mythical man-month: essays on software engineering. Pearson Education, 1995.
+Classic work on team dysfunctions: Lencioni, Patrick. “The five dysfunctions of a team: A Leadership Fable.” Jossey-Bass (2002).
+Oakley, Barbara, Richard M. Felder, Rebecca Brent, and Imad Elhajj. "Turning student groups into effective teams." Journal of student centered learning 2, no. 1 (2004): 9-34.
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026

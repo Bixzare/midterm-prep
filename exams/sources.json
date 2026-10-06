@@ -1,0 +1,170 @@
+﻿[
+    {
+        "file":  "Midterm 1 F24.pdf",
+        "bytes":  7590108,
+        "git_blob_sha1":  "4b6ce1224301faca0c3723897b8b9c5b7205dcef",
+        "sha256":  "972645f665fd847d0914ccf8b55ea688d083cf97ff5028d607f9e888d4564f04",
+        "sources":  [
+                        {
+                            "repo":  "f2024",
+                            "path":  "exams/Midterm 1 F24.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2024/blob/main/exams/Midterm%201%20F24.pdf"
+                        },
+                        {
+                            "repo":  "s2025",
+                            "path":  "exams/Midterm 1 F24.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2025/blob/main/exams/Midterm%201%20F24.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 1 F25.pdf",
+        "bytes":  1252953,
+        "git_blob_sha1":  "4ad587b5c941956e0aa6d230dea802fd1de26c67",
+        "sha256":  "0819fbdf7413008d8cc598a8c2b2c8f75dee6edae44e18fed56f42e910238be7",
+        "sources":  [
+                        {
+                            "repo":  "f2025",
+                            "path":  "exams/Midterm 1 F25.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2025/blob/main/exams/Midterm%201%20F25.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 1 S25.pdf",
+        "bytes":  1665094,
+        "git_blob_sha1":  "6ea4a00f4f6f87b2a54d1a652c5f3544d5aafc40",
+        "sha256":  "8263186bf13e2192e41c2a9c43ae2ec899ca6c7a31101104a9a1350271a60895",
+        "sources":  [
+                        {
+                            "repo":  "s2025",
+                            "path":  "exams/Midterm 1 S25.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2025/blob/main/exams/Midterm%201%20S25.pdf"
+                        },
+                        {
+                            "repo":  "f2025",
+                            "path":  "exams/Midterm 1 S25.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2025/blob/main/exams/Midterm%201%20S25.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 1 S26 MLiP.pdf",
+        "bytes":  319100,
+        "git_blob_sha1":  "22920c462bccff450a83a27edce7b44e4c954a9e",
+        "sha256":  "c23d23dc985850a02c40548e54d9796e2104ab59ccf77fb0aafb5e23e5b9bb07",
+        "sources":  [
+                        {
+                            "repo":  "s2026",
+                            "path":  "exams/Midterm 1 S26 MLiP.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2026/blob/main/exams/Midterm%201%20S26%20MLiP.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 2 F24 MLiP.pdf",
+        "bytes":  274798,
+        "git_blob_sha1":  "4e70292cf1ac55b0befc3b4b9fa498e33ce0df70",
+        "sha256":  "5b46f14440bc15c812bf616eb0d19d05aa9522d06a4267214c2d96f5a0e94ff7",
+        "sources":  [
+                        {
+                            "repo":  "f2024",
+                            "path":  "exams/Midterm 2 F24 MLiP.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2024/blob/main/exams/Midterm%202%20F24%20MLiP.pdf"
+                        },
+                        {
+                            "repo":  "s2025",
+                            "path":  "exams/Midterm 2 F24 MLiP.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2025/blob/main/exams/Midterm%202%20F24%20MLiP.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 2 F25 MLiP.pdf",
+        "bytes":  1738463,
+        "git_blob_sha1":  "f89cde456488a8b8357041a7088a47afe34c9286",
+        "sha256":  "a8d4343f2c8e8e15cc77c4aeec09de4287b4251dc69fa40cf849d451782d3039",
+        "sources":  [
+                        {
+                            "repo":  "f2025",
+                            "path":  "exams/Midterm 2 F25 MLiP.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2025/blob/main/exams/Midterm%202%20F25%20MLiP.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 2 practice questions.pdf",
+        "bytes":  93667,
+        "git_blob_sha1":  "52a7369849bc7d74dc4e8cbf23d39e845b7273c8",
+        "sha256":  "63ec84864f52f2e76a21bc6854a184b524b1a2e8b5062fc0249f5e31ec63cfd2",
+        "sources":  [
+                        {
+                            "repo":  "f2024",
+                            "path":  "exams/Midterm 2 practice questions.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2024/blob/main/exams/Midterm%202%20practice%20questions.pdf"
+                        },
+                        {
+                            "repo":  "s2025",
+                            "path":  "exams/Midterm 2 practice questions.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2025/blob/main/exams/Midterm%202%20practice%20questions.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 2 S25.pdf",
+        "bytes":  2812344,
+        "git_blob_sha1":  "fba043a7fbd4a5765c209cf7b36f29fe0690f567",
+        "sha256":  "e70bf5b76a70de8d81260c2ccd02f0555614775376491058244f198fb79a2df0",
+        "sources":  [
+                        {
+                            "repo":  "s2025",
+                            "path":  "exams/Midterm 2 S25.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2025/blob/main/exams/Midterm%202%20S25.pdf"
+                        },
+                        {
+                            "repo":  "f2025",
+                            "path":  "exams/Midterm 2 S25.pdf",
+                            "url":  "https://github.com/mlip-cmu/f2025/blob/main/exams/Midterm%202%20S25.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm 2 S26 MLiP.pdf",
+        "bytes":  1036044,
+        "git_blob_sha1":  "26619d363a21793307f56eeb88f2413465fc5589",
+        "sha256":  "d21a8986343d90f0f526d354cbeedc1a858dc626c8b39cd9575cc5a7f3d30864",
+        "sources":  [
+                        {
+                            "repo":  "s2026",
+                            "path":  "exams/Midterm 2 S26 MLiP.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2026/blob/main/exams/Midterm%202%20S26%20MLiP.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm S23.pdf",
+        "bytes":  910199,
+        "git_blob_sha1":  "ab808c2ff237bf0c736817b0645c09c78ffbc391",
+        "sha256":  "9892dbf4a754a31eaf72ba32c4d6c0cf1bb21e0099b89dd5eac0508dd62103e2",
+        "sources":  [
+                        {
+                            "repo":  "s2023",
+                            "path":  "exams/Midterm S23.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2023/blob/main/exams/Midterm%20S23.pdf"
+                        }
+                    ]
+    },
+    {
+        "file":  "Midterm S24.pdf",
+        "bytes":  462144,
+        "git_blob_sha1":  "70eeaccaef337545f897138c270cad0a1790687a",
+        "sha256":  "5cc76efd09c0d7891c0b2f176d8921fff191dd4600152f7ece830baaa5796c2c",
+        "sources":  [
+                        {
+                            "repo":  "s2024",
+                            "path":  "exams/Midterm S24.pdf",
+                            "url":  "https://github.com/mlip-cmu/s2024/blob/main/exams/Midterm%20S24.pdf"
+                        }
+                    ]
+    }
+]

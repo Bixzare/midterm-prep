@@ -1,0 +1,1097 @@
+10 pipelines - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 92
+Automating and Testing �ML Pipelines
+Machine Learning in Production
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+2 sur 92
+Infrastructure Quality...
+2
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+3 sur 92
+Readings
+Required reading (accidentally assigned last week): Eric Breck, Shanqing Cai, Eric Nielsen, Michael Salib, D. Sculley. The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction. Proceedings of IEEE Big Data (2017)
+3
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+4 sur 92
+Learning Goals
+Decompose an ML pipeline into testable functions
+Implement and automate tests for all parts of the ML pipeline
+Understand testing opportunities beyond functional correctness
+Describe the different testing levels and testing opportunities at each level
+Automate test execution with continuous integration
+4
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+5 sur 92
+Example Repo
+Runnable code versions of all examples in this lecture in this repo:
+https://github.com/mlip-cmu/pipeline-testing
+Feel free to follow along and experiment with it during the lecture
+5
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+6 sur 92
+Thinking in Pipelines
+6
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+7 sur 92
+Common ML Pipeline
+7
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note: Computational notebook
+Containing all code, often also dead experimental code
+​
+​
+8 sur 92
+Notebooks as Production Pipeline?
+Parameterize and use nbconvert?
+8
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+9 sur 92
+9
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+10 sur 92
+Subtle Bugs in Data Wrangling Code
+10
+df['Join_year'] = df.Joined.dropna().map(
+lambda x: x.split(',')[1].split(' ')[1])
+df.loc[idx_nan_age,'Age'].loc[idx_nan_age] =
+df['Title'].loc[idx_nan_age].map(map_means)
+df["Weight"].astype(str).astype(int)
+​
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Notes:
+1 attempting to remove na values from column, not table, drops the whole data frame
+2 loc[] called twice, resulting in assignment to temporary column only, goal was a slice of a slice
+3 astype() is not an in-place operation. the intention is probably to change the type but it doesn’t do it in place
+​
+11 sur 92
+Subtle Bugs in Data Wrangling Code (continued)
+​
+11
+df['Reviws'] = df['Reviews'].apply(int)
+df["Release Clause"] =
+df["Release Clause"].replace(regex=['k'], value='000')
+df["Release Clause"] =
+df["Release Clause"].astype(str).astype(float)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Notes:
+4 typo in column name
+5&6 modeling problem (k vs K)
+12 sur 92
+Subtle Bugs in Data Wrangling Code (continued)
+​
+12
+num = data.Size.replace(r'[kM]+$', '', regex=True).
+astype(float)
+factor = data.Size.str.extract(r'[\d\.]+([KM]+)',
+expand =False)
+factor = factor.replace(['k','M'], [10**3, 10**6]).fillna(1)
+data['Size'] = num*factor.astype(int)
+data["Size"]= data["Size"].
+replace(regex =['k'], value='000')
+data["Size"]= data["Size"].
+replace(regex =['M'], value='000000')
+data["Size"]= data["Size"].astype(str). astype(float)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note: both attempts are broken:
+Variant A, returns 10 for “10k”
+Variant B, returns 100.5000000 for “100.5M”
+13 sur 92
+Silent Mistakes
+Mistakes in ML Pipelines usually do not crash, do not throw exceptions
+Simply producing wrong outputs, poor models, missing updates
+13
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+14 sur 92
+Possible Silent Mistakes in ML Pipelines?�(in each stage)
+14
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+15 sur 92
+Possible Mistakes in ML Pipelines
+Danger of "silent" mistakes in many phases:
+Dropped data after format changes
+Failure to push updated model into production
+Incorrect feature extraction
+Use of stale dataset, wrong data source
+Data source no longer available (e.g web API)
+Telemetry server overloaded
+Negative feedback (telemtr.) no longer sent from app
+Use of old model learning code, stale hyperparameter
+Data format changes between ML pipeline steps
+15
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+16 sur 92
+Pipeline Thinking
+After exploration and prototyping build robust pipeline
+One-off model creation -> repeatable automateable process
+Enables updates, supports experimentation
+Explicit interfaces with other parts of the system (data sources, labeling infrastructure, training infrastructure, deployment, ...)
+Design for change
+16
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+17 sur 92
+Building Robust Pipeline Automation
+Support experimentation and evolution�	Automate�	Design for change�	Design for observability�	Testing the pipeline for robustness
+Thinking in pipelines, not models
+Integrating the Pipeline with other Components
+17
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+18 sur 92
+Focus today: Testing the pipeline
+We tested the model before (and it may still make mistakes)
+Now we test the code around the model
+Data wrangling, training, deployment, etc
+18
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+19 sur 92
+Pipeline Testability and Modularity
+19
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+20 sur 92
+Pipelines are Code
+From experimental notebook code to production code
+Each stage as a function or module
+Well tested in isolation and together
+Robust to changes in inputs (automatically adapt or crash, no silent mistakes)
+Use good engineering practices (version control, documentation, testing, naming, code review)
+20
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+21 sur 92
+Sequential Data Science Code in Notebooks
+How to test??
+​
+21
+# typical data science code from a notebook
+df = pd.read_csv('data.csv', parse_dates=True)
+​
+# data cleaning
+# ...
+​
+# feature engineering
+df['month'] = pd.to_datetime(df['datetime']).dt.month
+df['dayofweek']= pd.to_datetime(df['datetime']).dt.dayofweek
+df['hour'] = pd.to_datetime(df['datetime']).dt.hour
+df['delivery_count'] = boxcox(df['delivery_count'], 0.4)
+df.drop(['datetime'], axis=1, inplace=True)
+​
+dummies = pd.get_dummies(df, columns = ['month',  'weather', 'dayofweek', 'hour'])
+dummies = dummies.drop(['month_1', 'hour_0', 'weather_1'], axis=1)
+​
+X = dummies.drop(['delivery_count'], axis=1)
+y = pd.Series(df['delivery_count'])
+​
+X_train, X_test, y_train, y_test = �		train_test_split(X, y, test_size=0.3, random_state=1)
+​
+# training and evaluation
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+​
+print(lr.score(X_train, y_train))
+print(lr.score(X_test, y_test))
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+22 sur 92
+Testability can be decomposed into...
+Controllability:
+Ability to influence system internal state or behavior by changing its inputs
+Observability
+Degree to which you can determine that the behavior went as expected.
+22
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+23 sur 92
+Testable Code
+Think about testing when writing code
+Unit testing encourages you to write testable code
+Separate parts of the code to make them independently testable
+Abstract functionality behind interface, make it replaceable
+Bonus: Test-Driven Development is a design and development method in which you always write tests before writing code
+23
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+24 sur 92
+Pipeline restructured into separate functions
+24
+def encode_day_of_week(df):
+if 'datetime' not in df.columns: raise ValueError("Column datetime missing")
+if not is_string_dtype(df.datetime): raise ValueError("Invalid type for column datetime")
+df['dayofweek']= pd.to_datetime(df['datetime']).dt.day_name()
+df = pd.get_dummies(df, columns = ['dayofweek'])
+return df
+​
+# ...
+​
+def prepare_data(df):
+df = clean_data(df)
+df = encode_day_of_week(df)
+df = encode_month(df)
+df = encode_weather(df)
+df.drop(['datetime'], axis=1, inplace=True)
+return (df.drop(['delivery_count'], axis=1),
+encode_count(pd.Series(df['delivery_count'])))
+​
+def learn(X, y):
+lr = LinearRegression()
+lr.fit(X, y)
+return lr
+​
+def pipeline():
+train = pd.read_csv('train.csv', parse_dates=True)
+test = pd.read_csv('test.csv', parse_dates=True)
+X_train, y_train = prepare_data(train)
+X_test, y_test = prepare_data(test)
+model = learn(X_train, y_train)
+accuracy = eval(model, X_test, y_test)
+return model, accuracy
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+25 sur 92
+Orchestrating Functions
+​
+​
+​
+​
+​
+​
+​
+Dataflow frameworks like Luigi, DVC, Airflow, d6tflow, and Ploomber support distribution, fault tolerance, monitoring, ...
+Hosted versions like DataBricks and AWS SageMaker Pipelines
+25
+def pipeline():
+train = pd.read_csv('train.csv', parse_dates=True)
+test = pd.read_csv('test.csv', parse_dates=True)
+X_train, y_train = prepare_data(train)
+X_test, y_test = prepare_data(test)
+model = learn(X_train, y_train)
+accuracy = eval(model, X_test, y_test)
+return model, accuracy
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+26 sur 92
+Test the Modules
+26
+def encode_day_of_week(df):
+if 'datetime' not in df.columns: raise ValueError("Column datetime missing")
+if not is_string_dtype(df.datetime): raise ValueError("Invalid type for column datetime")
+df['dayofweek']= pd.to_datetime(df['datetime']).dt.day_name()
+df = pd.get_dummies(df, columns = ['dayofweek'])
+return df
+​
+def test_day_of_week_encoding():
+df = pd.DataFrame({'datetime': ['2020-01-01','2020-01-02','2020-01-08'], �				'delivery_count': [1, 2, 3]})
+encoded = encode_day_of_week(df)
+assert "dayofweek_Wednesday" in encoded.columns
+assert (encoded["dayofweek_Wednesday"] == [1, 0, 1]).all()
+​
+# more tests...
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+27 sur 92
+How to select test cases?
+27
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+28 sur 92
+Modularity fosters Testability
+Breaking code into functions/modules
+Supports reuse, separate development, and testing
+Can test individual parts
+28
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+29 sur 92
+Test Automation
+29
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+30 sur 92
+From Manual Testing to Continuous Integration
+30
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+31 sur 92
+Anatomy of a �Unit Test
+Specification
+Controlled environment
+Test inputs (calls and parameters)
+Expected outputs/behavior (oracle)
+31
+import pandas as pd
+import pytest
+from pipeline import parse_size # code under test
+​
+# common reusable abstractions
+@pytest.fixture
+def app_sizes():
+return pd.Series(["19M", "201k", "2.5M",
+"Varies with device"])
+​
+def test_parse_size_converts_units(app_sizes):
+"""Sizes with k and M suffixes become bytes.
+Other values become NaN."""
+# run code under test
+result = parse_size(app_sizes)
+# check expected results (oracle)
+assert result[:3].tolist() == [19_000_000,
+201_000, 2_500_000]
+assert pd.isna(result[3])
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+32 sur 92
+Unit Testing Pitfalls
+Working code, failing tests
+"Works on my machine"
+Flaky tests, ignored failed tests
+Tests break frequently
+How to avoid?
+32
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+33 sur 92
+Build systems & Continuous Integration
+Automate all build, analysis, test, and deployment steps from a command line call
+Ensure all dependencies and configurations are defined
+Ideally reproducible and incremental
+Distribute work for large jobs
+Track results
+Key CI benefit: Tests are regularly executed, part of process
+33
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+34 sur 92
+Tracking Model Qualities
+Many tools: MLFlow, Neptune, TensorBoard, Weights & Biases, Comet.ml, ...
+34
+More on that in a later MLOps lecture
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+35 sur 92
+Testing Maturity
+35
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+36 sur 92
+36
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+37 sur 92
+Case Study: Covid-19 Detection
+(from S20 midterm; assume model deployment in the cloud)
+​
+37
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Jump to 44 seconds
+38 sur 92
+Data Tests
+Feature expectations are captured in a schema.
+All features are beneficial.
+No feature’s cost is too much.
+Features adhere to meta-level requirements.
+The data pipeline has appropriate privacy controls.
+New features can be added quickly.
+All input feature code is tested.
+38
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+39 sur 92
+Tests for Model Development
+Model specs are reviewed and submitted.
+Offline and online metrics correlate.
+All hyperparameters have been tuned.
+The impact of model staleness is known.
+A simpler model is not better.
+Model quality is sufficient on important data slices.
+The model is tested for considerations of inclusion.
+39
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+40 sur 92
+ML Infrastructure Tests
+Training is reproducible.
+Model specs are unit tested.
+The ML pipeline is Integration tested.
+Model quality is validated before serving.
+The model is debuggable.
+Models are canaried before serving.
+Serving models can be rolled back.
+40
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+41 sur 92
+Monitoring Tests
+Dependency changes result in notification.
+Data invariants hold for inputs.
+Training and serving are not skewed.
+Models are not too stale.
+Models are numerically stable.
+Computing performance has not regressed.
+Prediction quality has not regressed.
+41
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+42 sur 92
+Testing across boundaries: Minimizing and Stubbing Dependencies
+42
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+43 sur 92
+Real Pipelines can be Complex
+43
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+44 sur 92
+How to unit test component with dependency on other code?
+44
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+45 sur 92
+How to Test Parts of a System?
+45
+# original implementation hardcodes external API
+def clean_gender(df):
+def clean(row):
+if pd.isnull(row['gender']):
+row['gender'] = gender_api_client.predict(�			row['firstname'], row['lastname'], row['location'])
+return row
+return df.apply(clean, axis=1)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+46 sur 92
+Automating Test Execution
+46
+def test_do_not_overwrite_gender():
+df = pd.DataFrame({'firstname': ['John', 'Jane', 'Jim'],
+'lastname': ['Doe', 'Doe', 'Doe'],
+'location': ['Pittsburgh, PA', 'Rome, Italy', 'Paris, PA '],
+'gender': [np.nan, 'F', np.nan]})
+out = clean_gender(df, model_stub)
+assert(out['gender'] ==['M', 'F', 'M']).all()
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+47 sur 92
+Decoupling from Dependencies
+Replace concrete API with an interface that caller can parameterize
+​
+47
+def clean_gender_col(df, model):
+def clean(row):
+if pd.isnull(row['gender']):
+row['gender'] = model(row['firstname'],
+row['lastname'],
+row['location'])
+return row
+return df.apply(clean, axis=1)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+48 sur 92
+Stubbing the Dependency
+48
+def test_do_not_overwrite_gender():
+def model_stub(first, last, location):
+return 'M'
+​
+df = pd.DataFrame({'firstname': ['John', 'Jane', 'Jim'], �				'lastname': ['Doe', 'Doe', 'Doe'], �				'location': ['Pittsburgh, PA', 'Rome, Italy', 'Paris, PA '], �				'gender': [np.nan, 'F', np.nan]})
+out = clean_gender(df, model_stub)
+assert(out['gender'] ==['M', 'F', 'M']).all()
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+49 sur 92
+General Testing Strategy: Decoupling Code Under Test
+(Mocking frameworks provide infrastructure for expressing such tests compactly.)
+49
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+50 sur 92
+Unit Tests with LLM Calls
+Tests that call a live model are slow, expensive, hit rate limits, and are flaky
+Temperature 0 alone does not make a test deterministic
+Inference output depends on the batch size of the server
+Providers update models behind the same model name
+Flaky tests get ignored
+Avoid real LLM calls in unit tests
+50
+Thinking Machines Lab. Defeating Nondeterminism in LLM Inference. Blog, Sept 2025.
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+51 sur 92
+Stubbing the Model
+Hardcoded/handwritten LLM responses
+51
+class ScriptedLLM:
+def __init__(self, *replies):
+self.replies, self.prompts = list(replies), []
+def __call__(self, prompt):
+self.prompts.append(prompt)   # observability: what did the model see?
+return self.replies.pop(0)    # controllability: what does it answer?
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+52 sur 92
+Record and Replay Model Calls
+Record real model replies once during test development, replay them in CI
+Map recorded answer to specific request (tuple of model ID, prompt, parameters, tools)
+If a recording is missing, fail the test
+52
+class ReplayLLM:
+def __init__(self, path):
+self.replies = json.loads(Path(path).read_text())
+​
+def __call__(self, prompt):
+return self.replies[prompt]   # KeyError if the prompt changed
+​
+def test_recap_with_recorded_reply():
+llm = ReplayLLM("recordings/recap.json")
+recap = summarize_unread(MESSAGES, llm=llm)
+assert recap.message_ids == [3, 7]
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+53 sur 92
+Test Strategies for Code that Calls LLMs
+53
+Layer
+Model replaced by
+When
+Oracle
+Unit and harness tests
+Stub or scripted fake
+Every commit
+Exact
+Integration tests
+Recorded real replies (replay)
+Every commit
+Exact
+Live smoke tests
+Real model API
+Nightly or before release
+Tolerant: valid schema, no errors, latency and cost limits
+Evals (see Behavioral Model Testing)
+Real model
+On prompt or model change
+Statistical threshold, LLM judge
+Testing in production
+Real model
+During/after deployment
+Telemetry (A/B or trend)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+54 sur 92
+Breakout: Testing a Meeting Agent
+Planning agent has access to GitHub issues where team tasks and progress is tracked. Agent generates meeting agendas and updates issue tracker after meeting based on transcript.
+Test function proccess_transcript(transcript) for this: Inside this function, an LLM recognizes actions from meeting transcript (e.g., close #12, assign #5 to Ann, create new “...”). Must refuse to modify issues that do not exist.
+As a group, post and follow up in #lecture, tagging group members and @mlipbot: Write a (python-ish) test with stubs for this behavior
+54
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+55 sur 92
+Compound AI Systems
+55
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+56 sur 92
+“Modern AI Pipelines”
+Less focus on data wrangling, model training/fine tuning, �more on prompting (“context engineering”)
+Multiple LLM calls
+Integration with tools (retrieval, send message, …)
+56
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+57 sur 92
+Silent Mistakes in Compound AI Systems?
+Recall:
+Prompt templates
+Sequences and routing of models/prompts
+Retrieval augmented generation
+Agents
+Prompt optimization
+Memory and harness optimization
+57
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+58 sur 92
+Possible Mistakes in Compound AI Systems
+A prompt variable is empty or None, but the model still answers fluently
+Context truncation drops the system prompt or the newest messages
+Output stops at max_tokens: cut-off JSON, the parser returns a default value
+A tool fails, the model gets an empty result and invents an answer
+A retry after a timeout runs a side-effect tool two times (e.g., send email)
+RAG index is stale, or uses a different embedding model than the queries
+Retrieval filter bug returns documents of a different user
+Model alias moves to a new snapshot, or the model is retired; fallback runs silently
+Cache key without model or prompt version returns old answers
+Moderation service times out, the pipeline skips the check ("fails open")
+Telemetry without prompt version: cannot link cost or feedback to a change
+58
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+59 sur 92
+Subtle Bugs in Context Assembly Code
+59
+context = history[:MAX_MESSAGES]          # keeps oldest, drops newest
+messages = ([system] + history)[-MAX_MESSAGES:]  # drops system prompt
+Template("Recap for {{ user }}: {{ msgs }}").render(msgs=m)
+# Jinja2: missing variable -> ""
+if len(prompt) > 8000: ...               # characters, not tokens
+try: recap = json.loads(reply.text)
+except json.JSONDecodeError: recap = {"summary": ""}  # silent default
+try: result = tool(**args)
+except Exception: result = ""            # model sees "no data"
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+These are the LLM versions of the pandas bugs from earlier. None of them crash. Each one gives the model bad input, and the model still gives a fluent answer.
+The slice keeps the oldest messages and drops the newest one, which is the current question.
+The "fix" keeps the newest messages but drops the system prompt. Only long conversations show this.
+Jinja2 renders a missing variable as an empty string. Use StrictUndefined.
+len() counts characters, but limits are in tokens. Use the tokenizer.
+A cut-off or fenced JSON reply becomes an empty summary. Nobody sees the error.
+A failed tool returns "", so the model thinks there is no data: "You have no meetings tomorrow."
+Message: the model hides the mistake, so we must test the code around the model. The tests come on the "Test Context Assembly Code" slide.
+​
+60 sur 92
+Agents: Test the Harness, not the Model
+Test correct context assembly
+Test how the model processes tool calls
+Test skill loading, memory updates, workflows
+Test safeguards, hooks, sandboxes, subagents
+Tests the tools
+Test error handling
+60
+An Empirical Study of Testing Practices in Open Source AI Agent Frameworks and Agentic Applications. Empirical Software Engineering, 2026 (arXiv:2509.19185).
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+61 sur 92
+Fail-Plausible: Silent Mistakes Get Worse
+ML pipeline: a mistake gives wrong data, often with some visible symptom
+LLM pipeline: the model turns an error into a fluent, plausible answer ("fail-plausible")
+"You have no meetings tomorrow" when the calendar API failed
+409 fixed bugs in 5 agent frameworks:
+76% of symptoms are wrong or missing results, not crashes
+The model-integration layer has the most bugs, but only 47% of its fixes add tests
+Detect errors outside the model's text: error fields, counters, alerts
+Tests assert on the state of the harness, not only on the answer
+61
+Wu. When Errors Become Narratives: silent failures in a production LLM agent runtime. arXiv:2606.14589, 2026 (preprint). | Understanding Bugs in Modern Agentic Frameworks. arXiv:2604.08906, 2026.
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+62 sur 92
+Breakout 2: Testing the Meeting Agent
+Planning agent has access to GitHub issues where team tasks and progress is tracked. Agent generates meeting agendas and updates issue tracker after meeting based on transcript.
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Identify 10 useful tests for the agent harness (identify what to test, no need to explain how or write code)
+62
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+63 sur 92
+Real Infrastructure Bugs at an LLM Provider
+Anthropic postmortem (Sept 2025): three overlapping bugs reduced answer quality for some users
+Routing bug: some requests went to servers configured for a different context window
+Server misconfiguration corrupted token generation (e.g., characters of the wrong language)
+Compiler bug in approximate top-k sampling
+Silent mistakes, not model bugs, tests did not find them
+63
+Anthropic. A postmortem of three recent issues. Engineering blog, Sept 2025. https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+64 sur 92
+Testing Error Handling / Infrastructure Robustness
+64
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+65 sur 92
+General Error Handling Strategies
+Avoid silent errors
+Recover locally if possible, propagate error if necessary -- fail entire task if needed
+Explicitly handle exceptional conditions and mistakes
+Test correct error handling
+If logging only, is anybody analyzing log files?
+65
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+66 sur 92
+Test for Expected Exceptions
+66
+def test_learning_fails_with_missing_data():
+df = pd.DataFrame({})
+with pytest.raises(NoDataError):
+learn(df)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+67 sur 92
+Test Recovery Mechanisms with Stub
+Use stubs to inject artificial faults
+67
+## testing retry mechanism
+from retry.api import retry_call
+import pytest
+# stub of a network connection, sometimes failing
+class FailedConnection(Connection):
+remaining_failures = 0
+def __init__(self, failures):
+self.remaining_failures = failures
+def get(self, url):
+print(self.remaining_failures)
+self.remaining_failures -= 1
+if self.remaining_failures >= 0:
+raise TimeoutError('fail')
+return "success"
+# function to be tested, with recovery mechanism
+def get_data(connection, value):
+def get(): return connection.get('https://replicate.npmjs.com/registry/'+value)
+return retry_call(get,
+exceptions = TimeoutError, tries=3, delay=0.1, backoff=2)
+# 3 tests for no problem, recoverable problem, and not recoverable
+def test_no_problem_case():
+connection = FailedConnection(0)
+assert get_data(connection, '') == 'success'
+def test_successful_recovery():
+connection = FailedConnection(2)
+assert get_data(connection, '') == 'success'
+def test_exception_if_unable_to_recover():
+connection = FailedConnection(10)
+with pytest.raises(TimeoutError):
+get_data(connection, '')
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+68 sur 92
+Test Error Handling throughout Pipeline
+Is invalid data rejected / repaired?
+Are missing data updates raising errors?
+Are unavailable APIs triggering errors?
+Are failing deployments reported?
+68
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+69 sur 92
+Test Error Handling for Model APIs
+Inject LLM-specific faults with stubs:
+rate limit (HTTP 429 with retry-after), overload (5xx), timeout
+context too long, output cut off at max_tokens, refusal
+model not found (retired model)
+Test the recovery mechanisms:
+retry obeys retry-after and stops after N attempts
+fallback to a second model or provider; clear degraded answer
+token and cost budget per request
+a retry does not repeat a side-effect tool call (idempotency key)
+69
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+70 sur 92
+Inject Model API Faults with a Stub
+70
+class FlakyModel:
+def __init__(self, failures):
+self.failures, self.calls = list(failures), 0
+def __call__(self, prompt):
+self.calls += 1
+if self.failures:
+raise self.failures.pop(0)
+return "ok"
+​
+def test_fallback_after_rate_limits():
+primary = FlakyModel([RateLimitError(retry_after=0)] * 3)
+backup = FlakyModel([])
+client = LLMClient([primary, backup], max_attempts=3)
+assert client.complete("hi") == "ok"
+assert primary.calls == 3 and backup.calls == 1
+​
+def test_no_duplicate_email_after_timeout():
+outbox = FakeOutbox(fail_first_ack=True)  # email sent, ack times out
+send_with_retry(outbox, email, idempotency_key="req-42")
+assert len(outbox.sent) == 1
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+71 sur 92
+Log Error Occurrence
+Even when reported or mitigated, log the issue
+Allows later analysis of frequency and patterns
+Monitoring systems can raise alarms for anomalies
+71
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+72 sur 92
+Example: Error Logging
+72
+from prometheus_client import Counter
+connection_timeout_counter = Counter(
+'connection_retry_total',
+'Retry attempts on failed connections')
+class RetryLogger():
+def warning(self, fmt, error, delay):
+connection_timeout_counter.inc()
+​
+retry_logger = RetryLogger()
+def get_data(connection, value):
+def get(): return connection.get('https://replicate.npmjs.com/registry/'+value)
+return retry_call(get,
+exceptions = TimeoutError, tries=3, delay=0.1, backoff=2,
+logger = retry_logger)
+More on that in a later MLOps lecture
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+73 sur 92
+Test Monitoring
+Inject/simulate �faulty behavior
+Mock out �notification service �used by monitoring
+Assert notification
+73
+class FakeNotifier:
+def __init__(self):
+self.messages = []
+def send(self, msg):
+self.messages.append(msg)
+​
+def test_alert_when_server_down():
+server = FakeServer()
+notifier = FakeNotifier()
+monitor = Monitor(server, notifier)
+server.stop()
+server.request(); server.request()
+monitor.check()        # or wait
+assert len(notifier.messages) == 1
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+74 sur 92
+Testing Error Handling in Compound AI System
+def test_agent_handles_tool_failure():
+"""Agent should gracefully handle a tool that errors out."""
+def failing_calendar(date_range):
+raise ConnectionError("Calendar API unavailable")
+result = react_agent("What meetings do I have tomorrow?",
+tools={"get_calendar": failing_calendar},
+max_steps=10, llm=fake_llm)
+assert "unavailable" in result.answer.lower() or result.terminated
+74
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+75 sur 92
+Test Monitoring in Production
+Like fire drills (manual tests may be okay!)
+Manual tests in production, repeat regularly
+Actually take down service or trigger wrong signal to monitor
+​
+75
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+76 sur 92
+Where to Focus Testing?
+76
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+77 sur 92
+Testing in ML Pipelines
+Usually assume ML libraries already tested (pandas, sklearn, etc)
+Focus on custom code
+data quality checks
+data wrangling (feature engineering)
+training setup
+interaction with other components
+Consider tests of latency, throughput, memory, ...
+77
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+78 sur 92
+Testing Data Quality Checks
+Test correct detection of problems
+​
+​
+​
+Test correct error handling or repair of detected problems
+​
+​
+78
+def test_invalid_day_of_week_data():
+...
+def test_fill_missing_gender():
+...
+def test_exception_for_missing_data():
+...
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+79 sur 92
+Test Data Wrangling Code
+79
+num = data.Size.replace(r'[kM]+$', '', regex=True).
+astype(float)
+factor = data.Size.str.extract(r'[\d\.]+([KM]+)',
+expand =False)
+factor = factor.replace(['k','M'], [10**3, 10**6]).fillna(1)
+data['Size'] = num*factor.astype(int)
+data["Size"]= data["Size"].
+replace(regex =['k'], value='000')
+data["Size"]= data["Size"].
+replace(regex =['M'], value='000000')
+data["Size"]= data["Size"].astype(str). astype(float)
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note: both attempts are broken:
+Variant A, returns 10 for “10k”
+Variant B, returns 100.5000000 for “100.5M”
+80 sur 92
+Test Context Assembly and Result Parsing
+80
+def test_truncation_keeps_system_prompt_and_newest():
+history = [message(f"m{i}") for i in range(100)]
+messages = build_context(SYSTEM, history, token_budget=500)
+assert messages[0] == SYSTEM
+assert messages[-1] == history[-1]
+assert count_tokens(messages) <= 500
+Only 21.9% of prompt changes are described in commit messages: Tafreshipour et al. Prompting in the Wild. MSR 2025.
+def test_recap_recovers_from_invalid_json():
+llm = ScriptedLLM('{"summary": "Standup moved to',  # cut off
+'{"summary": "Standup moved to 10am"}')
+recap = summarize_unread(MESSAGES, llm=llm)
+assert recap.summary == "Standup moved to 10am"
+assert len(llm.prompts) == 2                        # retried once
+assert "invalid JSON" in llm.prompts[-1]            # error sent back
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+81 sur 92
+Test Model Training Setup?
+Execute training with small sample data
+Ensure shape of model and data as expected (e.g., tensor dimensions)
+81
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+82 sur 92
+Test Interactions with Other Components
+Test error handling for detecting connection/data problems
+loading training data
+feature server
+uploading serialized model
+A/B testing infrastructure
+82
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+83 sur 92
+Integration and system tests
+83
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Notes:
+Software is developed in units that are later assembled. Accordingly we can distinguish different levels of testing.
+Unit Testing - A unit is the "smallest" piece of software that a developer creates. It is typically the work of one programmer and is stored in a single file. Different programming languages have different units: In C++ and Java the unit is the class; in C the unit is the function; in less structured languages like Basic and COBOL the unit may be the entire program.
+Integration Testing - In integration we assemble units together into subsystems and finally into systems. It is possible for units to function perfectly in isolation but to fail when integrated. For example because they share an area of the computer memory or because the order of invocation of the different methods is not the one anticipated by the different programmers or because there is a mismatch in the data types. Etc.
+System Testing - A system consists of all of the software (and possibly hardware, user manuals, training materials, etc.) that make up the product delivered to the customer. System testing focuses on defects that arise at this highest level of integration. Typically system testing includes many types of testing: functionality, usability, security, internationalization and localization, reliability and availability, capacity, performance, backup and recovery, portability, and many more.
+Acceptance Testing - Acceptance testing is defined as that testing, which when completed successfully, will result in the customer accepting the software and giving us their money. From the customer's point of view, they would generally like the most exhaustive acceptance testing possible (equivalent to the level of system testing). From the vendor's point of view, we would generally like the minimum level of testing possible that would result in money changing hands. Typical strategic questions that should be addressed before acceptance testing are: Who defines the level of the acceptance testing? Who creates the test scripts? Who executes the tests? What is the pass/fail criteria for the acceptance test? When and how do we get paid?
+​
+​
+84 sur 92
+Integration and �system tests
+Test larger units of behavior
+Often based on use cases or user stories -- from the customer’s perspective
+84
+# Story: recap shows unread messages
+​
+def test_recap_lists_unread_only():
+llm = ReplayLLM("recap.json")
+app = TestClient(create_app(llm))
+app.post("/send", json=MSG_1)
+app.post("/send", json=MSG_2)
+app.post("/read", json={"id": 1})
+r = app.get("/recap")
+assert r.status_code == 200
+assert r.json()["ids"] == [2]
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+85 sur 92
+Integration tests
+Test combined behavior of multiple functions
+85
+def test_cleaning_with_feature_eng():
+d = load_test_data()
+cd = clean(d)
+f = feature3.encode(cd)
+assert no_missing_values(f["m"])
+assert max(f["m"]) <= 1.0
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+86 sur 92
+Test Integration of Components
+86
+// making predictions with an ensemble of models
+function predict_price(data, models, timeoutms) {
+// send asynchronous REST requests all models
+const requests = models.map(model => rpc(model, data, {timeout: timeoutms}).�				 then(parseResult).catch(e => -1))
+// collect all answers and return average if at least two models succeeded
+return Promise.all(requests).then(predictions => {
+const success = predictions.filter(v => v >= 0)
+if (success.length < 2) throw new Error("Too many models failed")
+return success.reduce((a, b) => a + b, 0) / success.length
+})
+}
+// test ensemble of models
+const timeout = 500, M1 = "http://localhost:3000/predict", ...
+beforeAll(() => {
+// launch model 1 API at address M1
+// launch model 2 API at address M2
+// launch model API with timeout at address M3
+})
+afterAll(() => { /* shut down all model APIs */ })
+​
+test("success despite timeout", async () => {
+const start = performance.now();
+const val = await predict_price(input, [M1, M2, M3], timeout)
+expect(performance.now() - start).toBeLessThan(2 * timeout)
+expect(val).toBeGreaterThan(0)
+})
+​
+test("fail on too many timeouts", async () => {
+const start = performance.now();
+await expect(predict_price(input, [M1, M3, M3], timeout))
+.rejects.toThrow("Too many models failed")
+expect(performance.now() - start).toBeLessThan(2 * timeout)
+})
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+87 sur 92
+End-To-End Test of Entire Pipeline
+87
+def test_pipeline():
+train = pd.read_csv('pipelinetest_training.csv', parse_dates=True)
+test = pd.read_csv('pipelinetest_test.csv', parse_dates=True)
+X_train, y_train = prepare_data(train)
+X_test, y_test = prepare_data(test)
+model = learn(X_train, y_train)
+accuracy = eval(model, X_test, y_test)
+assert accuracy > 0.9
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+88 sur 92
+System Testing from a User Perspective
+Test the product as a whole, not just components
+Click through user interface, achieve task �(often manually performed)
+Derived from requirements (use cases, user stories)
+Testing in production
+88
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+89 sur 92
+Bonus: Data Linter at Google
+Miscoding
+Number, date, time as string
+Enum as real
+Tokenizable string (long strings, all unique)
+Zip code as number
+Outliers and scaling
+Unnormalized feature (varies widely)
+Tailed distributions
+Uncommon sign
+Packaging
+Duplicate rows
+Empty/missing data
+89
+Further readings: Hynes, Nick, D. Sculley, and Michael Terry. The data linter: Lightweight, automated sanity checking for ML data sets. NIPS MLSys Workshop. 2017.
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+90 sur 92
+Summary
+90
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+91 sur 92
+Summary
+Beyond model and data quality: Quality of the infrastructure matters, danger of silent mistakes
+Automate pipelines to foster testing, evolution, and experimentation
+Many SE techniques for test automation, testing robustness, test adequacy, testing in production useful for infrastructure quality
+91
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+92 sur 92
+Further Readings
+O'Leary, Katie, and Makoto Uchida. "Common problems with Creating Machine Learning Pipelines from Existing Code." Proc. Third Conference on Machine Learning and Systems (MLSys) (2020).
+Eric Breck, Shanqing Cai, Eric Nielsen, Michael Salib, D. Sculley. The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction. Proceedings of IEEE Big Data (2017)
+Zinkevich, Martin. Rules of Machine Learning: Best Practices for ML Engineering. Google Blog Post, 2017
+Serban, Alex, Koen van der Blom, Holger Hoos, and Joost Visser. "Adoption and Effects of Software Engineering Best Practices in Machine Learning." In Proc. ACM/IEEE International Symposium on Empirical Software Engineering and Measurement (2020).
+92
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note

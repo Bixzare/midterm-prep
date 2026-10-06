@@ -1,0 +1,106 @@
+[
+  {
+    "title": "Automating and Testing ML Pipelines",
+    "url": "https://docs.google.com/presentation/d/1IuspK3yVIuvCySZuMqoLc4o8WS3AEVxwnKiT8FOgYP4/edit?usp=sharing",
+    "text": "slides/automating-and-testing-ml-pipelines.txt",
+    "pdf": "slides/automating-and-testing-ml-pipelines.pdf",
+    "bytes": 2280273,
+    "sha256": "b605316eadf83fbe9d6aaf36d09e6f2d221f800b59613e77c37b158fcb085c37"
+  },
+  {
+    "title": "Behavioral Model Testing",
+    "url": "https://docs.google.com/presentation/d/1CwF4Z-tsuW-SqXd9KItClmWB-_X5UroMPpfhsesjRYU/edit?usp=sharing",
+    "text": "slides/behavioral-model-testing.txt",
+    "pdf": "slides/behavioral-model-testing.pdf",
+    "bytes": 3813670,
+    "sha256": "ee43ea537f1a85af6e43f8d504b369e8632ecf8592e4ced01d6ab483b5cbf628"
+  },
+  {
+    "title": "Correctness and Risk",
+    "url": "https://docs.google.com/presentation/d/1GfH7wYM833xKFKmkrYqHWyUgctuaSFD6ACBbwu0O3jw/edit?usp=sharing",
+    "text": "slides/correctness-and-risk.txt",
+    "pdf": "slides/correctness-and-risk.pdf",
+    "bytes": 7601793,
+    "sha256": "7c4026d1cc7cdc06f3a2dd37b99e8a97857c3a99f1fe19b557d750fcb76ec442"
+  },
+  {
+    "title": "Data Quality",
+    "url": "https://docs.google.com/presentation/d/1gP7GbYW9iEEAAI87eaLF4IYmZx3FWeT7b9KxEviHInU/edit?usp=sharing",
+    "text": "slides/data-quality.txt",
+    "pdf": "slides/data-quality.pdf",
+    "bytes": 4511521,
+    "sha256": "36d6bc69210241b4d77ae57c253adf41b03c4bc15641c01781edc91b1a65d7fb"
+  },
+  {
+    "title": "Deploying a Model",
+    "url": "https://docs.google.com/presentation/d/1RpM4bfnefP_jda0UQTBRSLK6BY7W3unB4vSbjBQh7mM/edit?usp=sharing ",
+    "text": "slides/deploying-a-model.txt",
+    "pdf": "slides/deploying-a-model.pdf",
+    "bytes": 4218626,
+    "sha256": "2c4431c71dce04057e144ec79ce0c07b45f02114e6de60e4204e2eb75f734e6b"
+  },
+  {
+    "title": "Fostering Interdisciplinary (Student) Teams",
+    "url": "https://docs.google.com/presentation/d/1JtFBCB2Zm6Dy0s8E98rmGUzLit03zVhyTVGzv0XkYrA/edit?usp=sharing",
+    "text": "slides/fostering-interdisciplinary-student-teams.txt",
+    "pdf": "slides/fostering-interdisciplinary-student-teams.pdf",
+    "bytes": 1674852,
+    "sha256": "08bffae82b1c34a61d47a48d11a6af6b08d9e2800a2beca1b8ec6e2d25f3e4af"
+  },
+  {
+    "title": "Introduction and Motivation",
+    "url": "https://docs.google.com/presentation/d/1BpS3K6OFcKM6VRp2OeyVH_A-2quO5Ky4eLXzT_jglO8/edit?usp=sharing",
+    "text": "slides/introduction-and-motivation.txt",
+    "pdf": "slides/introduction-and-motivation.pdf",
+    "bytes": 3759501,
+    "sha256": "4f87b07039306cf7fe8bd7b2198a5ad280c2451dd80496d662e6216233cc3904"
+  },
+  {
+    "title": "Model Quality",
+    "url": "https://docs.google.com/presentation/d/1Pm8oH4JJVNCg01QzUpAsiemyknhkAF-7b5DxjbnnWmc/edit?usp=sharing",
+    "text": "slides/model-quality.txt",
+    "pdf": "slides/model-quality.pdf",
+    "bytes": 3177831,
+    "sha256": "9ec008b90c0d383b5363172248b5b85e2e0cc777f235d6ad1df2c1b6d9a8b199"
+  },
+  {
+    "title": "Planning for Mistakes",
+    "url": "https://docs.google.com/presentation/d/1v_LTMhbBJvZ-h2y-xxvBf79ad7G23Rrfxa5E_OJEwWA/edit?usp=sharing",
+    "text": "slides/planning-for-mistakes.txt",
+    "pdf": "slides/planning-for-mistakes.pdf",
+    "bytes": 5346114,
+    "sha256": "ce8f37984787c13233365c843739dd8cb8b77bf129ce75eacbc9b399db127d5c"
+  },
+  {
+    "title": "Planning for Operations",
+    "url": "https://docs.google.com/presentation/d/1u9OSCalPWSgEKZpMIuXj_t_E_PDt-8otF5WgtarZf5E/edit?usp=sharing",
+    "text": "slides/planning-for-operations.txt",
+    "pdf": "slides/planning-for-operations.pdf",
+    "bytes": 3575750,
+    "sha256": "cdd29ed47e0a411563ef853a8612fad07aec438a983a62fad9ed4a484cbb3073"
+  },
+  {
+    "title": "Scaling the System",
+    "url": "https://docs.google.com/presentation/d/157-zNSoxfOsG93JWdjK1OTBN4GvxznvpwOqOMuV1QFk/edit?usp=sharing",
+    "text": "slides/scaling-the-system.txt",
+    "pdf": "slides/scaling-the-system.pdf",
+    "bytes": 2656402,
+    "sha256": "293630a16c2d027413a233686bad597a2730fa57fe2900693785a216d22dbb30"
+  },
+  {
+    "title": "Setting Goals, Gathering Requirements",
+    "url": "https://docs.google.com/presentation/d/1Yt2QQS8AvkFp7W5yuw8oYDRQ92RrlPbhexzyG1SHxJ0/edit?usp=sharing",
+    "text": "slides/setting-goals-gathering-requirements.txt",
+    "pdf": "slides/setting-goals-gathering-requirements.pdf",
+    "bytes": 5552287,
+    "sha256": "1bb4bfb51e9ccf93fc59246816f9e953bcb9c730658f7a04b56c5aa2203bbe89"
+  },
+  {
+    "title": "Testing and Experimenting in Production",
+    "url": "https://docs.google.com/presentation/d/1GcZdFHrTh-NHHsZE4go6Zqxn06sJAdVS1HkrGxFKWtg/edit?usp=sharing",
+    "text": "slides/testing-and-experimenting-in-production.txt",
+    "pdf": "slides/testing-and-experimenting-in-production.pdf",
+    "bytes": 4136010,
+    "sha256": "fc39c3bab9aa18cc744e1ca4d479b41de6371a129ece4e59b792c25cd3f1dee9"
+  }
+]

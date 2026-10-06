@@ -1,0 +1,739 @@
+05 model accuracy - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 77
+Model Quality: Accuracy, Pitfalls, and Measurement
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+First Part: Measuring Prediction Accuracy
+the data scientist's perspective
+2 sur 77
+Administrivia
+Fill out team survey (catme.org) – due Sunday
+I1 grades released
+I2 due tonight
+I3 out for next week (risk/hazard analysis)
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+3 sur 77
+Jumping to QA...
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 77
+Learning Goals
+Select a suitable metric to evaluate prediction accuracy of a model and to compare multiple models
+Select a suitable baseline when evaluating model accuracy
+Know and avoid common pitfalls in evaluating model accuracy
+Explain how software testing differs from measuring prediction accuracy of a model
+​
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 77
+The Model is Part of a System in an Environment
+5
+(CC BY-SA 4.0, Martin Sauter)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 77
+Scope: Model Quality, not ML Algorithm/Data/System Quality
+Today’s focus is on the quality of the produced model, not the algorithm used to learn the model or the data used to train the model or the product around the model
+assuming Decision Tree Algorithm and feature extraction are correctly implemented (according to specification), is the model learned from data any good?
+Focus on measuring quality, not debugging the source of quality problems
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 77
+Out of Scope Today: System-Level Considerations
+Models used by radiologists, humans in the loop
+Radiologists are specialists who do not directly see patients
+Radiologists may not trust model, but are also overworked
+Radiologist must explain findings
+Patient can see findings before physician (CURES act)
+​
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 77
+Out of Scope Today: Model Qualities beyond Accuracy
+But many model qualities matters when building a system beyond just prediction accuracy, e.g.:
+Model size
+Inference latency
+Learning latency
+User interaction model
+Ability to incrementally learn
+Explainability
+Robustness
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+9 sur 77
+Today and Thursday
+Narrow focus on prediction accuracy of the model
+That's difficult enough for now.
+More on system vs model goals and other model qualities later
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 77
+On Terminology
+Model: X̄ → Y
+Performance: In machine learning, "performance" typically refers to accuracy: "this model performs better" = it produces more accurate results
+Be aware of ambiguity across communities (see also: performance in arts, job performance, company performance, performance test (bar exam) in law, software/hardware/network performance)
+When speaking of "time", be explicit: "learning time", "inference latency", ...
+When speaking of model accuracy use "prediction accuracy", …
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 77
+Part 1:
+Measuring Prediction Accuracy for Classification Tasks
+(The Data Scientists Toolbox)
+​
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 77
+Typical Questions
+Compare two models (same or different implementation/learning technology) for the same task:
+Which one supports the system goals better?
+Which one makes fewer important mistakes?
+Which one is easier to operate?
+Which one is better overall?
+Is either one good enough?
+​
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 77
+Concept check: Accuracy, Confusion Matrix, Precision, Recall, F1, False Positive/ False Negative, AUC, Baseline?
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+14 sur 77
+Case Study: Cancer Prognosis
+​
+We should stop training radiologists now. It’s just completely obvious that within five years, deep learning is going to do better than radiologists. – Geoffrey Hinton, 2016
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Application to be used in hospitals to screen for cancer, both as routine preventative measure and in cases of specific suspicions. Supposed to work together with physicians, not replace.
+15 sur 77
+Confusion/Error Matrix
+Accuracy: What's the percentage that the model correctly predicted whether a patient has cancer or not?
+​
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+16 sur 77
+Is 99% Accuracy good?
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+17 sur 77
+Is 99% Accuracy even defined?
+What does it mean for a food-ordering agent to be "99% accurate"?
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+18 sur 77
+Is 99% Accuracy good?
+Depends on problem; can be excellent, good, mediocre, terrible
+10% accuracy can be good on some tasks (information retrieval)
+Always compare to a base rate!
+Reduction in error =
+​
+from 99.9% to 99.99% accuracy = 90% reduction in error
+from 50% to 75% accuracy = 50% reduction in error
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+19 sur 77
+Baselines?
+Suitable baselines for cancer prognosis? For audit risk prediction?
+​
+​
+​
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Many forms of baseline possible, many obvious: Random, all true, all false, repeat last observation, simple heuristics, simpler model
+20 sur 77
+Consider Different Forms of Baselines
+Lower bound – result of a baseline solution (less complex or trivial system the performance of which is supposed to be easily surpassed)
+Random-choice baseline
+Most-frequent-value baseline
+Simple heuristic
+Upper bound – oracle experiment result, human judgements, etc.
+Oracle: an imaginary entity that makes the best possible decisions, given practical limitations.
+​
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+21 sur 77
+Most-frequent-value Baseline for Imbalanced Classes
+Random predictor
+​
+​
+​
+.5 accuracy
+​
+Never cancer predictor
+​
+​
+​
+.999 accuracy
+​
+21
+Predicting unlikely events – 1 in 2000 has cancer (stats)
+​
+See also Bayesian statistics
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 77
+Besides Accuracy: Precision, Recall, F1
+Measuring success of correct classifications (or missing results):
+Recall = TP/(TP+FN)
+aka true positive rate, hit rate, sensitivity; higher is better
+False negative rate = FN/(TP+FN) = 1 - recall
+aka miss rate; lower is better
+Measuring rate of false classifications (or noise):
+Precision = TP/(TP+FP)
+aka positive predictive value; higher is better
+False positive rate = FP/(FP+TN)
+aka fall-out; lower is better
+Combined measure (harmonic mean): F1 score =
+22
+(CC BY-SA 4.0 by Walber)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 77
+Consider the Baseline Probability
+Random predictor
+​
+​
+​
+.5 accuracy
+​
+Never cancer predictor
+​
+​
+​
+.999 accuracy
+​
+23
+Predicting unlikely events – 1 in 2000 has cancer (stats)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+24 sur 77
+Area Under the Curve
+Turning numeric prediction into classification with threshold ("operating point").
+​
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: The plot shows the recall precision/tradeoff at different thresholds (the thresholds are not shown explicitly). Curves closer to the top-right corner are better considering all possible thresholds. Typically, the area under the curve is measured to have a single number for comparison
+25 sur 77
+False pos. and false neg. equally bad?
+Accuracy does not take into account the differences in the misclassification costs for each class. Misclassifying a patient with a serious disease as having a benign condition is more costly.
+Suggesting products to buy on e-commerce site
+Identifying human trafficking at the border
+Predicting high demand for ride sharing services
+Predicting recidivism chance
+Approving loan applications
+User asks for a vegetarian pizza recommendation from food ordering agent; agent always returns five options, one of them is pepperoni.
+No answer vs wrong answer?
+(This requires understanding the larger system!)
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+26 sur 77
+Extreme Classifiers
+Identifies every instance as negative (e.g., no cancer):
+0% recall (finds none of the cancer cases)
+100% false negative rate (misses all actual cancer cases)
+undefined precision (no false predictions, but no predictions at all)
+0% false positive rate (never reports false cancer warnings)
+Identifies every instance as positive (e.g., has cancer):
+100% recall (finds all instances of cancer)
+0% false negative rate (does not miss any cancer cases)
+low precision (also reports cancer for all noncancer cases)
+100% false positive rate (all noncancer cases reported as warnings)
+​
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 77
+More Accuracy Measures for Classification Problems
+Lift
+Break even point
+F1 measure, etc
+Log loss (for class probabilities)
+Cohen's kappa, Gini coefficient (improvement over random)
+​
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+28 sur 77
+Many Measures Beyond Classification
+Regression:
+Mean Squared Error (MSE)
+Mean Absolute Percentage Error (MAPE)
+R2 = percentage of variance explained by model
+Rankings:
+Mean Average Precision in first K results (MAP@K)
+Mean Reciprocal Rank (MRR) (average rank for first correct prediction)
+Coverage (percentage of items ever recommended)
+Personalization (how similar predictions are for different users/queries)
+Natural language processing:
+Translation and summarization -> comparing sequences (e.g ngrams) to human results with specialized metrics, e.g. BLEU and ROUGE
+Modeling text → how well its probabilities match actual text, e.g., likelihood or perplexity
+Always Compare Against Baselines!
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+29 sur 77
+Part 2:
+Measurement
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 77
+What is Measurement?
+Measurement is the empirical, objective assignment of numbers, according to a rule derived from a model or theory, to attributes of objects or events with the intent of describing them. – Craner, Bond, “Software Engineering Metrics: What Do They Measure and How Do We Know?"
+A quantitatively expressed reduction of uncertainty based on one or more observations. – Hubbard, “How to Measure Anything …"
+​
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 77
+Examples: What/how do we measure?
+Measuring model quality (cancer progn. model)
+Measuring system quality (cancer progn. system)
+Measuring user satisfaction (radiologists)
+Measuring organizational goals (profits)
+Measuring data scientist’s competency (hiring)
+Measuring software engineer’s productivity (bonus)
+​
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 77
+Everything is Measurable
+If X is something we care about, then X, by definition, must be detectable.
+How could we care about things like “quality,” “risk,” “security,” or “public image” if these things were totally undetectable, directly or indirectly?
+If we have reason to care about some unknown quantity, it is because we think it corresponds to desirable or undesirable results in some way.
+If X is detectable, then it must be detectable in some amount.
+If you can observe a thing at all, you can observe more of it or less of it
+If we can observe it in some amount, then it must be measurable.
+But: Not every measure is precise, not every measure is cost effective
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+33 sur 77
+On Terminology
+Quantification is turning observations into numbers
+Metric and measure refer a method or standard format for measuring something (e.g., number of mistakes per hour)
+Metric and measure synonymous for our purposes (some distinguish metrics as derived from multiple measures, or metrics to be standardizes measures)
+Operationalization (or computation) is identifying and implementing a method to measure some factor (e.g., identifying mistakes from telemetry logs)
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+34 sur 77
+Composing/Decomposing Measures
+Often higher-level measures are composed from lower level measures
+Clear trace from specific low-level measurements to high-level metric
+​
+​
+​
+​
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 77
+Stating Measures Precisely
+Always be precise about what we want to capture!
+"measure accuracy" → "evaluate accuracy with MAPE"
+"evaluate test quality" → "measure branch coverage with Jacoco"
+"measure execution time" → "average and 90%-quantile response time for REST-API x under normal load"
+"assess developer skills" → "measure average lines of code produced per day and number of bugs reported on code produced by that developer"
+"measure customer happiness" → "report response rate and average customer rating on survey shown to 5% of all customers (randomly selected)"
+Ideally: An independent party should be able to independently set up infrastructure to measure outcomes
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+36 sur 77
+Measuring
+Make measurement clear and unambiguous. Ideally, third party can measure independently based on description.
+Three steps:
+Measure: What do we try to capture?
+Data collection: What data is collected and how?
+Computation: How is the measure computed from the data?
+(Possible to repeat recursively when composing measures)
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 77
+How to measure user satisfaction? (Cancer prediction)
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 77
+Three-Step Example
+How to measure user satisfaction?
+Measure: User satisfaction (scale 1-5)
+Data collection: Show popup "How would you rate the diagnostic support today?" with 1-5 stars to 2% of randomly selected radiologists per day.
+Computation: Report average star rating of all responses received in last 7 days.
+Use common sense: No need to write formula for "average". Star ratings are implicitly understood. Some metrics are very common and operationalization is implied (e.g., F1-score).
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+39 sur 77
+Breakout: Measurement
+Describe measurement in three-step structure (measure, data collection, computation) for:
+Model quality of the cancer prognosis model
+A leading indicator for the organizational goal of the company building the cancer prognosis system
+As a group, post to #lecture and tag all group members and @mlipbot. Follow up on @mlipbot comments.
+​
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+40 sur 77
+Breakout: Measurement
+A food-delivery app adds a "surprise me" button to its ordering system. The team wants to know whether the feature is any good.
+State your definition of "good"
+Describe measurement in three-step structure (measure, data collection, computation) for:
+Model quality of the recommendation model
+A leading indicator for the organizational goal of the company
+Be precise enough that another group could implement your measure. As a group, post to #lecture and tag all group members and @mlipbot. Follow up on @mlipbot comments.
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 77
+Measurement Validity
+Construct validity: Are we measuring what we intended to measure?
+Does the abstract concept match the specific scale/measurement used?
+e.g., IQ: What is it actually measuring?
+Other examples: Pain, language proficiency, personality...
+Predictive validity: The extent to which the measurement can be used to explain some other characteristic of the entity being measured
+e.g., Higher SAT scores => higher academic excellence?
+External validity: Concerns the generalization of the findings to contexts and environments, other than the one studied
+e.g., Drug effectiveness on a test group: Does it hold over the general public?
+​
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+42 sur 77
+Streetlight effect
+A type of observational bias
+People tend to look for something where it’s easiest to do so
+Cheap proxy metrics may only poorly correlate with goal:
+number of daily active users as a measure of projected revenue;
+caps lock / curse words vs. "give me more"
+​
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 77
+Risks with Measurements
+Bad statistics: A basic misunderstanding of measurement theory and what is being measured.
+Bad decisions: The incorrect use of measurement data, leading to unintended side effects.
+Bad incentives: Disregard for the human factors, or how the cultural change of taking measurements will affect people.
+​
+43
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+44 sur 77
+Measuring Generalization
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+45 sur 77
+The Legend of the Failed Tank Detector
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Widely shared story, authenticity not clear: AI research team tried to train image recognition to identify tanks hidden in forests, trained on images of tanks in forests and images of same or similar forests without tanks. The model could clearly separate the learned pictures, but would perform poorly on other pictures.
+Turns out the pictures with tanks were taken on a sunny day whereas the other pictures were taken on a cloudy day. The model picked up on the brightness of the picture rather than the presence of a tank, which worked great for the training set, but did not generalize.
+Pictures: https://pixabay.com/photos/lost-places-panzer-wreck-metal-3907364/, https://pixabay.com/photos/forest-dark-woods-trail-path-1031022/
+​
+​
+46 sur 77
+Overfitting in Cancer Prognosis?
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 77
+Concept check: Overfit, Underfit, Train/Validation/Test Split, parameter, hyperparameter?
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 77
+Overfitting/Underfitting
+Overfitting: Model learned exactly for the input data, but does not generalize to unseen data (e.g., exact memorization)
+Underfitting: Model makes very general observations but poorly fits to data (e.g., brightness in picture)
+Typically adjust degrees of freedom during model learning to balance between overfitting and underfitting: can better learn the training data with more freedom (more complex models); but with too much freedom, will memorize details of the training data rather than generalizing
+​
+48
+(CC SA 4.0 by Ghiles)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 77
+Separate Training and Validation Data
+Always test for generalization on unseen validation data (independently sampled, typically from the same distribution)
+Accuracy on training data (or similar measure) used during learning to find model parameters
+​
+​
+​
+​
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+50 sur 77
+Detecting Overfitting
+Change hyperparameter to detect training accuracy (blue)/validation accuracy (red) at different degrees of freedom
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 77
+Crossvalidation
+Motivation
+Evaluate accuracy on different training and validation splits
+Evaluate with small amounts of validation data
+Method: Repeated partitioning of data into train and validation data, train and evaluate model on each partition, average results
+Many split strategies, including
+leave-one-out: evaluate on each datapoint using all other data for training
+k-fold: $k$ equal-sized partitions, evaluate on each training on others
+repeated random sub-sampling (Monte Carlo)
+​
+​
+​
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 77
+Production Data – The Ultimate Unseen Validation Data
+more in a later lecture
+​
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+53 sur 77
+Separate Training, Validation and Test Data
+Often a model is "tuned" manually or automatically on a validation set (hyperparameter optimization)
+In this case, we can overfit on the validation set, separate test set is needed for final evaluation
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 77
+On Terminology
+The decisions in a model (weights, coefficients) are called model parameter of the model, their values are usually learned from the data
+To a software engineer, these are constants in the learned function
+The inputs to the learning algorithm that are not the data are called model hyperparameters
+To a software engineer, these are parameters to the learning algorithm, similar to compiler options
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 77
+Common Pitfalls of Evaluating Model Quality
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 77
+Common Pitfalls of Evaluating Model Quality?
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 77
+0. Using Misleading Quality Measures
+using accuracy, when false positives are more harmful than false negatives
+comparing area under the curve, rather than relevant thresholds
+averaging over all populations, ignoring different results for subpopulations or different risks for certain predictions
+accuracy results on old static test data, when production data has shifted
+results on tiny validation sets
+reporting results without baseline
+...
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+58 sur 77
+1. Data not Representative
+Often neither training nor test data representative of production data
+​
+Adidas size 37 vs. "shoes like LeBron James"
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 77
+1. Data not Representative
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 77
+2. Shortcut Learning
+"Spurious Correlations": Variables are associated but not causally related, due to coincidence or the presence of a certain third, unseen factor.
+​
+60
+Figure from: Geirhos, Robert, et al. "Shortcut learning in deep neural networks." Nature Machine Intelligence 2, no. 11 (2020): 665-673.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 77
+Shortcut Learning
+Caused by non-representative data, to some extent.
+​
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+62 sur 77
+Generalization Beyond Training Data:
+Is this even fair to ask?
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+63 sur 77
+Generalization Beyond Training Data:
+What is "Distribution" for Foundation Models?
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 77
+Representative Test Data in Practice?
+Target distribution may not be known in early stages of the project
+Target distribution may shift over time (“distribution drift”)
+Evaluate the quality and representativeness of your test data (How?)
+Production data is good test data, but unlabeled...
+Monitoring and continuous data collection important! More later
+​
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+65 sur 77
+3. Label Leakage
+65
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Widely shared story, authenticity not clear: AI research team tried to train image recognition to identify tanks hidden in forests, trained on images of tanks in forests and images of same or similar forests without tanks. The model could clearly separate the learned pictures, but would perform poorly on other pictures.
+Turns out the pictures with tanks were taken on a sunny day whereas the other pictures were taken on a cloudy day. The model picked up on the brightness of the picture rather than the presence of a tank, which worked great for the training set, but did not generalize.
+Pictures: https://pixabay.com/photos/lost-places-panzer-wreck-metal-3907364/, https://pixabay.com/photos/forest-dark-woods-trail-path-1031022/
+​
+​
+66 sur 77
+3. Label Leakage
+Models have information they should not have access to!!
+​
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: The image includes metadata. Models have been found to rely heavily on that metadata, for example what kind of device was used to take the scan (mobile vs stationary) or where it was taken (rural vs big hospital).
+​
+​
+67 sur 77
+3. Label Leakage
+Label or close correlates included in inputs
+Examples:
+Input "interview conducted" in turnover prediction encodes human judgement
+Input "has bank account" associates with predicting whether somebody will open one
+Is this a problem or a good thing?
+Be cautious of "too good to be true" results
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+68 sur 77
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+69 sur 77
+4. Data Leakage: Learning from Test Data
+Test data leaks into training data
+surprisingly common in practice
+by accident, incorrect split – or intentional using all data for training
+overlap between multiple datasets used
+data preprocessing on entire dataset
+tuning on validation data (e.g., cross-validation) without separate testing data
+Results in overfitting and misleading accuracy measures
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+70 sur 77
+5. Data Leakage – Overfitting in Continuous Experimentation
+Test data should be used exactly once → danger of overfitting with reuse
+Use of test sets to compare (hyperparameter-tuned) models in dashboards → danger of overfitting
+Need fresh test data regularly
+Statistical techniques to approximate the needed amount of test data and the needed rotation
+​
+70
+Recommended reading: Renggli, Cedric, Bojan Karlaš, Bolin Ding, Feng Liu, Kevin Schawinski, Wentao Wu, and Ce Zhang. "Continuous integration of machine learning models with ease.ml/ci: Towards a rigorous yet practical treatment." arXiv preprint arXiv:1903.00278 (2019).
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+71 sur 77
+5. Data Leakage – Overfit on Benchmarks
+If many researchers publish best results on the same benchmark, collectively they perform "hyperparameter optimization" on the test set
+​
+71
+(Figure by Andrea Passerini)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+(Figure by Andrea Passerini)
+Note: If many researchers publish best results on the same benchmark, collectively they perform "hyperparameter optimization" on the test set
+​
+​
+72 sur 77
+6. Independence of Data: e.g., Temporal
+Attempt to predict the stock price development for different companies based on Twitter posts
+Data: stock prices of 1000 companies over 4 years and Twitter mentions of those companies
+How to split into train–validation?
+​
+​
+72
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: The model will be evaluated on past stock prices knowing the future prices of the companies in the training set. Even if we split by companies, we could observe general future trends in the economy during training
+​
+73 sur 77
+6. Independence of Data: e.g., Temporal
+Attempt to predict the stock price development for different companies based on Twitter posts
+Data: stock prices of 1000 companies over 4 years and Twitter mentions of those companies
+Problems of random train–validation split?
+​
+​
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: The model will be evaluated on past stock prices knowing the future prices of the companies in the training set. Even if we split by companies, we could observe general future trends in the economy during training
+​
+74 sur 77
+6. Independence of Data: e.g., Temporal
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: The curve is the real trend, red points are training data, green points are validation data. If validation data is randomly selected, it is much easier to predict, because the trends around it are known.
+75 sur 77
+Independence of Data: Related Datapoints
+Example: Kaggle competition on detecting distracted drivers
+​
+​
+​
+​
+​
+Relation of datapoints may not be in the data (e.g., driver)
+75
+https://www.fast.ai/2017/11/13/validation-sets/
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+76 sur 77
+Data Dependence in Food Ordering Agent Case Study?
+76
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+77 sur 77
+Preliminary Summary: Common Pitfalls
+Always question the i.i.d. assumption
+Test data not representative
+Dependence between training and test data
+Misleading accuracy metrics
+Evaluating on training or validation data
+Label leakage
+Overfitting on test data through repeated evaluations
+How to avoid? Ensure as part of process?
+Note: i.i.d. = independent and identically distributed
+77
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

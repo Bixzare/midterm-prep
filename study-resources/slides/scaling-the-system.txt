@@ -1,0 +1,695 @@
+12 scaling - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 80
+Scaling the System
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 80
+Administrativa
+Midterm here during lecture time on Thursday (one week from now)	Old midterms on GitHub (link on website)�	Grading rubric from last midterm posted on Slack�	Consider `/breakout` to retry breakout feedback�	Notes allowed (6 sheets of papers, handwritten or printed, both sides)
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+3 sur 80
+Revisit:
+Drift and Data Cascades
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 80
+Data vs Concept Drift
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+5 sur 80
+Drift & Model Decay
+Concept drift (or concept shift)
+properties to predict change over time (e.g., what is credit card fraud)
+model has not learned the relevant concepts
+over time: different expected outputs for same inputs
+Data drift (or covariate shift, virtual drift, distribution shift, or population drift)
+characteristics of input data changes (e.g., customers with face masks)
+input data differs from training data
+over time: predictions less confident, further from training data
+Schema drift (upstream data changes)
+external changes in data pipeline (e.g., format changes in weather service)
+model interprets input data incorrectly
+over time: abrupt changes due to faulty inputs
+How do we fix these drifts?
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 80
+Breakout: Drift
+Scenario: Target inventory management, predicting how much inventory should be in stock next week
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Concept Drift:
+Data Drift:
+Schema Drift:
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 80
+Data Cascades
+"Compounding events causing negative, downstream effects from data issues, that result in technical debt over time."
+​
+​
+7
+Takeaway: Many data quality problems are not technical in nature, but due to bad assumptions, poor knowledge, or bad incentives
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 80
+Common Data Cascades
+Physical world brittleness
+Idealized data, ignoring realities and change of real-world data
+Static data, one time learning mindset, no planning for evolution
+Inadequate domain expertise
+Not understand data and its context
+Involving experts only late for troubleshooting
+​
+Conflicting reward systems
+Missing incentives for data quality
+Not recognizing data quality importance, discard as technicality
+Missing data literacy with partners
+Poor (cross-org.) documentation
+Conflicts at team/organization boundary
+Undetected drift
+​
+8
+Sambasivan, N., et al. (2021). “Everyone wants to do the model work, not the data work”: Data Cascades in High-Stakes AI. In Proc. Conference on Human Factors in Computing Systems.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+9 sur 80
+Today: Scaling Systems
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 80
+Design and operations
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 80
+Suggested Readings
+​
+Nathan Marz. Big Data: Principles and best practices of scalable realtime data systems. Manning, 2015. Chapter 1: A new paradigm for Big Data
+Martin Kleppmann. Designing Data-Intensive Applications. OReilly. 2017.
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 80
+Learning Goals
+Organize different data management solutions and their tradeoffs
+Understand the scalability challenges involved in large-scale systems, including machine learning
+Explain the tradeoffs between batch processing and stream processing and the lambda architecture
+Recommend and justify a design and corresponding technologies for a given system
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 80
+Adding capacity
+Stories of catastrophic success?
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+14 sur 80
+Scaling Strategies
+Efficient Algorithms
+Faster Machines
+More Machines
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+15 sur 80
+Case Study
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Discuss possible architecture and when to predict (and update)
+2020 (Google): more than 4 trillion photos stored, over 1 billion users, 28 billion new photos per week (about 46k/sec)
+16 sur 80
+Code examples for today’s concepts
+Feel free to explore and follow along: �	https://github.com/mlip-cmu/scaling
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+17 sur 80
+Data Management and Processing in ML-Enabled Systems
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+18 sur 80
+Kinds of Data
+Training data
+Input data
+Telemetry data
+(Models)
+all potentially with huge total volumes and high throughput
+need strategies for storage and processing
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+19 sur 80
+Data Management and Processing in ML-Enabled Systems
+Store, clean, and update training data
+Learning process reads training data, writes model
+Prediction task (inference) on demand or precomputed
+Individual requests (low/high volume) or large datasets?
+Often both learning and inference data heavy, high volume tasks
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+20 sur 80
+Distributed Everything
+Distributed data cleaning
+Distributed feature extraction
+Distributed learning
+Distributed large prediction tasks
+Incremental predictions
+Distributed logging and telemetry
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+21 sur 80
+Distributed Systems and AI-Powered Systems
+Learning tasks can take substantial resources
+Datasets too large to fit on single machine
+Nontrivial inference time, many many users
+Large amounts of telemetry
+Experimentation at scale
+Models in safety critical parts
+Mobile computing, edge computing, cyber-physical systems
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 80
+Reminder: T-Shaped People
+Go deeper with: Martin Kleppmann. Designing Data-Intensive Applications. OReilly. 2017.
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 80
+Data Storage Basics
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+24 sur 80
+Relational Data Models
+24
+select p.photo_id, p.path, u.photos_total
+from photos p, users u
+where u.user_id=p.user_id and u.account_name = 'ckaestne'
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+25 sur 80
+Document Data Models
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+26 sur 80
+Log files, unstructured data
+127.0.0.1 - - [06/Dec/2025:02:49:12 +0000] "GET /img13.jpg HTTP/1.1" 200 48213
+127.0.0.1 - - [06/Dec/2025:02:49:35 +0000] "GET /img27.jpg HTTP/1.1" 200 51877
+127.0.0.1 - - [06/Dec/2025:03:52:36 +0000] "GET /main.css HTTP/1.1" 200 2310
+127.0.0.1 - - [06/Dec/2025:04:17:03 +0000] "GET /img13.jpg HTTP/1.1" 200 48213
+127.0.0.1 - - [06/Dec/2025:05:04:54 +0000] "GET /img34.jpg HTTP/1.1" 200 39012
+127.0.0.1 - - [06/Dec/2025:05:38:07 +0000] "GET /img27.jpg HTTP/1.1" 200 51877
+127.0.0.1 - - [06/Dec/2025:05:44:24 +0000] "GET /img13.jpg HTTP/1.1" 200 48213
+127.0.0.1 - - [06/Dec/2025:06:08:19 +0000] "GET /img13.jpg HTTP/1.1" 200 48213
+​
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 80
+Tradeoffs
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+28 sur 80
+Data Encoding
+Plain text (csv, logs)
+Semi-structured, schema-free (JSON, XML)
+Schema-based encoding (relational, Avro, ...)
+Compact encodings (protobuffer, ...)
+​
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+29 sur 80
+Distributed Data Storage
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 80
+Replication vs Partitioning
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 80
+Partitioning
+Divide data:
+Horizontal partitioning: Different rows in different tables; e.g., photos by date/user, hashing often used
+Vertical partitioning: Different columns in different tables; e.g., photo path and date vs. camera setting vs. tagged friends
+Tradeoffs?
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 80
+Replication with Leaders and Followers
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+33 sur 80
+Replication Strategies: Leaders and Followers
+Write to leader, propagated synchronously or async.
+Read from any follower
+Elect new leader on leader outage; catchup on follower outage
+Built in model of many databases (MySQL, MongoDB, ...)
+Benefits and Drawbacks?
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+34 sur 80
+Example: Google File System
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 80
+Beyond Leaders and Followers
+Multi-Leader Replication
+Scale write access, add redundancy
+Requires coordination among leaders and resolution of write conflicts
+Offline leaders (e.g. apps), collaborative editing (like Google Docs, Automerge, Yjs), EDB Postgres Distributed, …
+Leaderless Replication
+Client writes to multiple replica, propagate from there
+Versioning of entries (clock problem)
+Read from multiple replica (quorum required), version repair on reads/background repair process
+e.g. Amazon Dynamo, Cassandra, ScyllaDB
+Transactions
+Multiple operations conducted as one, all or nothing
+Avoids problems such as dirty reads, dirty writes
+Various strategies, including locking and optimistic+rollback
+Overhead in distributed setting
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+36 sur 80
+Data Processing (Overview)
+Services (online)
+Responding to client requests as they come in
+Evaluate: Response time
+Batch processing (offline)
+Computations run on large amounts of data
+Takes minutes to days; typically scheduled periodically
+Evaluate: Throughput
+Stream processing (near real time)
+Processes input events, not responding to requests
+Shortly after events are issued
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 80
+Microservices
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 80
+Microservices
+38
+Mobile app
+(client)
+Search
+search(user, text)
+index(photo)
+Library
+listPhotos(user)
+add(photo), favorite(id)
+Upload
+upload(user, file)
+Albums
+createAlbum(user, name)
+addPhotos(album, ids)
+Prints
+orderPrints(user, ids)
+getOrder(id)
+Embedding model
+embed(image)
+embed(text)
+Object detection
+detectObjects(image)
+Face detection
+detectFaces(image)
+Media
+put(file)
+get(id, size)
+Payment
+charge(user, amount)
+Service
+Data storage
+Replicas
+Calls
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+39 sur 80
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+40 sur 80
+Microservices
+Independent, cohesive services
+Each specialized for one task
+Each with own data storage
+Each independently scalable through multiple instances + load balancer
+Remote procedure calls
+Different teams can work on different services independently (even in different languages)
+But: Substantial complexity from distributed system nature: various network failures, latency from remote calls, ...
+Avoid microservice complexity unless really needed for scalability
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 80
+API Gateway Pattern
+Central entry point, authentication, routing, updates, ...
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+42 sur 80
+Batch Processing
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 80
+Large Jobs
+Analyzing TB of data, typically distributed storage
+Filtering, sorting, aggregating
+Producing reports, models, ...
+43
+cat /var/log/nginx/access.log |
+awk '{print $7}' |
+sort |
+uniq -c |
+sort -r -n |
+head -n 5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+44 sur 80
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+45 sur 80
+Distributed Batch Processing
+Process data locally at storage
+Aggregate results as needed
+Separate plumbing from job logic
+MapReduce as common framework
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+46 sur 80
+MapReduce -- Functional Programming Style
+Similar to shell commands: Immutable inputs, new outputs, avoid side effects
+Jobs can be repeated (e.g., on crashes)
+Easy rollback
+Multiple jobs in parallel (e.g., experimentation)
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 80
+Machine Learning and MapReduce
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Useful for big learning jobs, but also for feature extraction
+​
+​
+48 sur 80
+Dataflow Engines (Spark, Flink, Ray, ...)
+Single job, rather than subjobs
+More flexible than just map and reduce
+Multiple stages with explicit dataflow between them
+Often in-memory data
+Plumbing and distribution logic separated
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 80
+Key Design Principle: Data Locality
+Moving Computation is Cheaper than Moving Data �								-- Hadoop Documentation
+Data often large and distributed, code small
+Avoid transferring large amounts of data
+Perform computation where data is stored (distributed)
+Transfer only results as needed
+"The map reduce way"
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+50 sur 80
+Stream Processing
+Event-based systems, message passing style, publish subscribe
+​
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 80
+Stream Processing (e.g., Kafka)
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 80
+Messaging Systems
+Multiple producers send messages to topic
+Multiple consumers can read messages
+-> Decoupling of producers and consumers
+Message buffering if producers faster than consumers
+Typically some persistency to recover from failures
+Messages removed after consumption or after timeout
+Various error handling strategies (acknowledgements, redelivery, ...)
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+53 sur 80
+Common Designs
+Like shell programs: Read from stream, produce output in other stream → loose coupling
+​
+​
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 80
+Stream Queries
+Processing one event at a time independently
+vs incremental analysis over all messages up to that point
+vs floating window analysis across recent messages
+Works well with probabilistic analyses
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 80
+Consumers
+Multiple consumers share topic for scaling and load balancing
+Multiple consumers read same message for different work
+Partitioning possible
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 80
+Design Questions
+Message loss important? (enforce at-least-once processing)
+Must messages never be processed repeatedly (enforce at-most-once processing)
+Is the message order important?
+Are messages still needed after they are consumed?
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 80
+Stream Processing and AI-enabled Systems?
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Process data as it arrives, prepare data for learning tasks, use models to annotate data, analytics
+58 sur 80
+Reasoning about Dataflows
+Many data sources, many outputs, many copies
+Which data is derived from what other data and how?
+Is it reproducible? Are old versions archived?
+How do you get the right data to the right place in the right format?
+Plan and document data flows
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 80
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 80
+Event Sourcing
+Append only databases
+Record edit events, never mutate data
+Compute current state from all past events, can reconstruct old state
+For efficiency, take state snapshots
+Similar to traditional database logs, but persistent
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 80
+Benefits of Immutability (Event Sourcing)
+All history is stored, recoverable
+Versioning easy by storing id of latest record
+Can compute multiple views
+Compare git
+On a shopping website, a customer may add an item to their cart and then remove it again. Although the second event cancels out the first event [...], it may be useful to know for analytics purposes that the customer was considering a particular item but then decided against it. Perhaps they will choose to buy it in the future, or perhaps they found a substitute. This information is recorded in an event log, but would be lost in a database [...].
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+62 sur 80
+Drawbacks of Immutable Data
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes:
+Storage overhead, extra complexity of deriving state
+Frequent changes may create massive data overhead
+Some sensitive data may need to be deleted (e.g., privacy, security)
+​
+​
+63 sur 80
+The Lambda Architecture
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 80
+3 Layer Storage Architecture
+Batch layer: best accuracy, all data, recompute periodically
+Speed layer: stream processing, incremental updates, possibly approximated
+Serving layer: provide results of batch and speed layers to clients
+Assumes append-only data
+Supports tasks with widely varying latency
+Balance latency, throughput and fault tolerance
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+65 sur 80
+Lambda Architecture and Machine Learning
+Learn accurate model in batch job
+Learn incremental model in stream processor
+65
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+66 sur 80
+Data Lake
+Trend to store all events in raw form (no consistent schema)
+May be useful later
+Data storage is comparably cheap
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+67 sur 80
+Data Lake
+Trend to store all events in raw form (no consistent schema)
+May be useful later
+Data storage is comparably cheap
+Bet: Yet unknown future value of data is greater than storage costs
+Lakehouse: open table formats (Apache Iceberg, Delta Lake) over Parquet files; query with Trino, Spark, or DuckDB
+For logs: schema on read, e.g., Grafana Loki
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+68 sur 80
+Breakout: Scaling Zulip
+Scenario: Scaling Zulip to a very large �company (>50k users).
+In addition to summarization (I1),�need ML-based anomaly detection for �compromised accounts (insider threats).
+​
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+How to design scalable inference for summarization: [service/stream/batch/lambda] [short justification]
+How to design scalable training of anomaly detection model: [service/stream/batch/lambda] [short justification]
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+69 sur 80
+Excursion: ETL Tools
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+70 sur 80
+ETL: Extract, Transform, Load
+Transfer data between data sources, often OLTP -> OLAP system
+Many tools and pipelines
+Extract data from multiple sources (logs, JSON, databases), snapshotting
+Transform: cleaning, (de)normalization, transcoding, sorting, joining
+Loading in batches into database, staging
+Automation, parallelization, reporting, data quality checking, monitoring, profiling, recovery
+Many commercial tools
+Examples of tools in several lists
+70
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+71 sur 80
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+72 sur 80
+72
+Molham Aref "Business Systems with Machine Learning"
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+73 sur 80
+Excursion: �Performance Planning and Analysis
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+74 sur 80
+Performance Planning and Analysis
+Ideally architectural planning upfront
+Identify key components and their interactions
+Estimate performance parameters
+Simulate system behavior (e.g., queuing theory)
+Existing system: Analyze performance bottlenecks
+Profiling of individual components
+Performance testing (stress testing, load testing, etc)
+Performance monitoring of distributed systems
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+75 sur 80
+Performance Testing
+Load testing: Assure handling of maximum expected load
+Scalability testing: Test with increasing load
+Soak/spike testing: Overload application for some time, observe stability
+Stress testing: Overwhelm system resources, test graceful failure + recovery
+​
+Observe (1) latency, (2) throughput, (3) resource use
+All automateable; tools like JMeter
+75
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+76 sur 80
+Profiling
+76
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+77 sur 80
+Performance Monitoring of Distr. Systems
+77
+Source: https://blog.appdynamics.com/tag/fiserv/
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+78 sur 80
+Performance Monitoring of Distributed Systems
+Instrumentation of (Service) APIs
+Load of various servers
+Typically measures: latency, traffic, errors, saturation
+Tools: OpenTelemetry, Prometheus, Jaeger, Grafana
+Monitoring long-term trends
+Alerting
+Automated releases/rollbacks
+Canary testing and A/B testing
+78
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+79 sur 80
+Summary
+Large amounts of data (training, inference, telemetry, models)
+Distributed storage and computation for scalability
+Common design patterns (e.g., batch processing, stream processing, lambda architecture)
+Design considerations: mutable vs immutable data
+Distributed computing also in machine learning; many challenges through distribution: failures, debugging, performance, …
+Lots of tooling for data extraction, transformation, processing
+79
+Recommended reading: Martin Kleppmann. Designing Data-Intensive Applications. OReilly. 2017.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+80 sur 80
+Even More Recommended Readings
+Molham Aref "Business Systems with Machine Learning" Invited Talk 2020
+Sawadogo, Pegdwendé, and Jérôme Darmont. "On data lake architectures and metadata management." Journal of Intelligent Information Systems 56, no. 1 (2021): 97-120.
+Marz, Nathan, and James Warren. Big Data: Principles and best practices of scalable realtime data systems. Manning, 2015.
+Smith, Jeffrey. Machine Learning Systems: Designs that Scale. Manning, 2018.
+Polyzotis, Neoklis, Sudip Roy, Steven Euijong Whang, and Martin Zinkevich. 2017. “Data Management Challenges in Production Machine Learning.” In Proceedings of the 2017 ACM International Conference on Management of Data, 1723–26. ACM.
+Huyen, Chip. Designing Machine Learning Systems. O'Reilly, 2022.
+Reis, Joe, and Matt Housley. Fundamentals of Data Engineering. O'Reilly, 2022.
+80
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

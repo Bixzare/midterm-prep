@@ -1,0 +1,621 @@
+13 operations - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 69
+Planning for Operations
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 69
+Administrativa
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+3 sur 69
+Operations
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 69
+Readings
+Required reading: Shankar, Shreya, et al. ‘“We Have No Idea How Models will Behave in Production until Production”: How Engineers Operationalize Machine Learning.’ Proceedings of the ACM on Human-Computer Interaction 8.CSCW1 (2024): 1-34.
+Recommended readings:
+O'Leary, Katie, and Makoto Uchida. "Common problems with Creating Machine Learning Pipelines from Existing Code." Proc. Conference on Machine Learning and Systems (MLSys) (2020).
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 69
+Learning Goals
+Deploy a service for models using container infrastructure
+Automate common configuration management tasks
+Devise a monitoring strategy and suggest suitable components for implementing it
+Diagnose common operations problems
+Understand the typical concerns and concepts of MLOps
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 69
+Running Example: Blogging Platform with Spam Filter
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 69
+"Operations"
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 69
+Operations
+Provision and monitor the system in production, respond to problems
+Avoid downtime, scale with users, manage operating costs
+Heavy focus on infrastructure
+Traditionally sysadmin and hardware skills
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Everything it takes to run the system in production
+9 sur 69
+Service Level Objectives
+Quality requirements in operations, each with typical measures:
+maximum latency
+minimum system throughput
+targeted availability/error rate
+time to deploy an update
+durability for storage
+For the system as a whole or individual services
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 69
+Example Service Level Objectives?
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 69
+Operators on a Team
+Operators cannot work in isolation
+Rely on developers for software quality and performance
+Negotiate service level agreements and budget  (e.g., 99.9% vs 99.99% availability)
+Risk management role (not risk avoidance)
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 69
+Operations and ML
+ML has distinct workloads and hardware requirements
+Deep learning often pushes scale boundaries
+Regular updates or learning in production
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 69
+Common Themes
+Observability is essential
+Release management and automated deployments
+Infrastructure as code and virtualization
+Scaling deployments
+Incident response planning
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+14 sur 69
+Dev vs. Ops
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+15 sur 69
+Common Release Problems?
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+16 sur 69
+Common Release Problems (Examples)
+Missing dependencies
+Different compiler versions or library versions
+Different local utilities (e.g. unix grep vs mac grep)
+Database problems
+OS differences
+Too slow in real settings
+Difficult to roll back changes
+Source from many different repositories
+Obscure hardware? Cloud? Enough memory?
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+17 sur 69
+Developers
+Coding
+Testing, static analysis, reviews
+Continuous integration
+Bug tracking
+Running local tests and scalability experiments
+...
+​
+Operations
+Allocating hardware resources
+Managing OS updates
+Monitoring performance
+Monitoring crashes
+Managing load spikes, …
+Tuning database performance
+Running distributed at scale
+Rolling back releases
+...
+​
+17
+QA responsibilities in both roles
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+18 sur 69
+Quality Assurance does not stop in Dev
+Ensuring product builds correctly (e.g., reproducible builds)
+Ensuring scalability under real-world loads
+Supporting environment constraints from real systems (hardware, software, OS)
+Efficiency with given infrastructure
+Monitoring (server, database, Dr. Watson, etc)
+Bottlenecks, crash-prone components, … (possibly thousands of crash reports per day/minute)
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+19 sur 69
+DevOps
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+20 sur 69
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+21 sur 69
+Key ideas and principles
+Better coordinate between developers and operations (collaborative)
+Key goal: Reduce friction bringing changes from development into production
+Considering the entire tool chain into production (holistic)
+Documentation and versioning of all dependencies and configurations ("configuration as code")
+Heavy automation, e.g., continuous delivery, monitoring
+Small iterations, incremental and continuous releases
+Buzz word!
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 69
+Common Practices
+All configurations in version control
+Test and deploy in containers
+Automated testing, testing, testing, ...
+Monitoring, orchestration, and automated actions in practice
+Microservice architectures
+Release frequently
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 69
+Heavy tooling and automation
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+24 sur 69
+Heavy tooling and automation -- Examples
+Infrastructure as code — Ansible, Terraform, Puppet, Chef
+CI/CD — Jenkins, TeamCity, GitLab, Shippable, Bamboo, Azure DevOps
+Test automation — Selenium, Cucumber, Apache JMeter
+Containerization — Docker, Rocket, Unik
+Orchestration — Kubernetes, Swarm, Mesos
+Software deployment — Elastic Beanstalk, Octopus, Vamp
+Measurement — Datadog, DynaTrace, Kibana, NewRelic, ServiceNow
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+25 sur 69
+Continuous Delivery
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+26 sur 69
+Manual Release Pipelines
+26
+Source: https://www.slideshare.net/jmcgarr/continuous-delivery-at-netflix-and-beyond
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 69
+Continuous Integr.
+Automate tests after commit
+Independent test infrastructure
+​
+Continuous Delivery
+Full automation from commit to deployable container
+Heavy focus on testing, reproducibility and rapid feedback, creates transparency
+​
+Continuous Deployment
+Full automation from commit to deployment
+Empower developers, quick to production
+Encourage experimentation and fast incremental changes
+Commonly integrated with monitoring and canary releases
+​
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+28 sur 69
+Automate Everything
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+29 sur 69
+Example: Facebook Tests for Mobile Apps
+Unit tests (white box)
+Static analysis (null pointer warnings, memory leaks, ...)
+Build tests (compilation succeeds)
+Snapshot tests (screenshot comparison, pixel by pixel)
+Integration tests (black box, in simulators)
+Performance tests (resource usage)
+Capacity and conformance tests (custom)
+29
+Further readings: Rossi, Chuck, Elisa Shibley, Shi Su, Kent Beck, Tony Savor, and Michael Stumm. Continuous deployment of mobile software at facebook (showcase). In Proceedings of the 2016 24th ACM SIGSOFT International Symposium on Foundations of Software Engineering, pp. 12-23. ACM, 2016.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 69
+Release Challenges for Mobile Apps
+Large downloads
+Download time at user discretion
+Different versions in production
+Pull support for old releases?
+Server side releases silent and quick, consistent
+-> App as container, most content + layout from server
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 69
+Real-world pipelines �are complex
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 69
+Containers and Configuration Management
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+33 sur 69
+Containers
+Lightweight virtual machine
+Contains entire runnable software, incl. all dependencies and configurations
+Used in development and production
+Sub-second launch time
+Explicit control over shared disks and network connections
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+34 sur 69
+Docker Example
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 69
+Common configuration management questions
+What runs where?
+How are machines connected?
+What (environment) parameters does software X require?
+How to update dependency X everywhere?
+How to scale service X?
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+36 sur 69
+Ansible Examples
+36
+Software provisioning, configuration mgmt., and deployment tool
+Apply scripts to many servers
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 69
+Puppet Example
+Declarative specification, �can be applied to many machines
+37
+$doc_root = "/var/www/example"
+​
+exec { 'apt-get update':
+command => '/usr/bin/apt-get update'
+}
+​
+package { 'apache2':
+ensure  => "installed",
+require => Exec['apt-get update']
+}
+​
+file { $doc_root:
+ensure => "directory",
+owner => "www-data",
+group => "www-data",
+mode => 644
+}
+​
+file { "$doc_root/index.html":
+ensure => "present",
+source => "puppet:///modules/main/index.html",
+require => File[$doc_root]
+}
+​
+file { "/etc/apache2/sites-available/000-default.conf":
+ensure => "present",
+content => template("main/vhost.erb"),
+notify => Service['apache2'],
+require => Package['apache2']
+}
+​
+service { 'apache2':
+ensure => running,
+enable => true
+}
+https://www.digitalocean.com/community/tutorials/configuration-management-101-writing-puppet-manifests
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 69
+Container Orchestration with Kubernetes
+Manages which container to deploy to which machine
+Launches and kills containers depending on load
+Manage updates and routing
+Automated restart, replacement, replication, scaling
+Kubernetis master controls many nodes
+Substantial complexity and learning curve
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+39 sur 69
+39
+CC BY-SA 4.0 Khtan66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+40 sur 69
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+41 sur 69
+Monitoring
+Monitor server health
+Monitor service health
+Monitor telemetry
+Collect and analyze measures or log files
+Dashboards and triggering automated decisions
+​
+Many tools, e.g., Grafana as dashboard, Prometheus for metrics, Loki + ElasticSearch for logs
+Push and pull models
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+42 sur 69
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 69
+The DevOps Mindset
+Consider the entire process and tool chain holistically
+Automation, automation, automation
+Elastic infrastructure
+Document, test, and version everything
+Iterate and release frequently
+Emphasize observability
+Shared goals and responsibilities
+43
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+44 sur 69
+MLOps
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+45 sur 69
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+46 sur 69
+On Terminology
+MLOps: Collaboration and communication between data scientists and operators, e.g.,
+Automate model deployment
+Model training and versioning infrastructure
+Model deployment and monitoring
+AIOps: Using AI/ML to make operations decision, e.g. in a data center
+DataOps: Data analytics, often business setting and reporting
+Infrastructure to collect data (ETL) and support reporting
+Combines agile, DevOps, Lean Manufacturing ideas
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 69
+MLOps Overview
+Integrate ML artifacts into software release process, unify process (i.e., DevOps extension)
+Automated data and model validation (continuous deployment)
+Continuous deployment for ML models: from experimenting in notebooks to quick feedback in production
+Versioning of models and datasets (more later)
+Monitoring in production (discussed earlier)
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 69
+Tooling Landscape LF AI
+48
+No way to put more recent versions on a slide – see https://landscape.lfai.foundation/?group=projects-and-products&view-mode=grid
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 69
+MLOps Goals and Principles
+Like DevOps: Automation, testing, holistic, observability, teamwork
+Supporting frequent experimentation, rapid prototyping, and constant iteration – with flexibility and confidence
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+50 sur 69
+MLOps Tools -- Examples
+Model registry, versioning and metadata: MLFlow, Neptune, ModelDB, WandB, ...
+Model monitoring: Fiddler, Hydrosphere
+Data pipeline automation and workflows: DVC, Kubeflow, Airflow
+Model packaging and deployment: BentoML, Cortex
+Distributed learning and deployment: Dask, Ray, ...
+Feature store: Feast, Tecton
+Integrated platforms: Sagemaker, Valohai, ...
+Data validation: Cerberus, Great Expectations, ...
+Long lists, e.g., https://github.com/kelvins/awesome-mlops
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 69
+MLOps Common Goals
+Enable experimentation with data and models, small incremental changes; hide complexity from data scientists
+Automate (nuanced) model validation (like CI) and integrate with testing in production (monitoring)
+Dynamic view of constantly evolving training and test data; invest in data validation
+Version data, models; track experiment results
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 69
+Recall: DevOps Mindset
+Consider the entire process and tool chain holistically
+Automation, automation, automation
+Elastic infrastructure
+Document, test, and version everything
+Iterate and release frequently
+Emphasize observability
+Shared goals and responsibilities
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+53 sur 69
+Breakout: MLOps Goals
+For the blog spam filter scenario, consider DevOps and MLOps infrastructure (CI, CD, containers, config. mgmt, monitoring, model registry, pipeline automation, feature store, data validation, ...)
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Which DevOps or MLOps goals to prioritize?
+Which tools to explore/invest in first?
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 69
+Incident Response Planning
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 69
+Mistakes will Happen. Be Prepared
+Even with careful anticipation and mitigation, mistakes will happen
+Anticipated or not
+ML as unreliable component raises risks
+Design mitigations help avoid anticipated mistakes
+Incident response plan prepares for unanticipated or unmitigated mistakes
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 69
+Incident Response Plan
+Provide contact channel for problem reports
+Have expert on call
+Design process for anticipated problems, e.g., rollback, reboot, takedown
+Prepare for recovery
+Proactively collect telemetry
+Investigate incidents
+Plan public communication (responsibilities)
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 69
+Incident Resp. Plan for Blog's Spam Filter?
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+58 sur 69
+Change is Hard: �Organizational Culture
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+59 sur 69
+Excursion: �Organizational Culture
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 69
+Organizational Culture
+“this is how we always did things”
+Implicit and explicit assumptions and rules guiding behavior
+Often grounded in history, very difficult to change
+Examples:
+“Move fast and break things”
+“Privacy first”
+“Development opportunities for all employees”
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 69
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+62 sur 69
+Organizational Culture
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+63 sur 69
+Levels of Organizational Culture
+Artifacts -- What we see
+Behaviors, systems, processes, policies
+Espoused Values -- What we say
+Ideals, goals, values, aspirations
+Basic assumptions -- What we believe
+Underlying assumptions, "old ways of doing things", unconsciously taken for granted
+Iceberg models: Only artifacts and espoused values visible, but practices driven by invisible basic assumptions
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 69
+Culture Change
+Changing organizational culture is very difficult
+Top down: espoused values, management buy in, incentives
+Bottom up: activism, show value, spread
+Examples of success of failure stories?
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+65 sur 69
+MLOps Culture
+Dev with Ops instead of Dev vs Ops
+A culture of collaboration, joint goals, joint responsibilities
+Artifacts: Joint tools, processes
+Underlying assumptions: Devs provide production-ready code; Ops focus on value, automation is good, observability is important, ...
+65
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+66 sur 69
+Resistance to DevOps Culture?
+From "us vs them" to blameless culture -- How?
+Introduction of new tools and processes -- Disruptive? Costly? Competing with current tasks? Who wants to write tests?
+Future benefits from rapid feedback and telemetry -- Unrealistic?
+Automation and shifting responsibilities  -- Hiring freeze and layoffs?
+Past experience with poor adoption -- All costs, no benefits? Compliance only?
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+67 sur 69
+Successful DevOps Adoption
+Need supportive management; typically driven by advocacy of individuals, convincing colleagues and management
+Education to generate buy-in
+Experts and consultants can help with initial costly transition
+Demonstrate benefits on small project, promote afterward
+Focus on key bottlenecks, over perfect adoption (e.g., prioritize experimentation, test automation, rapid feedback with telemetry)
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+68 sur 69
+Summary
+Plan for change, plan for operations
+Operations requirements: service level objectives
+DevOps integrations development and operations tasks with joint goals and tools
+Heavy automation
+Continuous integration and continuous delivery
+Containers and configuration management
+Monitoring
+MLOps extends this to operating pipelines and deploying models
+Organizational culture is slow and difficult to change
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+69 sur 69
+Further Reading
+Shankar, Shreya, et al. ‘“We Have No Idea How Models will Behave in Production until Production”: How Engineers Operationalize Machine Learning.’ Proceedings of the ACM on Human-Computer Interaction 8.CSCW1 (2024): 1-34.
+https://ml-ops.org/
+Beyer, Betsy, Chris Jones, Jennifer Petoff, and Niall Richard Murphy. Site reliability engineering: How Google runs production systems. O’Reilly, 2016.
+Kim, Gene, Jez Humble, Patrick Debois, John Willis, and Nicole Forsgren. The DevOps Handbook: How to Create World-Class Agility, Reliability, & Security in Technology Organizations. IT Revolution, 2nd ed, 2021.
+Treveil, Mark, Nicolas Omont, Clément Stenac, Kenji Lefevre, Du Phan, Joachim Zentici, Adrien Lavoillotte, Makoto Miyazaki, and Lynn Heidmann. Introducing MLOps: How to Scale Machine Learning in the Enterprise. O’Reilly, 2020.
+Luz, Welder Pinheiro, Gustavo Pinto, and Rodrigo Bonifácio. “Adopting DevOps in the real world: A theory, a model, and a case study.” Journal of Systems and Software 157 (2019): 110384.
+Schein, Edgar H. Organizational culture and leadership. 5th ed. John Wiley & Sons, 2016.
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

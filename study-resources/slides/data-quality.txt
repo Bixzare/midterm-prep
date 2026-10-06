@@ -1,0 +1,1862 @@
+11 data quality - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 122
+Reading
+Sambasivan, N., Kapania, S., Highfill, H., Akrong, D., Paritosh, P., & Aroyo, L. M. (2021, May). “Everyone wants to do the model work, not the data work”: Data Cascades in High-Stakes AI. In Proc. Conference on Human Factors in Computing Systems (pp. 1-15).
+1
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+2 sur 122
+Data Quality
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+3 sur 122
+Administrativa
+Milestone 1 due tonight�	Team feedback due 24h later
+Milestone 2 is a two-week assignment�	Due Oct 27 (4 weeks from today) due to midterm and fall break�	Don’t wait until after fall break to start
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+4 sur 122
+Learning Goals
+Consider data quality as part of a system; design an organization that values data quality
+Distinguish precision and accuracy; understanding the better models vs more data tradeoffs
+Use schema languages to enforce data schemas
+Design and implement automated quality assurance steps that check data schema conformance and distributions
+Devise infrastructure for detecting data drift and schema violations
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 122
+Poor Data Quality has Consequences
+(often delayed, hard-to-fix consequences)
+​
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 122
+Case Study: Inventory Management
+Goal: Train an ML model to predict future sales; make decisions about what to (re)stock/when/how many...
+​
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 122
+GIGO: Garbage in, garbage out
+7
+Image source: https://monkeylearn.com/blog/data-cleaning-python
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+8 sur 122
+Garbage In, Garbage Out: Target Canada
+75,000 products entered manually into SAP by inexperienced staff with minimal training
+No data validation rules, the system accepted anything, including nonsense, wrong units (inches vs. cm), wrong field order, missing tariff codes, vague descriptions
+Data accuracy estimated at �~30% at launch �(vs. 98–99% at Target U.S.)
+ML/forecasting systems were �consuming corrupt data from day �one
+8
+https://canadianbusiness.com/ideas/the-last-days-of-target-canada/
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+9 sur 122
+Garbage In, Garbage Out: Target Canada
+Consequences:
+Incorrect product dimensions → items couldn't fit in shipping containers → overseas shipments held at customs or delayed for weeks
+Replenishment system relied on accurate shelf/product dimensions to calculate restocking → data was wrong → system couldn't trigger reorders → shelves went empty
+Forecasting system consumed bad sales projections → ordered massive excess inventory → $941M loss in year one, largely from markdowns on unsellable overstock
+System showed items as "in stock" when shelves were physically bare → headquarters was blind to the real situation in stores
+9
+https://canadianbusiness.com/ideas/the-last-days-of-target-canada/
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+10 sur 122
+Example Repo
+Runnable code versions and extended examples of all parts of this lecture in this repo:
+https://github.com/mlip-cmu/data-quality
+Feel free to follow along and experiment with it during the lecture
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+11 sur 122
+Data Quality vs Quantity
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 122
+Data cleaning and repairing account for about 60% of the work of data scientists.
+"Everyone wants to do the model work, not the data work"
+​
+​
+​
+​
+Own experience?
+​
+​
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 122
+Accuracy vs. Precision�(on Data)
+Accuracy: Reported values (on average) represent real value
+Precision: Repeated measurements yield the same result
+Accurate, but imprecise: Q. How to deal with this issue?
+Inaccurate, but precise: ?
+13
+(CC-BY-4.0 by Arbeck)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Speculate on examples — height, maybe, vs sentiment�Note: Average to deal with noise; calibrate to deal with bias
+14 sur 122
+Data Accuracy and Precision: Impact on ML
+More data → better models (up to a point, diminishing effects)
+Noisy data (imprecise) → less confident models, more data needed
+some ML techniques are more or less robust to noise (more on robustness in a later lecture)
+Inaccurate data → misleading models, biased models
+Need the “right” data
+Invest in data quality, not just quantity
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+15 sur 122
+Raw Data is an Oxymoron
+15
+Recommended Reading: Gitelman, Lisa, Virginia Jackson, Daniel Rosenberg, Travis D. Williams, Kevin R. Brine, Mary Poovey, Matthew Stanley et al. "Data bite man: The work of sustaining a long-term study." In "Raw Data" Is an Oxymoron, (2013), MIT Press: 147-166.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+16 sur 122
+What do we mean by clean data?
+Accuracy: The data was recorded correctly.
+Completeness: All relevant data was recorded.
+Uniqueness: The entries are recorded once.
+Consistency: The data agrees with itself.
+Timeliness: The data is kept up to date.
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+17 sur 122
+Data comes from many sources
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+18 sur 122
+Data comes from many sources
+Manually entered
+Generated through actions in IT systems
+Logging information, traces of user interactions
+Sensor data
+Crowdsourced
+These sources have different levels of reliability and quality
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+19 sur 122
+What happens: Data is noisy
+Wrong results and computations, crashes
+Duplicate data, near-duplicate data
+Out of order data
+Data format invalid
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+20 sur 122
+Two levels of data precision
+Data Integrity / Schema: Ensuring basic consistency about shape and types
+Wrong and inconsistent data: Application- and domain-specific data issues
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+21 sur 122
+Data Integrity / Schema
+Ensuring basic consistency about shape and types
+​
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 122
+Schema in Relational Databases
+22
+CREATE TABLE Suppliers (
+ID INT PRIMARY KEY,
+Name VARCHAR(255) NOT NULL,
+ContactName VARCHAR(255),
+ContactPhone VARCHAR(20)
+);
+CREATE TABLE Products (
+ID INT PRIMARY KEY,
+Name VARCHAR(255) NOT NULL,
+Category VARCHAR(50),
+UnitPrice DECIMAL(10, 2) NOT NULL,
+QuantityInStock INT NOT NULL,
+Unit VARCHAR(5) NOT NULL CHECK (Unit IN('count', 'kg', 'liter'))
+SupplierID INT,
+FOREIGN KEY (SupplierID) REFERENCES Suppliers(ID)
+);
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 122
+Data Schema
+Define the expected format of data
+expected fields and their types
+expected ranges for values
+constraints among values (within and across sources)
+Data can be automatically checked against schema
+Protects against change; explicit interface between components
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+24 sur 122
+Schema Problems: Uniqueness, data format, integrity, …
+Illegal attribute values: UnitPrice=“Kraft Dinner 225g”
+Violated attribute dependencies: ImportedFrom=“China”, TariffCode=NULL
+Uniqueness violation: (ID=10421, UPC=“062891000017”), (ID=23177, UPC=“062891000017”)
+Referential integrity violation: product=(ID=10421, SupplierID=502) if supplier 502 not defined
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+25 sur 122
+Dirty Data: Example
+Problems with this data? Which Problems are Schema Problems?
+​
+25
+TABLE: PRODUCT
+ID
+Name
+Category
+UnitPrice
+Unit
+Case L×W×H (cm)
+SupplierID
+10421
+Kraft Dinner 225g
+pantry
+1.29
+count
+40 × 30 × 20
+204
+10421
+Bananas
+produce
+0.69
+kg
+15.7 × 11.8 × 9.8
+201
+10422
+Tide Pods 42 ct
+produce
+13.99
+liter
+30 × 20 × 25
+205
+10423
+MISC ITEM
+pantry
+Cheerios
+count
+999 × 999 × 999
+203
+TABLE: SUPPLIER
+ID
+Name
+Phone
+City
+Province
+201
+Fresh Fields Produce
+999-999-9999
+Mississauga
+ON
+203
+General Mils
+416-555-0199
+Torronto
+Ontario
+204
+Kraft Heinz Canada
+416-555-0123
+Toronto
+ON
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+​
+Answer key (Target Canada: data entered manually, no validation)
+Schema problems:
+- PRODUCT ID 10421 twice (primary key not unique)
+- UnitPrice "Cheerios": not a number (name typed into the wrong field)
+- Unit "liter" for category produce (violated dependency: produce is sold by count or kg)
+- SupplierID 205 does not exist in SUPPLIER (referential integrity)
+Other problems (wrong or inconsistent data; the schema accepts them):
+- Bananas case 15.7 × 11.8 × 9.8: inches typed into a cm field (40 × 30 × 25 cm)
+- Tide Pods in category produce (wrong but legal value; should be household)
+- 999 × 999 × 999 and 999-999-9999: placeholders for missing values
+- MISC ITEM: vague description
+- General Mils, Torronto: misspellings
+- Province "Ontario" vs "ON": inconsistent format
+26 sur 122
+Data Schema Constraints for Inventory System?
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 122
+What Happens When New Data Violates Schema?
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+28 sur 122
+Modern Databases: Schema-Less
+Also vector databases, schema-aware databases that basically store long text in each cell, etc.
+​
+28
+Image source: https://www.kdnuggets.com/2021/05/nosql-know-it-all-compendium.html
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+29 sur 122
+Schema-Less Data Exchange
+CSV files
+Key-value stores (JSon, XML, Nosql databases)
+Message brokers
+REST API calls
+R/Pandas Dataframes
+​
+​
+29
+ProductID,Product Name,Quantity,Unit,SupplierID
+101,Banana,50,kg,201
+102,Cucumber,75.5,kg,502
+103,Cauliflower,30,count,283
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 122
+Schema-Less Data Exchange
+Q. Benefits? Drawbacks?
+​
+Q. How to enforce a schema?
+​
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 122
+CSV Schema
+31
+version 1.1
+@totalColumns 5
+id: positiveInteger
+name: length(1,255)
+quantity: numericLiteral
+unit: is("count") or is("kg") or is("liter")
+supplierId: positiveInteger
+https://digital-preservation.github.io/csv-schema/
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+32 sur 122
+Pydantic
+from litellm import completion
+from pydantic import BaseModel
+class LineItem(BaseModel):
+product: str
+quantity: int
+​
+response = completion(
+model="gemini/gemini-2.0-flash",
+messages=[{"role": "user", "content": "Extract: 12 cases of bananas"}],
+response_format={
+"type": "json_schema",
+"json_schema": {
+"name": "line_item",
+"schema": {
+"type": "object",
+"properties": {
+"product": {"type": "string"},
+"quantity": {"type": "integer"}
+},
+"required": ["product", "quantity"],
+"additionalProperties": False
+}
+}
+}
+)
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+33 sur 122
+Pydantic
+from pydantic import BaseModel
+​
+messages=[
+{"role": "system", "content": "Extract the event information."},
+{"role": "user", "content": "Alice and Bob are going to a science fair on Friday."}, ]
+​
+class CalendarEvent(BaseModel):
+name: str
+date: str
+participants: list[str]
+​
+resp = completion(
+model="...",
+messages=messages,
+response_format=CalendarEvent,
+)
+​
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+34 sur 122
+Pydantic checks data against a Python class
+1 · You write a class
+Field names with Python types. The class is the schema.
+2 · Pydantic parses data into it
+JSON or a dict goes in, a typed Python object comes out. "36" becomes the number 36.0.
+3 · Or it raises ValidationError
+One entry per problem: which field, and what is wrong with it.
+Pydantic is a Python library; web frameworks and LLM libraries accept its classes.
+from pydantic import BaseModel
+​
+class LineItem(BaseModel):  # simplified
+product: str
+quantity: float
+unit: str
+​
+good = '{"product": "Banana", "quantity": "36", "unit": "kg"}'
+LineItem.model_validate_json(good)
+→ LineItem(product='Banana', quantity=36.0, unit='kg')
+​
+bad = '{"product": "Banana", "quantity": "fifty"}'
+LineItem.model_validate_json(bad)
+→ ValidationError: 2 validation errors for LineItem
+quantity  Input should be a valid number
+unit      Field required
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Pydantic is a Python library for checking data. You describe the data you expect as a class: each field gets a name and a Python type. Then you hand Pydantic some data, here a JSON string, with model_validate_json. If the data fits, you get back an ordinary Python object whose fields have the right types: quantity is the float 36.0, even though the JSON had the string "36", because Pydantic converts values when the conversion is safe. If the data does not fit, Pydantic raises a ValidationError that lists every problem at once, with the field and a message: "fifty" is not a number, and unit is missing. Many tools accept a Pydantic class as the description of the data they should produce or accept, including FastAPI and the SDKs for calling LLMs. We use it for both on the next slides. LineItem here is a cut-down version of the one in the demo; the next slide shows the full one. (Output on the slide is from Pydantic 2.13, shortened.)
+35 sur 122
+Our schema for a delivery e-mail: DeliveryNotice
+class LineItem(BaseModel):  # one product in the delivery
+model_config = ConfigDict(extra="forbid")  # no unknown fields
+product: str
+quantity: float
+unit: Literal["count", "kg", "liter"] = Field(  # one of these
+description="convert lb to kg, gallons to count")
+@model_validator(mode="after")  # our own check
+def plausible(self):
+if self.quantity <= 0:
+raise ValueError("quantity must be positive")
+if self.unit == "count" and not self.quantity.is_integer():
+raise ValueError("not a whole number of items")
+return self
+​
+class DeliveryNotice(BaseModel):
+supplier: str
+delivery_date: date
+items: list[LineItem]  # one LineItem per product
+For each e-mail, the LLM fills in one DeliveryNotice, with one LineItem per product.
+SHAPE → JSON SCHEMA
+Types, allowed units, required fields, no extra fields
+Pydantic writes them out as a JSON schema, which the LLM gets with the request (response_format). Some LLM APIs enforce it, some do not.
+MEANING → VALIDATORS
+Positive quantities; whole numbers for count
+These rules are Python code, so the JSON schema leaves them out. Pydantic checks them on every line item when it parses the answer.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+DeliveryNotice is our class, not part of Pydantic. It describes what we want the LLM to extract from a supplier's delivery e-mail: who delivers, when, and one LineItem per product. The code uses three things the last slide did not show. Literal lists the allowed values. extra="forbid" rejects fields we did not ask for. A method marked @model_validator is our own check; Pydantic runs it after the type checks and turns a ValueError raised there into a ValidationError. The class has two kinds of rules. The blue lines describe the shape: field names, types, allowed units, no extra fields. Pydantic turns them into a JSON schema with model_json_schema(), and passing response_format=DeliveryNotice sends that schema to the LLM. Some providers enforce the schema while the LLM writes its answer, others do not, so we check the answer anyway. The orange lines describe meaning: a quantity must be positive, and a count must be a whole number. These rules are Python code, so the JSON schema leaves them out and the LLM never sees them. Pydantic checks them on each line item when it parses the answer, and an error path such as items.1.unit points at the second line item.
+36 sur 122
+Pydantic turns the class into a JSON schema
+In the LineItem class
+In the JSON schema the LLM gets
+product: str
+"product": {"type": "string"}
+quantity: float
+"quantity": {"type": "number"}
+unit: Literal["count", "kg", "liter"]
+"enum": ["count", "kg", "liter"]
+Field(description="convert lb to kg, gallons to count")
+"description": "convert lb to kg, gallons to count"
+extra="forbid"
+"additionalProperties": false
+fields without a default value
+"required": ["product", "quantity", "unit"]
+@model_validator: quantity > 0, whole counts
+nothing
+The LLM gets only the right-hand column, sent with the request. It reads the description as an instruction. It never sees the validator rules, so Pydantic checks them when the answer comes back.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+This is what model_json_schema() produces for LineItem, one line of the class per row (the full output is schema.json in the demo; DeliveryNotice looks the same, with a date field marked "format": "date"). Before Pydantic, you would write the right-hand column by hand as a Python dict and pass it as response_format; with Pydantic you write the class and the library writes the schema. The description is free text, and the LLM treats it as part of the prompt: it asks for the lb-to-kg conversion that the second answer for the potatoes makes. In the last row, model_json_schema() cannot translate our Python validator, so nothing about positive or whole quantities reaches the LLM. That is why we validate the answer ourselves.
+37 sur 122
+Validate, retry once with the errors, then quarantine
+The catalog is the store's table of 60 products. The prompt lists their names, and step 4 checks that the LLM used them.
+1 · E-mail
+free text from a supplier
+2 · LLM
+asked for JSON that fits DeliveryNotice
+3 · Pydantic
+checks types, allowed units and validators
+4 · Catalog
+every product name must be in the catalog
+5 · Inventory
+receives a typed DeliveryNotice
+Retry once
+the error messages go back to the LLM
+Quarantine
+a human handles what fails
+valid
+known
+invalid
+2nd answer
+unknown
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+extract.py runs this loop. The e-mail goes to the LLM with response_format=DeliveryNotice. We parse the answer with DeliveryNotice.model_validate_json(answer). If Pydantic raises a ValidationError, we append the LLM's answer and a user message "Your answer is not valid: [the errors]. Return a corrected JSON object." and ask once more. The error messages are precise (field path plus what is wrong), so the LLM can often fix its own output. If the second answer is still invalid, the e-mail goes to out/quarantine.json for a human. A valid notice then goes through one check Pydantic does not do: each product name is fuzzy-matched against our catalog, and a name that scores below 90 is quarantined too. Only then does the notice reach the inventory.
+38 sur 122
+Five supplier e-mails through the loop
+The e-mail says
+LLM's first answer
+Pydantic says
+Result
+"36 kg of bananas"
+Banana · 36 · kg
+valid
+stored
+"8 cases of milk gallons (4 per case)"
+Whole Milk · 32 · count
+valid
+stored
+"50 lbs of potatoes"
+Potato · 50 · lbs
+items.1.unit: Input should be 'count', 'kg' or 'liter'
+retry: 22.68 kg, stored
+"40 liters laundry detergent, …"
+JSON cut off before the closing }
+Invalid JSON: EOF while parsing an object
+retry: whole JSON, stored
+"half a pallet of the 24-packs"
+Bottled Water · 0.5 · count
+items.0: 0.5 is not a whole number of items
+retry: 0.5 again, quarantined
+Error paths count from 0: items.1.unit is the unit of the second line item.
+Given the error message, the LLM fixed the wrong unit and the broken JSON on its second try. For "half a pallet", 0.5 fits quantity: float, so the JSON schema accepts it; only our whole-number rule rejects it, so a human gets that e-mail.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+These are the recorded LLM answers the demo replays; the error texts are the real Pydantic messages. Rows 1 and 2: valid the first time; note that the LLM already did the arithmetic for the milk (8 cases x 4). Row 3: the LLM copied "lbs", which is not in the Literal; the error lists the allowed values, and the second answer converts to 22.68 kg. Row 4: the answer was cut off, so it is not even JSON; the retry returns the complete object. Row 5: 0.5 is a valid float, so it fits the JSON schema; our validator says a count must be a whole number. The LLM cannot know how many packs are on half a pallet, so it answers 0.5 again, and a human gets the e-mail. On the earlier question of what to do when new data violates the schema, this demo rejects the answer, asks once more, and then quarantines the e-mail.
+39 sur 122
+The same class checks requests to our web API
+# our server (FastAPI, a Python web framework)
+app = FastAPI()
+​
+@app.post("/deliveries", status_code=201)
+def post_delivery(notice: DeliveryNotice):
+received.append(notice)
+return {"accepted": len(notice.items)}
+# a supplier's system sends, instead of an e-mail:
+POST /deliveries
+{"delivery_date": "2025-06-31",
+"items": [{"product": "Banana",
+"quantity": "fifty",
+"unit": "lbs"}],
+"note": "urgent", …}
+Because post_delivery takes a DeliveryNotice, FastAPI checks every request against that class before the function runs. This request is rejected: the reply has status code 422 ("your data is invalid") and lists one error per field. FastAPI also publishes the schema at /openapi.json, so suppliers can read the rules before they send anything.
+Field
+Error message
+delivery_date
+Input should be a valid date or datetime, day value is outside expected range
+items.0.quantity
+Input should be a valid number, unable to parse string as a number
+items.0.unit
+Input should be 'count', 'kg' or 'liter'
+note
+Extra inputs are not permitted
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The API uses the same class. Here a supplier's system, not an LLM, posts JSON to our endpoint. FastAPI validates the body with DeliveryNotice before our function runs: June 31 is not a date, "fifty" is not a number, lbs is not an allowed unit, and "note" is a field we did not ask for. The client gets HTTP 422 with all four problems at once, each with its field path. And FastAPI publishes the schema at /openapi.json, so clients can read the contract before they send anything. Validating every request against DeliveryNotice is one way to enforce a schema on schema-less data exchange over REST, the question from earlier in the lecture.
+40 sur 122
+Apache Avro (e.g. for Kafka)
+40
+Side benefit:
+More efficient storage
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 122
+Apache Avro: a schema for events sent between programs
+Each checkout terminal sends one event per receipt line. The events go through Kafka, a message broker: producers (the terminals) write events to it, and consumers (inventory, forecasting, …) read them.
+1 · The schema is a JSON file
+Producers and consumers agree on it. It names each field and its type.
+2 · Every write is checked
+The Avro writer rejects an event that does not fit the schema.
+3 · The data is compact binary
+A reader needs the schema to decode it, so the schema travels with the data or is kept in a registry.
+{"type": "record", "name": "SaleEvent",
+"fields": [
+{"name": "event_id", "type": "string"},
+{"name": "event_time", "type": {"type": "long",
+"logicalType": "timestamp-millis"}},  // ms since 1970
+{"name": "store_id", "type": "int"},
+{"name": "terminal_id", "type": "string"},
+{"name": "product_id", "type": "int"},
+{"name": "quantity", "type": "double"},  // a float
+{"name": "unit", "type": {"type": "enum", "name": "Unit",
+"symbols": ["count", "kg", "liter"]}},  // one of these
+// an exact decimal with 2 digits after the point
+{"name": "unit_price", "type": {"type": "bytes",
+"logicalType": "decimal", "precision": 8, "scale": 2}},
+// used when an event has no promo
+{"name": "promo", "type": "boolean", "default": false}
+]}
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Setting: the supermarket's checkout terminals produce a stream of sale events, one per receipt line. In a real system they go through Kafka, a message broker, and several programs read them. Those programs need to agree on what an event looks like, and Avro is one common way to write that agreement down. The schema is plain JSON: a record called SaleEvent with nine fields. Most types are simple (string, int, double, boolean). Three are richer: event_time is a timestamp stored as milliseconds, unit is an enum with three allowed values, and unit_price is an exact decimal with two digits after the point. promo has a default of false; defaults decide which schema changes are safe (two slides on). The data itself is binary, without field names, so it is small, and nobody can read it without the schema.
+42 sur 122
+The writer rejects events that break the schema
+event = {"event_id": "2-20250602-01295", "event_time": datetime(2025, 6, 2, 11, 2, 33),
+"store_id": 2, "terminal_id": "T1", "product_id": 128,
+"quantity": 0.584, "unit": "kg", "unit_price": Decimal("10.99"), "promo": False}
+writer(file, schema, [event], validator=True, strict=True)  # fastavro, a Python Avro library
+Change to the event
+What the writer says (shortened)
+quantity = "fifty"
+SaleEvent.quantity is <fifty> of type <class 'str'> expected double
+unit = "lbs"
+SaleEvent.unit is <lbs> of type <class 'str'> expected {'type': 'enum', …, 'symbols': ['count', 'kg', 'liter']}
+store_id removed
+rejected, but the message only says that the whole event does not match; it does not name store_id
+extra field cashier = "C25"
+record contains more fields than the schema specifies: cashier
+With validator=True, the writer checks each event as the terminal writes it, so a bad event never reaches Kafka or the consumers. strict=True adds the check for extra fields; without it, the writer drops unknown fields without an error.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The top box is a real event from the demo data: 0.584 kg of something at store 2. We write it with fastavro, a Python library for Avro. validator=True makes the writer check every record against the schema, and strict=True also rejects fields the schema does not name. Then we break the event four ways. A text quantity and an unknown unit are type errors, and the messages say exactly which field. A missing field is rejected too, but the message only says the whole record does not match, so you have to look for yourself. For the extra cashier field, Avro by default drops it and raises no error, so the value is lost; strict=True makes that an error. Compare with Pydantic from before: same idea, but here the check happens at the producer, before the data leaves.
+43 sur 122
+Schema changes must keep old events readable
+Avro decodes an event with two schemas: the one it was written with and the one the reader expects. It fills in defaults for fields the event lacks and skips fields the reader does not know.
+V2 ADDS A FIELD WITH A DEFAULT
++ {"name": "loyalty_id",
+"type": ["null", "string"],
+"default": null}
+v2 reader, v1 events: loyalty_id = None
+v1 reader, v2 events: loyalty_id is skipped
+Compatible: old and new programs keep working
+V3 CHANGES A TYPE AND RENAMES A FIELD
+"quantity": "double" → "string"
+"terminal_id" → "register_id"
+v3 reader, v1 events:
+SchemaResolutionError: Schema mismatch: double is not string
+Incompatible: consumers on v3 cannot read the old events
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Here are two changes to SaleEvent. Version 2 adds loyalty_id, which may be null and defaults to null. A consumer that already uses v2 can read events written with v1: Avro fills in the default. A consumer still on v1 can read v2 events: Avro skips the field it does not know. So producers and consumers can upgrade in any order. Version 3 changes quantity from a number to text and renames terminal_id. Avro has no way to turn a double into a string, and a renamed field looks like one field removed and another, without a default, added. Reading the old events with v3 fails with the error on the slide, which is the real output of the demo.
+44 sur 122
+A registry checks each new schema before use
+Before a producer sends events with a new schema version, it registers the version in a schema registry (for example, Confluent Schema Registry). The registry refuses a version that old or new programs could not read.
+Producer
+wants to use v2 or v3
+Schema registry
+checks both directions
+Kafka
+only accepted versions
+Consumers
+on v1, v2, …
+New schema
+New reads old events
+Old reads new events
+Registry
+v2: adds an optional loyalty_id
+yes
+yes
+accepts it
+v3: quantity as text, terminal_id renamed
+no
+no
+rejects it
+An incompatible change then fails once, at the producer, when someone tries to deploy it. Without the registry it fails later, in every consumer, while events are flowing.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+A schema registry prevents the v3 failure from the previous slide. Every producer registers a schema version before it uses it, and the registry compares the new version with the old ones: can a program with the new schema read old events (backward compatible), and can a program with the old schema read new events (forward compatible)? v2 passes both, v3 fails both. In the demo, a small function can_read does this check by writing a few events with one schema and reading them with the other; a real registry such as Confluent Schema Registry compares the schemas directly, and each topic can say which directions it requires. For data quality, this moves the schema check to the moment a schema changes, before any event with the new schema exists.
+45 sur 122
+Side benefit: files with a schema are smaller
+The same 64,560 sale events, saved in four file formats
+Format
+How it stores the events
+Size
+vs. CSV
+CSV
+text, one row per line, no types
+5.31 MB
+1×
+JSON Lines
+text, one object per line; field names repeated on every line
+11.96 MB
+2.3× larger
+Avro, compressed
+binary, one event after another; the schema once, at the start of the file
+0.91 MB
+5.8× smaller
+Parquet, compressed
+binary, one column after another; the schema at the end of the file
+0.27 MB
+20× smaller
+Avro stores rows. Good for a stream of events that arrive and are written one at a time.
+Parquet stores columns. Good for analysis: a query reads only the columns it needs, and a column of similar values compresses well.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Once every value has a known type, the file can store it in binary instead of as text, and does not repeat field names. The numbers are from formats.py in the demo, on 64,560 events (Avro compressed with deflate, Parquet with zstd). The difference between Avro and Parquet is the layout. Avro writes one event after another, which is what a producer does with a stream. Parquet writes all event_ids, then all event_times, and so on; a column such as unit, with only three distinct values, compresses to almost nothing, and an analysis that needs only quantity reads only that column. So Avro suits a message broker, and Parquet suits files that people analyze.
+46 sur 122
+The schema in the file keeps the types
+The same events, read back into pandas from each file
+​
+CSV
+JSON Lines
+Avro
+Parquet
+event_time
+text
+timestamp
+timestamp
+timestamp
+unit_price
+float
+float
+exact decimal
+float
+types come from
+pandas guessing from the text
+pandas guessing; dates only for names like *_time
+the schema in the file
+the schema in the file
+CSV returns the timestamps as text, and the consumer must know to parse them. Avro returns the price as an exact decimal, as its schema says; a float cannot hold 10.99 exactly. The Parquet file has a float because it was written from a pandas float column.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Same data, read back. CSV has no types at all, so pandas guesses: numbers become numbers, but the timestamps stay text unless you tell read_csv to parse them. JSON Lines gets the timestamp right only because pandas guesses dates from column names; a column called sold would stay text. Avro and Parquet store the schema inside the file, so the reader does not guess. The price column shows one more difference: Avro's schema says the price is an exact decimal, so we get Python Decimal values back, while the Parquet file was written straight from a pandas float column and keeps a float. Parquet can store exact decimals too, if the writer asks for them.
+47 sur 122
+Schema Checks after Loading
+Custom code or libraries, e.g., Great Expectations:
+47
+expect_column_values_to_be_of_type("id", "int")
+expect_column_values_to_be_unique("id")
+expect_column_values_to_be_of_type("quantity", "float")
+expect_column_values_to_be_between("quantity", min_value=0, max_value=None)
+expect_column_values_to_be_in_set("unit", ["count", "kg", "liter"])
+expect_column_values_to_be_of_type("supplierId", "int")
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+48 sur 122
+Check a table’s schema after loading it, before using it
+Store clerks type every delivery into the store system. Each month, about 8,000 delivery rows are loaded into pandas for inventory and forecasting. Nothing checked the rows when the clerks typed them in.
+delivery_id
+delivery_date
+supplier_name
+product_name
+category
+quantity
+unit
+entered_at
+612959
+2025-03-01
+Three Rivers Beverages
+Cola 6 pk
+beverages
+16
+count
+2025-03-01 13:33
+616133
+2025-03-14
+Fresh Fields Produce
+Banana
+produce
+54
+kg
+2025-03-14 13:20
+618049
+2025-03-21
+Ohio Valley Farms
+Potato
+produce
+20
+kg
+2025-03-21 13:01
+Great Expectations (GX)
+A Python library. You write a list of expectations, one testable rule each. GX runs the list on every new batch of rows and reports which rules fail, and for which values.
+Pandera
+A Python library. You write the table's schema as a class, like a Pydantic class, but each field is a column of a pandas DataFrame.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+With Avro, the writer checked every event. Here nobody checked anything at write time: clerks type deliveries into the store system, and once a month the rows are exported and loaded into pandas. The demo data is simulated: a generator produces the true values and then adds the kinds of mistakes clerks make. Because we know the true values, we can tell which flagged rows are real mistakes; the slides state those facts without going into the generator. So we check the table after loading and before inventory or forecasting use it. We look at two Python libraries that do this: Great Expectations for the monthly delivery records, and Pandera for the product master data.
+49 sur 122
+Each expectation in GX is one testable rule
+Ten of the 14 expectations for the delivery table (arguments shortened). Rows 1–6 check each value, rows 7–8 compare columns or rows, rows 9–10 check a statistic of a whole column.
+Expectation
+What it says
+ExpectColumnValuesToBeOfType("quantity", "float64")
+quantity is a floating-point number
+ExpectColumnValuesToBeUnique("delivery_id")
+no two rows share an ID
+ExpectColumnValuesToBeBetween("quantity", min_value=0)
+no negative quantities
+ExpectColumnValuesToBeInSet("unit", ["count", "kg", "liter"])
+only the three units
+ExpectColumnValuesToBeInSet("category", known_categories)
+only categories from the product list
+ExpectColumnValuesToBeBetween("delivery_date", 2024-01-01, 2025-12-31)
+delivery dates in 2024 or 2025
+ExpectColumnPairValuesAToBeGreaterThanB("entered_at", "received_at")
+typed in after the delivery arrived
+ExpectCompoundColumnsToBeUnique([date, store, product, quantity])
+no delivery is in the table twice
+ExpectColumnMaxToBeBetween("quantity", max_value=2000)
+no delivery is larger than 2,000
+ExpectColumnMedianToBeBetween("quantity", 10, 60)
+a typical delivery is 10 to 60 units
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Great Expectations calls each rule an expectation, and a list of them a suite. Every expectation is a class whose name says what it checks. The first group looks at one value at a time: the type, uniqueness, a range, a set of allowed values. The second group compares values: entered_at must not be earlier than received_at, and the combination of date, store, product and quantity must not repeat. The last group checks a statistic of the whole column: its largest value and its median. In the code, each expectation takes keyword arguments such as column="quantity"; the slide shortens them. The suite has four more, for the types of delivery_id and supplier_id, known suppliers, and the standard deviation of quantity.
+50 sur 122
+The March deliveries fail 7 of 14 expectations
+The March deliveries as the clerks typed them in. A month without typing mistakes meets all 14 expectations.
+Expectation
+Result
+What GX shows
+quantity ≥ 0
+4 rows fail
+−12, −24, −72
+largest quantity ≤ 2,000
+largest is 80,000
+only the largest value: 80,000 kg of bananas (the real delivery was 54 kg)
+standard deviation of quantity ≤ 200
+it is 1,687
+only the number, not the rows that cause it
+unit in count, kg, liter
+46 rows fail
+ct, each, Count, kilogram, kgs, Kg, KG
+category from the product list
+13 rows fail
+Allegheny Bakery, CleanHome Supplies: supplier names in the category column
+delivery date in 2024 or 2025
+2 rows fail
+1900-01-01, a placeholder date
+no delivery in the table twice
+52 rows fail
+26 deliveries, each typed in twice
+The per-row checks list the bad values. The statistics checks report one number each: 12 deliveries are 1,000 times too large, and GX shows only the largest.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+This is the output of gx_validate.py, run on the clean month and on the month as typed in. The clean month passes everything; the typed-in month fails half the suite. Walk through the kinds of mistakes: negative quantities, units spelled seven different ways, supplier names typed into the category column, the placeholder date 1900-01-01 that some systems use for an unknown date, and deliveries typed in twice. Point out the difference between the kinds of expectations. The per-row expectations list the failing values, and GX can list the rows. The statistics expectations only report a number: the maximum is 80,000, and the standard deviation is 1,687. In the data, 12 deliveries are 1,000 times their real size, probably grams typed into a kilogram field; a per-row range check (quantity between 0 and 2,000) would list all 12. GX also writes the results as an HTML report, called Data Docs.
+51 sur 122
+A unique ID does not make deliveries unique
+Two rows from the March deliveries
+Column
+Row 1
+Row 2
+delivery_id
+612959
+900247
+delivery_date
+2025-03-01
+2025-03-01
+store_id
+1
+1
+product_name
+Cola 6 pk
+Cola 6 pk
+quantity
+16 count
+16 count
+received_at
+2025-03-01 13:00
+2025-03-01 13:00
+entered_at
+2025-03-01 13:33
+2025-03-01 15:13
+The system gives every typed-in row a new ID, so the ID check passes. The same delivery was typed in twice, 100 minutes apart. Only a check on the columns that describe a delivery finds it: ExpectCompoundColumnsToBeUnique.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Only two values differ between these rows, shown in orange: the ID and the time of typing. Everything that describes the delivery is the same, including the time it arrived. The system hands out a fresh delivery_id whenever someone types in a row, so an ID can be unique while the thing it stands for is counted twice. For inventory, this cola delivery would count 32 packs instead of 16. The expectation that catches it checks that the combination of date, store, product and quantity is unique. Choosing those columns is a judgement call: two real deliveries of the same product and quantity on the same day would also be flagged.
+52 sur 122
+Pandera: a table's schema as a Python class
+The schema of the product master data: one row per product the store sells, 64 rows, read from a CSV file as text
+class ProductMaster(pa.DataFrameModel):
+id: Series[int] = pa.Field(unique=True, gt=100)
+gtin: Series[str] = pa.Field(str_matches=r"^\d{13}$", unique=True)  # GTIN: the 13-digit barcode number
+unit: Series[str] = pa.Field(isin=["count", "kg", "liter"])
+unit_price: Series[float] = pa.Field(gt=0, le=500)
+supplier_id: Series[int] = pa.Field(isin=SUPPLIERS)  # the known supplier IDs
+shelf_life_days: Series[int] = pa.Field(ge=1, le=1825)  # at most 5 years
+...  # 4 more columns
+@pa.check("gtin")  # our own rule for one column: the barcode's last digit must fit the others
+def check_digit(cls, gtin):
+return gtin.map(gtin_is_valid)
+@pa.dataframe_check  # our own rule across columns: produce is sold by count or kg
+def produce_unit(cls, df):
+return (df.category != "produce") | df.unit.isin(["count", "kg"])
+class Config:
+coerce = True  # first convert the text to the column types
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Pandera describes a whole table. Each field is a column: its type (Series[int] is a column of integers) and its rules in pa.Field, such as unique, greater than, a regular expression, or a set of allowed values. The blue lines are these built-in rules. The orange lines are rules we write ourselves: a check for one column, here the GTIN check digit (the last digit of a barcode is computed from the others, so a typo usually breaks it), and a check across columns, here that produce is sold by count or by kilogram, never by liter. Because the CSV was read as text, coerce=True tells Pandera to convert each column to its type first; a value that cannot be converted, such as "N/A" as a price, is a failure too. Compared to GX, the schema is ordinary Python code, and it can be kept in the same file as the code that uses the table.
+53 sur 122
+Bad rows go to quarantine, good rows go on
+ProductMaster.validate(data, lazy=True) collects every failure instead of stopping at the first. The failing rows go to quarantine.csv with the reason; the other rows go on to the next step.
+id
+Product
+Value in the data
+Rule it breaks
+106
+Tomato
+unit "lbs"
+allowed units; produce by count or kg
+124
+Whole Wheat Bread
+GTIN 0702030001240
+the barcode's check digit
+139
+Marinara Sauce 24 oz
+price "2,99"
+price must convert to a number
+131
+Frozen Shrimp 1 lb
+supplier 502
+known supplier IDs only
+152
+Dish Soap 20 oz
+shelf life 9999 days
+at most 1,825 days
+120
+Cheddar Cheese 8 oz
+price −3.99
+price above 0
+150
+Paper Towels 6 rolls, 8 rolls
+two products with id 150
+id and GTIN unique
+Of 64 rows, 47 are valid and 17 are in quarantine; the table shows 7. Not caught: case sizes in inches instead of centimeters, a price that is too low, a product entered twice under a slightly different name. Each of these values is plausible on its own.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+By default, validation stops at the first problem. With lazy=True, Pandera checks everything and returns all failures in one table, and we use it to split the data: rows with any failure go to a quarantine file with a reason column, and the rest continues. A person can fix the quarantined rows and send them back. Some of the problems: a comma as the decimal point, a supplier ID nobody has, 9999 as a stand-in for "does not expire", a negative price, and one ID used for two products. Stress the last sentence on the slide. A case height of 12 is fine whether it means centimeters or inches, and a price of 0.99 is a valid price. Catching those needs checks that compare rows with each other or with other tables.
+54 sur 122
+A schema can also be learned from past data
+pa.infer_schema reads the February deliveries, a month without typing mistakes, and writes down the types and ranges it sees:
+quantity:  float64, greater_than_or_equal_to(2.0), less_than_or_equal_to(126.0)
+store_id:  int64,   greater_than_or_equal_to(1.0), less_than_or_equal_to(8.0)
+unit:      string
+Checking the March deliveries against this learned schema:
+23
+March deliveries flagged
+21
+are real typing mistakes
+2
+are correct deliveries, only larger than any in February
+The upper bound of 126 is February's largest delivery. Review a learned schema, and widen its bounds, before you use it.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Writing every range by hand is work, so Pandera can infer a schema from data you trust. Here it looked at February's clean deliveries and took the smallest and largest values it saw as the bounds. Checked against the March data as typed in, the learned schema flags 23 deliveries. 21 are mistakes that the typed-in version adds, such as the huge quantities. The other 2 are correct deliveries that happen to be a bit larger than anything in February. A learned bound is a description of one sample, so it produces false alarms as soon as normal data varies, and it misses errors that fall inside the range. Treat it as a first draft that a person reviews.
+55 sur 122
+Many Schema Libraries/Formats
+Examples
+Avro
+XML Schema
+Protobuf
+Thrift
+Parquet
+ORC
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 122
+Summary: Schema
+Basic structure and type definition of data
+Well supported in databases and many tools
+Very low bar for data quality
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 122
+Dirty Data: Breakout
+As a group, post and follow up in #lecture, tagging group members and @mlipbot: Identify 2 data quality problems that would not be possible with schema enforcement.
+57
+TABLE: DELIVERY
+ID
+StoreID
+Product
+Received
+Qty
+Unit
+50117
+3101
+Bananas
+2013-03-04
+36
+kg
+50118
+3101
+Bananas
+2013-03-04
+36
+kg
+50119
+3109
+Kraft Dinner 225g
+2013-03-05
+48
+count
+50120
+3102
+Cheerios 525g
+2013-02-30
+24
+count
+50121
+3102
+Bananas
+2013-03-06
+80000
+kg
+50122
+3103
+Tide Pods 42 ct
+2013-03-06
+12
+cases
+TABLE: STORE
+StoreID
+City
+Province
+3101
+Toronto
+ON
+3102
+Calgary
+ON
+3103
+Ottawa
+ON
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Answer key (3 schema problems, 3 wrong or inconsistent data problems)
+Schema problems:
+- 50122: Unit "cases" is not an allowed value (count, kg, liter)
+- 50119: StoreID 3109 does not exist in STORE (referential integrity)
+- 50120: Received 2013-02-30 is not a valid date
+Wrong or inconsistent data (the schema accepts them):
+- 50117 and 50118: the same delivery entered twice (different IDs, same store, product, date, quantity)
+- 50121: 80,000 kg of bananas for one store (outlier; probably a typo or a wrong unit)
+- Store 3102: Calgary is in Alberta (AB), not Ontario (ON)
+Follow-up question: how would you detect each problem automatically?
+58 sur 122
+Wrong and Inconsistent Data
+Application- and domain-specific data issues
+​
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 122
+Dirty Data: Example
+Problems with this data? Which Problems are Schema Problems?
+​
+59
+TABLE: PRODUCT
+ID
+Name
+Category
+UnitPrice
+Unit
+Case L×W×H (cm)
+SupplierID
+10421
+Kraft Dinner 225g
+pantry
+1.29
+count
+40 × 30 × 20
+204
+10421
+Bananas
+produce
+0.69
+kg
+15.7 × 11.8 × 9.8
+201
+10422
+Tide Pods 42 ct
+produce
+13.99
+liter
+30 × 20 × 25
+205
+10423
+MISC ITEM
+pantry
+Cheerios
+count
+999 × 999 × 999
+203
+TABLE: SUPPLIER
+ID
+Name
+Phone
+City
+Province
+201
+Fresh Fields Produce
+999-999-9999
+Mississauga
+ON
+203
+General Mils
+416-555-0199
+Torronto
+Ontario
+204
+Kraft Heinz Canada
+416-555-0123
+Toronto
+ON
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+​
+Answer key (Target Canada: data entered manually, no validation)
+Schema problems:
+- PRODUCT ID 10421 twice (primary key not unique)
+- UnitPrice "Cheerios": not a number (name typed into the wrong field)
+- Unit "liter" for category produce (violated dependency: produce is sold by count or kg)
+- SupplierID 205 does not exist in SUPPLIER (referential integrity)
+Other problems (wrong or inconsistent data; the schema accepts them):
+- Bananas case 15.7 × 11.8 × 9.8: inches typed into a cm field (40 × 30 × 25 cm)
+- Tide Pods in category produce (wrong but legal value; should be household)
+- 999 × 999 × 999 and 999-999-9999: placeholders for missing values
+- MISC ITEM: vague description
+- General Mils, Torronto: misspellings
+- Province "Ontario" vs "ON": inconsistent format
+60 sur 122
+Wrong and Inconsistent Data
+Missing values: SupplierPhone=999-999-9999
+Misspellings: City=Torronto
+Misfielded values: Category=Kraft Heinz
+Duplicate records: Name=Kraft Dinner 225g, Name=KD Mac & Cheese 225g
+Wrong reference: delivery=(ProductID=10421, Name=“Bananas”) if product 10421 exists but is Kraft Dinner
+​
+Q. How can we detect and fix these problems?
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 122
+Most mistakes happen when people type data in.
+How mistakes get into the data
+Mistake
+Examples in the data
+typo
+"Atlanic Salmon", "oCrn Flakes 18 oz", the city "Pittsburg"
+several spellings
+the unit kg as Kg, kgs, KG or kilogram; count as ct, each or Count
+a wrong but valid ID
+a delivery of olive oil typed in with the product ID of oat milk
+a value in the wrong field
+the city "USA"; a supplier's name in the category field
+a quantity off by a factor
+grams typed as kilograms (54,000 kg of bananas); an extra digit (300 instead of 30)
+a placeholder for "unknown"
+the date 1900-01-01, the phone number 999-9999999, a shelf life of 9999 days
+typed in twice, or never
+the same cola delivery twice, 100 minutes apart; a delivery nobody typed in
+swapped digits
+two digits swapped in a manual stock count
+an outdated price
+the checkout system charges an old price instead of the catalog price
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+These are the kinds of mistakes from the lecture's list of wrong and inconsistent data, as they show up in a supermarket. Almost all of them come from people typing: misspelling, spelling a unit their own way, picking a neighboring product in a list, typing into the wrong field, entering grams where the system expects kilograms, typing a placeholder when they do not know a value, or entering a delivery twice. The checkout system adds one of its own: prices it did not update. Because the demo data is simulated, every mistake was put in on purpose and logged, so we can say exactly how many flagged rows are real mistakes. Keep the last line in mind: the checks and repairs in the rest of the lecture, especially the learned ones, only work because mistakes are the exception.
+62 sur 122
+Data Cleaning Overview
+Data analysis / Error detection
+Usually focused on specific kind of problems, e.g., duplication, typos, missing values, distribution shift
+Detection in input data vs detection in later stages (more context)
+Error repair
+Repair data vs repair rules, one at a time or holistic
+Data transformation or mapping
+Automated vs human guided
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+63 sur 122
+Example Tool: Great Expectations
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 122
+Rule-based detection: Data Quality Rules
+Rules can be used to reject data or repair it
+Invariants on data that must hold
+Typically about relationships of multiple attributes or data sources, eg.
+ZIP code and city name should correspond
+User ID should refer to existing user
+SSN should be unique
+For two people in the same state, the person with the lower income should not have the higher tax rate
+Classic integrity constraints in databases or conditional constraints
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+65 sur 122
+A flagged row: which value is wrong?
+977 deliveries have a product name that is not the catalog name of their product ID. A check finds them all. To repair a row, we have to decide which of the two values is wrong, and what the right value is.
+Delivery
+Product ID says
+Name typed in
+The real mistake
+500646
+130 Atlantic Salmon
+Atlanic Salmon
+the name, a typo (585 deliveries like this)
+500177
+157 Refill Oat Milk
+Refill Olive Oil
+the ID: it should be 156, Refill Olive Oil (392 deliveries like this)
+The next three slides repair the same 977 deliveries with three methods. They differ in the information they use to identify the wrong value:
+Repair rule
+a person decides in advance which value to trust
+Fuzzy matching
+a reference list: the product catalog
+Probabilistic repair
+the data itself
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Detecting a problem and repairing it are two different jobs. The check "the name must be the catalog name of the product ID" flags 977 deliveries, and every one of them is a real mistake. But the check only reports that the two values do not match. In 585 rows the clerk misspelled the name, and the ID is right. In 392 rows the clerk picked a neighboring product in the list, so the ID is wrong and the name is right. A repair has to tell these apart. The three methods that follow are alternatives: each one repairs the rows on its own, and we compare them on exactly these 977 rows.
+66 sur 122
+A repair rule always overwrites the same column
+Repair rule: when the name and the product ID do not match, replace the name with the catalog name of the ID.
+585
+repaired correctly: every typo in a name
+392
+repaired wrongly: where the ID was the mistake, the correct name "Refill Olive Oil" becomes "Refill Oat Milk". The row now looks consistent, so no check flags it again.
+Same failure: "take the city from the ZIP code" fixes "Pittsburg" and "USA", but moves the Monroeville store to Pittsburgh, because its ZIP code was the wrong value.
+Where a rule works: mapping unit spellings (Kg, kgs, ct, each, …) to kg, count or liter repaired 990 cells, all correctly. Each spelling can mean only one unit.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The simplest repair is a rule a person writes: when name and ID do not match, keep the ID. It is fast and fixes every typo. But the person who wrote it decided once, for all rows, which value is right, and for the 392 wrong IDs that decision is wrong. The rule overwrites the correct name, and afterwards the name and the ID match, so the check that found the mistake no longer flags it. The ZIP code rule from the stores table fails the same way for store 5. A repair rule is safe when each wrong value has only one possible correction: a unit spelled "kgs" can only mean kg.
+67 sur 122
+Fuzzy matching repairs only the clear cases
+A string-similarity library (rapidfuzz) finds the catalog name closest to the typed name. The repair is automatic only if that name is the catalog name of the delivery's product ID and is at least 85% similar; otherwise a person decides.
+571
+repaired correctly, e.g. "Atlanic Salmon" becomes "Atlantic Salmon"
+0
+repaired wrongly
+406
+sent to a person: all 392 wrong IDs, where the typed name is exactly another product's name, and 14 typos that were not similar enough
+Less likely to make wrong repairs because it repairs only when the typed name closely matches the catalog name of the ID. The wrong IDs go to a person. Its repairs are only as correct as the catalog.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Fuzzy matching compares strings by how many characters would have to change, so "Atlanic Salmon" is 97% similar to "Atlantic Salmon". It repairs automatically only when the closest catalog name belongs to the product ID on the delivery. For the wrong IDs the typed name is a perfect match for a different product: the ID and the name refer to two different products, and the catalog contains both, so it gives no way to choose. Those go to a person, who can check the delivery note. The price of making no mistakes is 406 rows of manual work.
+68 sur 122
+Learning from the data which value is wrong
+A small version of HoloClean, a research tool. Combinations of product ID, name, category, unit and supplier that occur in at least 30 deliveries count as correct. A rarer combination gets candidate repairs, the common combinations that differ in one or two columns, each with a probability. Repairs with a probability of at least 0.9 are applied; the rest go to a person.
+Delivery as typed in
+Repair
+Result
+ID 101 (Banana), name "Hummus 10 oz", category dairy, supplier 212
+ID → 160, Hummus 10 oz
+correct: category and supplier belong to hummus
+ID 134 (Cola 12 pk), name "Cola 6 pk", category beverages, supplier 206
+name → "Cola 12 pk"
+wrong: the ID should be 133; both packs have the same category, unit and supplier
+744 repaired correctly: all 585 typos and 159 wrong IDs
+71 repaired wrongly, each with a probability of at least 0.9
+162 sent to a person
+It needs no catalog, and it is the only method that fixes wrong IDs. It works only if most rows are correct, and it fails when two products have the same values in the other columns.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+This method does not need a rule or a reference list. Because most deliveries are typed in correctly, the combinations of product columns that appear often are taken as the truth. For a rare combination, the method searches for common ones that differ in one or two columns and scores each candidate by how often it occurs and how similar the changed values are. The hummus row shows the strength: the name, category, unit and supplier all belong to hummus, so the highest-scoring repair changes the ID, which neither the rule nor fuzzy matching can do. The cola row shows the weakness: the 6-pack and the 12-pack share category, unit and supplier, so the other columns are identical for both products, and the highest-scoring repair changes the wrong column, with a probability above 0.9. That happened in 71 deliveries. The demo implements this idea from HoloClean in a few lines of Python.
+69 sur 122
+Three repairs of the same 977 deliveries
+Method
+Knowledge comes from
+Repaired correctly
+Repaired wrongly
+Sent to a person
+repair rule
+a person, once, for all rows
+585
+392
+0
+fuzzy matching
+the product catalog
+571
+0
+406
+probabilistic repair
+the other columns in the data
+744
+71
+162
+Each method trades wrong repairs against work for people. The rule sends no rows to a person and repairs 392 wrongly; fuzzy matching repairs none wrongly and sends 406 to a person. Probabilistic repair fixes the most rows, but its 71 wrong repairs have probabilities as high as its correct ones, so nothing separates them.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The same 977 rows, three methods. Reading down the table, people supply less knowledge: a rule someone wrote, then a reference list someone maintains, then nothing but the data. In exchange, the methods rely more on the data itself being mostly correct. None of them gets all 977 right without help. The choice depends on what a wrong repair costs compared with an hour of a person's time: for inventory, a wrong product ID moves stock to the wrong product, so the cautious method with a person in the loop is often the right one. In the lecture's terms, these are repairing data with rules versus holistic, learned repair, and automated versus human-guided repair.
+70 sur 122
+Most approaches use ML to detect inconsistencies, writing rules is hard
+Anomaly detection (e.g., 80,000 kg shipment of bananas)
+Learning common patterns and outliers (e.g., product identifier and product name mapping)
+Drift detection (e.g., average scale readings rising)
+Near duplicate detection (e.g., two identical/similar shipments on the same day)
+Learn patterns from past repairs (e.g., corrected weight in sales)
+Usually identifying suspicious data rather than clear mistakes
+70
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+71 sur 122
+ML-based for Detecting Inconsistencies
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+72 sur 122
+Not many standard tools, �often custom data sciency solutions
+Anomaly detection with PyOD or Isolation Forest, LOF etc. in scikit-learn
+Near duplicate with Zingg, Dedupe, Splink
+Many academic tools, e.g. ActiveClean, Raha, HoloClean
+72
+Great Expectations library:
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+73 sur 122
+Discussion: �Data Quality Rules?
+​
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+74 sur 122
+ML ranks suspicious rows for a person to check
+A model can learn what normal data looks like from the data, and rank the rows that look different. A person checks the top of the ranking; some of those rows turn out to be correct.
+Approach
+What it learns
+Example it finds in the supermarket data
+Anomaly detection
+the usual values
+a delivery of 40,000 kg of onions
+Common patterns
+which values go together
+product 144 with the name "oCrn Flakes 18 oz"
+Near-duplicate detection
+when two rows describe one event
+the same yogurt delivery typed in twice, as 24 and 26.4 tubs
+Learning from past repairs
+which rows people corrected before
+checkout lines from a scale that weighs 15% too heavy
+How we measure a detector: take the rows it ranks highest and count how many are real mistakes. That share is its precision.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The rules in the previous part were written by people who knew the data. For many mistakes nobody writes a rule in advance. The four approaches on the slide learn from the data what is normal, or from past corrections what was wrong, and each one gives every row a score. The output is a ranked list of suspicious rows, some of them correct; the top of the list goes to a person. The examples are all real rows from the demo data. Because the data is simulated, we know which rows are real mistakes, so we can say for each detector what share of its top-ranked rows are mistakes. That share is the precision, and it is the number on the next slides.
+75 sur 122
+An unusual quantity depends on the product
+An anomaly detector gives every delivery a score for how different it is from the others, and a person checks the highest scores. 495 of the 198,815 deliveries have a wrong quantity: an extra digit, grams typed as kilograms, or a minus sign.
+Features: quantity, product and weekday
+100 lemons is a large number next to 5 kg of salmon, although both are normal deliveries. Many correct deliveries get high scores.
+61%
+of the 495 highest-scored deliveries are real mistakes
+Added: the usual quantity for this store and product
+Store 5 usually receives 40 kg of yellow onions per delivery, so 40,000 kg is 1,000 times the usual amount, and 100 lemons is a usual delivery of lemons.
+82%
+of the 495 highest-scored deliveries are real mistakes
+The numbers are for IsolationForest (scikit-learn). With ECOD, another common detector, the added feature raises precision from 56% to 82%. Switching detectors changes precision by a few points; the added feature raises it by more than 20.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+An anomaly detector learns what typical rows look like and scores each row by how far it is from them. It has no information about a delivery beyond the features we give it. With the quantity alone, every delivery is compared with all others: products that always come in large numbers get high scores, and small wrong deliveries get low ones. Adding one feature, how far this quantity is from the usual quantity of this product in this store, lets the detector compare like with like. That feature raises precision by more than 20 points for both detectors; switching between detectors changes it much less. It works because a store receives similar amounts of a product again and again. A third detector, LOF, fails on this data (0.4%): it compares how crowded each point's neighborhood is, and thousands of deliveries with exactly the same quantity make that comparison useless here.
+76 sur 122
+Learning which values go together
+All deliveries with product ID 144, grouped by the name the clerk typed in:
+Name typed in
+Deliveries
+Corn Flakes 18 oz
+3,232
+Tomato Soup
+7
+12 misspellings: Cor Flakes 18 oz, oCrn Flakes 18 oz, Corn Flkaes 18 oz, …
+12
+Almost every delivery of product 144 has the same name. From this, the method learns the pattern product ID → name and flags the 19 deliveries that break it. Nobody wrote this rule.
+The method tries every pair of columns and keeps the pairs that hold in at least 95% of rows. Most are real rules, such as "a store has one city". "A supplier delivers one category" holds in 98.7% of rows and is only a habit: the seafood supplier also sells frozen shrimp, so most rows that break it are correct.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+This is the idea behind learning patterns, shown on one product: one name appears in almost all deliveries of product 144. The code computes, for every pair of columns, how often each value comes with its most common partner, and keeps the pairs where that share is at least 95% and below 100%. For product ID and name the share is 99.5% over all products. The seven "Tomato Soup" rows are deliveries typed in with the wrong product ID, and the twelve others are typos; the pattern flags all 19. The same computation finds product name to category and store to city. The supplier-to-category pattern shows the limit: it describes how the business usually works, and a person has to decide that its exceptions are correct.
+77 sur 122
+Same 977 rows, found without writing a rule
+In the repair part, a person wrote the rule "the name must be the catalog name of the product ID" and needed the catalog to check it. The learned pattern product ID → name flags exactly the same 977 deliveries, using only the delivery data.
+Solved: finding the rows
+Nobody has to think of the rule, and no catalog is needed.
+Still open: which value is wrong
+585 rows have a typo in the name and 392 have a wrong product ID. The pattern flags both kinds in the same way.
+Delivery
+product_id
+Name typed in
+Usual name for this ID
+The real mistake
+500430
+144
+oCrn Flakes 18 oz
+Corn Flakes 18 oz
+typo in the name
+500177
+157
+Refill Olive Oil
+Refill Oat Milk
+wrong ID: should be 156
+Deciding which value to change is the repair problem from the previous part, with the same three options: a repair rule, fuzzy matching or probabilistic repair.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+This slide connects the learned patterns to the repair part. There, a person had to think of the rule that the name must match the product ID, and the check needed the product catalog. The learned pattern finds the identical 977 deliveries without either; it only needs most deliveries to be typed in correctly. So the learned pattern does the detection work, also for rules nobody thought to write. The repair question stays the same. A flagged row still has a name and an ID that do not match, and the pattern flags the typo and the wrong ID in the same way, so it gives no information about which value to change. The methods from the repair part apply unchanged, with the same trade-off between wrong repairs and work for people.
+78 sur 122
+Finding a delivery that was typed in twice
+January to March 2025: 22,573 deliveries; 108 were typed in twice, some with a slightly different quantity the second time.
+Delivery
+Store
+Product
+Date
+Quantity
+611803
+1
+Greek Yogurt 32 oz
+2025-02-24
+24
+900967
+1
+Greek Yogurt 32 oz
+2025-02-24
+26.4
+Same store, product and date: strong evidence of a duplicate. Quantities 10% apart: some evidence. Splink, a Python library for finding records that describe the same thing, adds up this evidence field by field and gives each pair of rows a match probability; for this pair it is 0.36.
+Method
+Duplicates found, of 108
+Pairs flagged wrongly
+exact match on store, product, date and quantity
+69
+5
+Splink, pairs with a match probability of at least 0.1
+108
+5
+Splink learns from the data how much each matching field counts. Learned from the data alone, the weights were wrong; we set by hand that a real duplicate almost always has the same store and product.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Near-duplicate detection is also called record linkage: deciding whether two records describe the same thing. Splink is one library for it, next to Dedupe and Zingg on the lecture slide. It compares each pair of rows field by field. A field that matches adds evidence, a field that differs removes some, and the sum becomes a probability. The yogurt pair is one delivery typed in twice, the second time with a slightly different quantity, so the exact rule misses it. With a threshold of 0.1, Splink finds all 108 duplicate pairs and flags 5 pairs that are two real deliveries; the exact rule finds 69. Splink estimates the weights from the data with an algorithm called expectation maximization. On this data it grouped the wrong rows until we set two weights from domain knowledge: a real duplicate has the same store and product in 99.9% of cases. A higher threshold flags fewer wrong pairs and finds fewer duplicates; at 0.3 it finds only 39.
+79 sur 122
+Past repairs teach a model what to check next
+At the checkout, fruit and meat are weighed; staff later correct some of these lines, and each correction is recorded. A gradient-boosting classifier learns from 20 days of past corrections which lines get corrected, using store, terminal, cashier, hour, product, quantity and price.
+Next 10 days: 7,210 lines, 480 need a correction (6.7%). Staff check the 360 lines the model ranks highest (5%):
+351 of 480
+lines that need a correction are among them; 98% of the checked lines need one.
+The causes behind the past corrections
+Cause
+Corrections
+the scale at store 2, terminal T3, weighs 15% too heavy from March 10 on
+418
+the container's weight was not subtracted (meat counter)
+177
+a look-alike product code, e.g. banana for organic banana, often by cashier C25
+78
+Terminal and store contribute most to the predictions, then product: the features that match these causes.
+The model only finds the kinds of mistakes that staff corrected before.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Every correction that staff make is a label: this line was wrong. Collected over time, these labels are training data. The classifier is trained on 14,329 lines from March 1 to 20, 673 of them corrected, and predicts for the next ten days which lines will need a correction. Checking 5% of the lines finds almost three quarters of the mistakes, and nearly every checked line is a hit. The model has no feature for scales or containers; it learned that lines from terminal T3 in store 2, meat products, and one cashier are risky, which matches the causes in the table. Permutation importance measures how much each feature contributes. The limit is in the last sentence: a new kind of mistake, one nobody has corrected before, does not show up in the training data, so the model will not rank it high.
+80 sur 122
+Dirty Data: Breakout 2
+As a group, post and follow up in #lecture, tagging group members and @mlipbot: Identify 2 data quality problems that schema enforcement would not catch and suggest how to detect/fix it.�	[Problem 1]: [How to detect/fix]�	[Problem 2]: [How to detect/fix]
+80
+TABLE: DELIVERY
+ID
+StoreID
+Product
+Received
+Qty
+Unit
+50117
+3101
+Bananas
+2013-03-04
+36
+kg
+50118
+3101
+Bananas
+2013-03-04
+36
+kg
+50119
+3109
+Kraft Dinner 225g
+2013-03-05
+48
+count
+50120
+3102
+Cheerios 525g
+2013-02-30
+24
+count
+50121
+3102
+Bananas
+2013-03-06
+80000
+kg
+50122
+3103
+Tide Pods 42 ct
+2013-03-06
+12
+cases
+TABLE: STORE
+StoreID
+City
+Province
+3101
+Toronto
+ON
+3102
+Calgary
+ON
+3103
+Ottawa
+ON
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Answer key (3 schema problems, 3 wrong or inconsistent data problems)
+Schema problems:
+- 50122: Unit "cases" is not an allowed value (count, kg, liter)
+- 50119: StoreID 3109 does not exist in STORE (referential integrity)
+- 50120: Received 2013-02-30 is not a valid date
+Wrong or inconsistent data (the schema accepts them):
+- 50117 and 50118: the same delivery entered twice (different IDs, same store, product, date, quantity)
+- 50121: 80,000 kg of bananas for one store (outlier; probably a typo or a wrong unit)
+- Store 3102: Calgary is in Alberta (AB), not Ontario (ON)
+Follow-up question: how would you detect each problem automatically?
+81 sur 122
+Dealing with Drift
+Why does my model begin to perform poorly over time?
+A very particular form of data accuracy problem (data becomes wrong), caused not by human creators but by the world. Very prevalent & affects product!
+​
+81
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+82 sur 122
+Models often Degrade over Time
+82
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+83 sur 122
+Data changes
+System objective changes over time
+Software components are upgraded or replaced
+Prediction models change
+Quality of supplied data changes
+User behavior changes
+Assumptions about the environment no longer hold
+Users can react to model output; or try to game/deceive the model
+Examples in inventory system?
+83
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+84 sur 122
+Data vs Concept Drift
+84
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+85 sur 122
+Types of Drift
+85
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+86 sur 122
+Drift & Model Decay
+Concept drift (or concept shift)
+properties to predict change over time (e.g., what is credit card fraud)
+model has not learned the relevant concepts
+over time: different expected outputs for same inputs
+Data drift (or covariate shift, virtual drift, distribution shift, or population drift)
+characteristics of input data changes (e.g., customers with face masks)
+input data differs from training data
+over time: predictions less confident, further from training data
+Schema drift (upstream data changes)
+external changes in data pipeline (e.g., format changes in weather service)
+model interprets input data incorrectly
+over time: abrupt changes due to faulty inputs
+How do we fix these drifts?
+86
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+87 sur 122
+On Terminology
+Concept and data drift are separate concepts
+In practice and literature, not always clearly distinguished
+Colloquially encompasses all forms of model degradations and environment changes
+Define term for target audience
+​
+​
+87
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+88 sur 122
+Breakout: Drift
+Scenario: Target inventory management, predicting how much inventory should be in stock next week
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Concept Drift:
+Data Drift:
+Schema Drift:
+88
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+89 sur 122
+Indicators of Concept Drift
+How to detect concept drift in production?
+​
+​
+89
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+90 sur 122
+Indicators of Concept Drift
+Model degradations observed with telemetry
+Telemetry indicates different outputs over time for similar inputs
+Differences in influential features and feature importance over time
+Relabeling training data changes labels
+Interpretable ML models indicate rules that no longer fit
+(many papers on this topic, typically on statistical detection)
+90
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+91 sur 122
+Indicators of Data Drift
+How to detect data drift in production?
+​
+​
+91
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+92 sur 122
+Indicators of Data Drift
+Model degradations observed with telemetry
+Distance between input distribution and training distribution increases
+Average confidence of model predictions declines
+Relabeling of training data retains stable labels
+92
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+93 sur 122
+Detecting Data Drift
+93
+Compare distributions over time (e.g., t-test)
+Detect both sudden jumps and gradual changes
+Distributions can be manually specified or learned (see invariant detection)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+94 sur 122
+Drift Detection Tools
+Many ML monitoring platforms support drift detection
+Evidently AI, NannyML, Alibi Detect, …
+Arize AI, Fiddler AI, Whylabs, …
+SageMaker Model Monitor, Azure ML Data Drift, Vertex Model Monitoring, …
+Possible to build your own…
+94
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+95 sur 122
+Microsoft Azure Data Drift Dashboard
+95
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+96 sur 122
+Dealing with Drift
+Regularly retrain model on recent data
+Use evaluation in production to detect decaying model performance
+Involve humans when increasing inconsistencies detected
+Monitoring thresholds, automation
+Monitoring, monitoring, monitoring!
+96
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+97 sur 122
+Data Quality is a System-Wide Concern
+97
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+98 sur 122
+Data Cascades
+"Compounding events causing negative, downstream effects from data issues, that result in technical debt over time."
+​
+​
+98
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+99 sur 122
+Common Data Cascades
+Physical world brittleness
+Idealized data, ignoring realities and change of real-world data
+Static data, one time learning mindset, no planning for evolution
+Inadequate domain expertise
+Not understand data and its context
+Involving experts only late for troubleshooting
+​
+Conflicting reward systems
+Missing incentives for data quality
+Not recognizing data quality importance, discard as technicality
+Missing data literacy with partners
+Poor (cross-org.) documentation
+Conflicts at team/organization boundary
+Undetected drift
+​
+99
+Sambasivan, N., et al. (2021). “Everyone wants to do the model work, not the data work”: Data Cascades in High-Stakes AI. In Proc. Conference on Human Factors in Computing Systems.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+100 sur 122
+Interacting with physical world brittleness
+Brittle deployments interacting with not-digitised physical worlds
+Time to manifest: 2-3 years to emerge, almost always in the production stage
+Impact: Complete model failure, abandonment of projects, harms to beneficiaries from mispredictions
+Triggers: drifts
+Hardware drifts (Rain, wind, fingerprints, shadows)
+Environmental drifts (lighting, temperature, humidity)
+Social drifts (new regulations, new user behaviors)
+Address: Monitor data source, retrain models, introduce noise in data
+e.g. an AI model for the COVID-19 pandemic on day 1 versus day 100 required a total change in various assumptions since the pandemic and human responses were volatile and dynamic
+​
+100
+Example for Inventory Mgmt Scenario?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+101 sur 122
+Inadequate application-domain expertise
+AI practitioners are responsible for data sense-making in contexts in which they do not have domain expertise.
+Time to manifest: After building models through client feedback & system performance
+Impact: Costly modification (improve labels, collect more data), Unanticipated downstream impacts
+Triggers:
+Subjectivity in ground truths (e.g. Decision history on claims of insurance companies)
+Poor application-domain expertise in finding representative data (e.g. Cannot take 90% of the data from one hospital and generalise for the entire world!)
+Address: Faithfully document data sources, involve domain experts in data collection
+​
+101
+Example for Inventory Mgmt Scenario?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+102 sur 122
+Conflicting Reward Systems
+Misaligned incentives and priorities between practitioners, domain experts, and field partners.
+Time to manifest: Model deployment
+Impact: Costly iterations, moving to an alternate data source, quitting the project
+Triggers: Need annotation but...
+Inserted as extraneous work
+Not compensated well
+Competing priority with partners’ primary responsibility
+Address: Provide incentives & training
+e.g., when a clinician spends a lot of time punching in data, not paying attention to the patient, that has a human cost
+​
+102
+Example for Inventory Mgmt Scenario?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+103 sur 122
+Poor Cross-organizational Documentation
+Lack of documentation across various cross organisational relations, causing lack of understanding on metadata
+Time to manifest: manual reviews, by "chance"
+Impact: Wasted time and effort from using incorrect data, being blocked on building models, and discarding subsets or entire datasets
+Triggers:
+inherited datasets lacked critical details
+feld partners not being aware of constraints in achieving good quality AI
+Address: Create a data curation plan in advance and take ample field notes in order to create reproducible assets for data
+e.g., a lack of metadata and collaborators changing schema without understanding context led to a loss of four months of precious medical robotics data collection.”
+​
+103
+Example for Inventory Mgmt Scenario?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+104 sur 122
+Discussion: Possible Data Cascades?
+Interacting with physical world brittleness
+Inadequate domain expertise
+Conflicting reward systems
+Poor (cross-organizational) documentation
+​
+​
+104
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+105 sur 122
+Data Documentation
+Let's use data documentation as an entry point to discuss what aspects of data we care about.
+​
+105
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+106 sur 122
+Data Quality is a System-Wide Concern
+Data flows across components, e.g., from user interface into database to crowd-sourced labeling team into ML pipeline
+Humans interacting with the system
+Entering data, labeling data
+Observed with sensors/telemetry
+Incentives, power structures, recognition
+Organizational practices
+Value, attention, and resources given to data quality
+Documentation at the interfaces is important
+106
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+107 sur 122
+Data Quality Documentation
+Teams rarely document expectations of data quantity or quality.
+Data quality tests are rare, but some teams adopt defensive monitoring.
+Local tests about assumed structure and distribution of data
+Identify drift early and reach out to producing teams
+Several ideas for documenting distributions, including Datasheets and Dataset Nutrition Label
+Mostly focused on static datasets, describing origin, consideration, labeling procedure, and distributions; Example
+107
+🗎 Gebru, Timnit, et al. "Datasheets for datasets." Communications of the ACM 64, no. 12 (2021).
+🗎 Nahar, Nadia, et al. “Collaboration Challenges in Building ML-Enabled Systems: Communication, Documentation, Engineering, and Process.” In Pro. ICSE, 2022.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+108 sur 122
+Data Card
+Data Cards are for fostering transparent, purposeful and human-centered documentation of datasets within the practical contexts of industry and research. They are structured summaries of essential facts about various aspects of ML datasets…provide explanations of processes and rationales that shape the data and consequently the models.
+​
+108
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+109 sur 122
+109
+The Dataset Creator and Purpose
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+110 sur 122
+110
+How to Use the Dataset
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+111 sur 122
+111
+Data fields
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+112 sur 122
+112
+Datapoint Example
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+113 sur 122
+113
+Data source and collection
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+114 sur 122
+114
+Labeling Process
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+115 sur 122
+115
+Data distribution
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+116 sur 122
+Entries in data card
+Very good reference for data quality, but way too difficult to fill out for every dataset so usually ignored...
+116
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+117 sur 122
+Data Cards give you an idea of what might impact data quality
+We will touch on some:
+Data quality, in terms of noise (e.g. from upstream data source, from human labelers)
+Data drifts (static dataset and its source, vs. the world now)
+Data quality, in terms of distributions (disagreements between annotators, biases towards certain distribution, annotation incentives – tend to select easy labels, etc.)
+Data curation (shape the data towards what you want)
+117
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+118 sur 122
+Preview: Inaccurate Data can also be caused by factors other than drift
+How do you detect and fix more systemic data quality issues?
+​
+118
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+119 sur 122
+Challenge from collection and processing: Bias
+The concept of "raw data" might be misleading; Data is always some proxy we actively collect to represent the world. Someone decides...
+What data to collect
+How to collect them
+What scale to use
+They change what you can do with the data
+119
+Recommended Reading: Gitelman, Lisa, Virginia Jackson, Daniel Rosenberg, Travis D. Williams, Kevin R. Brine, Mary Poovey, Matthew Stanley et al. "Data bite man: The work of sustaining a long-term study." In "Raw Data" Is an Oxymoron, (2013), MIT Press: 147-166.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+120 sur 122
+What happens: Data is inaccurate �(for what you want to do)
+Missing data
+Biased data
+Systematic errors in data distribution
+120
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+121 sur 122
+Summary
+Data quality is a system-level concern
+Data quality at the interface between components
+Documentation and monitoring often poor
+Involves organizational structures, incentives, ethics, …
+Data from many sources, often inaccurate, imprecise, inconsistent, incomplete, … – many different forms of data quality problems
+Many mechanisms for enforcing consistency and cleaning
+Data schema ensures format consistency
+Data quality rules ensure invariants across data points
+Concept and data drift are key challenges → monitor
+121
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+122 sur 122
+Further Readings
+Schelter, S., Lange, D., Schmidt, P., Celikel, M., Biessmann, F. and Grafberger, A., 2018. Automating large-scale data quality verification. Proceedings of the VLDB Endowment, 11(12), pp.1781-1794.
+Polyzotis, Neoklis, Martin Zinkevich, Sudip Roy, Eric Breck, and Steven Whang. "Data validation for machine learning." Proceedings of Machine Learning and Systems 1 (2019): 334-347.
+Polyzotis, Neoklis, Sudip Roy, Steven Euijong Whang, and Martin Zinkevich. 2017. “Data Management Challenges in Production Machine Learning.” In Proceedings of the 2017 ACM International Conference on Management of Data, 1723–26. ACM.
+Theo Rekatsinas, Ihab Ilyas, and Chris Ré, “HoloClean - Weakly Supervised Data Repairing.” Blog, 2017.
+Ilyas, Ihab F., and Xu Chu. Data cleaning. Morgan & Claypool, 2019.
+Moreno-Torres, Jose G., Troy Raeder, Rocío Alaiz-Rodríguez, Nitesh V. Chawla, and Francisco Herrera. "A unifying view on dataset shift in classification." Pattern recognition 45, no. 1 (2012): 521-530.
+Vogelsang, Andreas, and Markus Borg. "Requirements Engineering for Machine Learning: Perspectives from Data Scientists." In Proc. of the 6th International Workshop on Artificial Intelligence for Requirements Engineering (AIRE), 2019.
+Humbatova, Nargiz, Gunel Jahangirova, Gabriele Bavota, Vincenzo Riccio, Andrea Stocco, and Paolo Tonella. "Taxonomy of real faults in deep learning systems." In Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering, pp. 1110-1121. 2020.
+122
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

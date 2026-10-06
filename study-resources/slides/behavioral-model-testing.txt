@@ -1,0 +1,738 @@
+06 evals - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 75
+Model Testing beyond Accuracy
+Machine Learning in Production
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+2 sur 75
+Learning Goals
+Curate validation datasets for assessing model quality, covering subpopulations and capabilities as needed
+Explain the oracle problem and how it challenges testing of software and models
+Use invariants to check partial model properties with automated testing
+Select and deploy automated infrastructure to evaluate and monitor model quality
+​
+2
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+3 sur 75
+3
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+4 sur 75
+Curating Validation Data & Input Slicing
+4
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+5 sur 75
+Breakout Discussion
+Write a few tests for the following program:
+​
+​
+A test may look like:
+​
+​
+As a group, discuss how you select tests. Discuss how many tests you need to feel confident.
+As a group, post and follow up in #lecture, tagging group members:
+Selection strategy: …
+Test quantity: ...
+5
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note: Can focus on specification (and concepts in the domain, such as leap days and month lengths) or can focus on implementation
+Will not randomly sample from distribution of all days
+​
+6 sur 75
+Software Test Case Design
+Opportunistic/exploratory testing: Add some unit tests, without much planning
+Specification-based testing ("black box"): Derive test cases from specifications
+Boundary value analysis
+Equivalence classes
+Combinatorial testing
+Random testing
+Structural testing ("white box"): Derive test cases to cover implementation paths
+Line coverage, branch coverage
+Control-flow, data-flow testing, MCDC, ...
+Test execution usually automated, but can be manual too; automated generation from specifications or code possible
+6
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+7 sur 75
+Example: Boundary Value Testing
+Analyze the specification, not the implementation!
+Key Insight: Errors often occur at the boundaries of a variable value
+For each variable select (1) minimum, (2) min+1, (3) medium, (4) max-1, and (5) maximum; possibly also invalid values min-1, max+1
+Example: nextDate(2015, 6, 13) = (2015, 6, 14)
+Boundaries?
+​
+7
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+8 sur 75
+Example: Equivalence classes
+Idea: Typically many values behave similarly, but some groups of values are different
+Equivalence classes derived from specifications (e.g., cases, input ranges, error conditions, fault models)
+Example nextDate(2015, 6, 13)
+leap years, month with 28/30/31 days, days 1-28, 29, 30, 31
+Pick 1 value from each group, combine groups from all variables
+8
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+9 sur 75
+Thought experiment
+suggest test cases based on boundary value analysis and equivalence class testing
+9
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+10 sur 75
+Selecting Validation Data for Model Quality?
+Validation data should reflect usage data
+Be aware of data drift (face recognition during pandemic, new patterns in credit card fraud detection)
+"Out of distribution" predictions often low quality (it may even be worth to detect out of distribution data in production, more later)
+(note, similar to requirements validation: did we hear all/representative stakeholders)
+10
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+11 sur 75
+Not All Inputs are Equal: Frequent Cases
+"Call mom" "What's the weather tomorrow?" "Add asafetida to my shopping list"
+11
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+12 sur 75
+Not All Inputs are Equal: Edge Cases
+12
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+13 sur 75
+Not All Inputs are Equal
+some random mistakes vs rare but biased mistakes?
+A system to detect when somebody is at the door that never works for people under 5ft (1.52m)
+A spam filter that deletes alerts from banks
+Technology from Amazon, Apple, Google, IBM and Microsoft misidentified 35 percent of words from people who were black. White people fared much better. – NYTimes March 2020
+​
+13
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+14 sur 75
+How do you identify Important Inputs?
+(We already hinted so...)
+​
+​
+​
+​
+​
+​
+14
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+15 sur 75
+Identify Important Inputs
+Curate Validation Data for Specific Problems and Subpopulations:
+Important inputs ("call mom") – expect very high accuracy
+closest equivalent to unit tests
+Different subpopulations (e.g., accents) – expect comparable accuracy
+Challenging cases or stretch goals – accept lower accuracy
+Derive from requirements, experts, user feedback, expected problems etc. Think specification-based testing.
+15
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+16 sur 75
+Access to Important Inputs: Partitioning
+Guide testing by identifying groups and analyzing accuracy of subgroups
+Often for fairness: gender, country, age groups, ...
+Possibly based on business requirements or cost of mistakes
+Slice test data by population criteria, also evaluate interactions
+Identifies problems and plan mitigations, e.g., enhance with more data for subgroup or reduce confidence
+16
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+17 sur 75
+Input Partitioning Example
+Slice and hypothesis on model's cat recognition behavior
+17
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Source: Johnson, Nari, et al. "Where Does My Model Underperform? A Human Evaluation of Slice Discovery Algorithms." In HCOMP 2023
+18 sur 75
+Input Partitioning Example
+Multiple slices on image recognition, and model comparison
+​
+​
+​
+​
+​
+​
+18
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Source: Cabrera, Alex, et al. "Zeno: An Interactive Framework for Behavioral Evaluation of Machine Learning." In CHI 2023
+19 sur 75
+Example: Model Impr. at Apple (Overton)
+19
+Ré, Niu, Gudipati, Srisuwananukorn. (2019). Overton: A data system for monitoring and improving machine-learned products. arXiv:1909.05372.
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Focus engineers on creating training and validation data, not on model search (AutoML)
+Flexible infrastructure to slice telemetry data to identify underperforming subpopulations -> focus on creating better training data (better, more labels, in semi-supervised learning setting)
+​
+​
+20 sur 75
+Example: Model Impr. at Apple (Overton)
+Focus engineers on creating training and validation data, not on model search (AutoML)
+Flexible infrastructure to slice telemetry data to identify underperforming subpopulations -> focus on creating better training data (better, more labels, in semi-supervised learning setting)
+​
+20
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+21 sur 75
+Input Partitioning Discussion
+How to slice evaluation data for food ordering agent?
+​
+​
+​
+​
+​
+​
+21
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+22 sur 75
+Input Partitioning Discussion
+How to slice evaluation data for Excel Agent?
+​
+​
+​
+​
+​
+​
+22
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+23 sur 75
+Behavioral Testing (Capabilities)
+23
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+24 sur 75
+Testing Capabilities
+Core idea: Define "capabilities" that the model should grasp in order to do a test well, and create targeted test cases for those capabilities.
+​
+​
+​
+​
+Where do capabilities come from?
+24
+Ribeiro, Marco Tulio, Tongshuang Wu, Carlos Guestrin, and Sameer Singh. "Beyond Accuracy: Behavioral Testing of NLP Models with CheckList." In Proceedings ACL, p. 4902–4912. (2020).
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Sort of involves thinking about a model and what it should do in a unit-testing like way.  Breaking it down into particular pieces of functionality.
+In the paper we listed a bunch of standard, "shared" capabilities across NLP tasks -- e.g. whatever model it is, it should be able to handle negation, synonyms, etc., just that the model should react in different ways.
+Should be more use-case specific and from domain knowledge!
+​
+​
+25 sur 75
+Capabilities and where they come from
+In the paper we listed a bunch of standard, "shared" capabilities across NLP tasks -- e.g. whatever model it is, it should be able to handle negation, synonyms, etc., just that the model should react in different ways.
+Should be more use-case specific and from domain knowledge!
+​
+25
+Ribeiro, Marco Tulio, Tongshuang Wu, Carlos Guestrin, and Sameer Singh. "Beyond Accuracy: Behavioral Testing of NLP Models with CheckList." In Proceedings ACL, p. 4902–4912. (2020).
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Sort of involves thinking about a model and what it should do in a unit-testing like way.  Breaking it down into particular pieces of functionality.
+26 sur 75
+Strategies for identifying capabilities
+Analyze common mistakes (e.g., classify past mistakes in cancer prognosis, food agent interactions that don’t convert)
+Use existing knowledge about the problem (e.g., linguistics theories)
+Observe humans (e.g., how do radiologists look for cancer)
+Derive from requirements (e.g., fairness)
+Causal discovery from observational data?
+​
+26
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+27 sur 75
+What could be capabilities of the Excel Agent?
+​
+​
+27
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+28 sur 75
+Capabilities: common paradigm in LLM evals
+​
+​
+MMLU (Massive Multitask Language Understanding): 16,000 multiple-choice questions across 57 subjects → capabilities (biology, US history, law.)
+Aggregate accuracy hides variation.
+HumanEval: 164 handwritten Python programming problems (function signature + docstring)
+Tested via execution against hidden unit tests (simulation-based testing!)
+Both benchmarks operationalize "what should this model be able to do", slicing by subject/problem type.
+28
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Debates about MMLU are debates about test curation. Which matter? Is the data contaminated? Does multiple-choice format mask weaknesses?
+Both benchmarks operationalize "what should this model be able to do", use slicing.
+Both require curation decisions that encode assumptions about what matters
+When a benchmark "saturates," we need new capabilities to test.
+​
+29 sur 75
+Capabilities vs Specifications vs Slicing
+Capabilities are partial specifications of expected behavior (not expected to always hold)
+Some capabilities correspond to slices of existing test data, for others we may need to create new data
+​
+29
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+30 sur 75
+Generating Test Data for Capabilities
+Idea 1: Domain-specific generators
+Testing negation in sentiment analysis with template:
+I {NEGATION} {POS_VERB} the {THING}.
+​
+Testing texture vs shape priority with artificial generated images:
+​
+30
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+31 sur 75
+Generating Test Data for Capabilities
+Idea 2: Mutating existing inputs
+Testing synonyms in sentiment analysis by replacing words with synonyms, keeping label
+Testing robust against noise and distraction: add “and”, “false”, “is not true” or random URLs to text
+​
+​
+31
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+32 sur 75
+Generating Test Data for Capabilities
+Idea 3: Crowd-sourcing test creation
+Testing sarcasm in sentiment analysis: Ask humans to minimally change text to flip sentiment with sarcasm
+Testing background in object detection: Ask humans to take pictures of specific objects with unusual backgrounds
+​
+​
+32
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+33 sur 75
+Generating Test Data for Capabilities
+Idea 4: Slicing test data
+Testing negation in sentiment analysis by finding sentences containing 'not'
+​
+​
+33
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+34 sur 75
+Generating Test Data for Capabilities
+Idea 5: Directly synthesize data using LLMs
+This can give you "pseudo" labeled data for tasks/capabilities largest models are known to have. Known as "distillation"
+​
+​
+34
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Risks?
+35 sur 75
+Generating Test Data for Capabilities
+How to generate test data for capabilities of the Excel Agent?
+35
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+36 sur 75
+Testing vs Training Capabilities
+Dual insight for testing and training
+Strategies for curating test data can also help select training data
+Generate capability-specific training data to guide training (data augmentation)
+​
+​
+36
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+37 sur 75
+Why Augmentation: Generalization beyond Training Distribution?
+Typically training and validation data from same distribution (i.i.d. assumption!)
+Many models can achieve similar accuracy
+Models that learn "right" abstractions possibly indistinguishable from models that use shortcuts
+Some models generalize better to other distributions not used in training
+e.g., cancer images from other hospitals, from other populations, unanticipated user queries to the agent
+Drift and attacks, ...
+37
+See discussion in D'Amour, Alexander, et al. "Underspecification presents challenges for credibility in modern machine learning." arXiv preprint arXiv:2011.03395 (2020).
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+38 sur 75
+Hypothesis: Capabilities may help
+Capabilities are "partial specifications", given beyond training data
+Encode domain knowledge of the problem
+Capabilities are inherently domain specific
+Curate capability-specific test data for a problem
+Testing for capabilities helps to distinguish models that use intended abstractions
+May help find models that generalize better
+​
+38
+Matt Gardner et al. "Evaluating Models’ Local Decision Boundaries via Contrast Sets." arXiv 2020.
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+39 sur 75
+On Terminology
+Test data curation is emerging as a very recent concept for testing ML components
+No consistent terminology
+"Testing capabilities" in checklist paper
+"Stress testing" in some others (but stress testing has a very different meaning in software testing: robustness to overload)
+Software engineering concepts translate, but names not adopted in ML community
+specification-based testing, black-box testing
+equivalence class testing, boundary-value analysis
+39
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+40 sur 75
+Testing Invariants with Unlabeled Data
+(random testing, if it wasn't for that darn oracle problem)
+​
+40
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+41 sur 75
+Randomly Generating "Realistic" Inputs is Possible
+But how do we know whether the computation is correct?
+41
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+42 sur 75
+Automated Model Validation Data Generation?
+But how do we get labels?
+42
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+43 sur 75
+The Oracle Problem
+How do we know the expected output of a test?
+​
+​
+43
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+44 sur 75
+Manually constructing outputs
+(tedious, labor intensive; possibly crowd sourced)
+​
+44
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+45 sur 75
+Compare against reference impl.
+assuming we have a correct implementation. no reference implementation for ML problems)
+​
+45
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+46 sur 75
+Checking global specifications
+Ensure no computation crashes
+​
+​
+​
+​
+​
+​
+​
+​
+(we usually don’t fear crashing bugs in ML models)
+​
+46
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+47 sur 75
+Invariants as partial specification
+47
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+48 sur 75
+Invariants in Machine Learned Models?
+48
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+49 sur 75
+Invariants in Large Language Models?
+49
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+50 sur 75
+Invariants in Agentic Systems?
+50
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+51 sur 75
+Invariants in Machine Learned Models (Metamorphic Testing)
+Exploit relationships between inputs
+If two inputs differ only in X → output should be the same
+If inputs differ in Y output should be flipped
+If inputs differ only in feature F, prediction for input with higher F should be higher
+...
+​
+51
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+52 sur 75
+Metamorphic Testing, more formally
+Formal description of relationships among inputs and outputs (Metamorphic Relations)
+In general, for a model 𝑓 and inputs 𝑥 define two functions to transform inputs and outputs 𝑔𝐼 and 𝑔𝑂 such that:
+∀𝑥.𝑓(𝑔𝐼(𝑥)) = 𝑔𝑂(𝑓(𝑥))
+​
+e.g. 𝑔𝐼(𝑥) = 𝚛𝚎𝚙𝚕𝚊𝚌𝚎(𝑥," is ", " is not ") and 𝑔𝑂(𝑥) = ¬𝑥
+52
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+53 sur 75
+Some Capabilities are Invariants
+Some capability tests can be expressed as invariants and automatically encoded as transformations to existing test data
+Negation should flip sentiment analysis result
+Typos should not affect sentiment analysis result
+Changes to locations or names should not affect sentiment analysis results
+​
+​
+53
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+54 sur 75
+Some Capabilities are Invariants
+For those that output should change: in ML we calculate the prediction probability
+Add negation to positive sentences should decrease the probability of model predicting it to be a positive sentence
+54
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+55 sur 75
+Examples of Invariants
+Credit rating should not depend on gender:
+∀𝑥.𝑓(𝑥[gender←male])=𝑓(𝑥[gender←female])
+Synonyms should not change the sentiment of text:
+∀𝑥.𝑓(𝑥)=𝑓(𝚛𝚎𝚙𝚕𝚊𝚌𝚎(𝑥,"is not", "isn't"))
+Negation should swap meaning:
+∀𝑥∈"X is Y".𝑓(𝑥)=1−𝑓(𝚛𝚎𝚙𝚕𝚊𝚌𝚎(𝑥," is ", " is not "))
+Robustness around training data:
+∀𝑥∈training data.∀𝑦∈mutate(𝑥,𝛿).𝑓(𝑥)=𝑓(𝑦)
+Low credit scores should never get a loan (sufficient conditions for classification, "anchors"):
+∀𝑥.𝑥.score<649⇒¬𝑓(𝑥)
+Identifying invariants requires domain knowledge of the problem!
+Powerful, if we have this we have automatic test in production
+55
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+56 sur 75
+On Testing with Invariants/Assertions
+Defining good metamorphic relations requires knowledge of the problem domain
+Good metamorphic relations focus on parts of the system
+Invariants usually cover only one aspect of correctness – maybe capabilities
+Invariants and near-invariants can be mined automatically from sample data (see specification mining and anchors)
+​
+56
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+57 sur 75
+Approaches for Checking Invariants
+Generating test data (random, distributions) usually easy
+Transformations of existing test data
+Adversarial learning: For many techniques gradient-based techniques to search for invariant violations – that's roughly analogous to symbolic execution in SE
+Early work on formally verifying invariants for certain models (e.g., small deep neural networks)
+​
+57
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+58 sur 75
+Summary: Invariants and Generation
+Generating sample inputs is easy, but knowing corresponding outputs is hard (oracle problem)
+Crashing bugs are not a concern
+Invariants + generated data can check capabilities or properties (metamorphic testing)
+Inputs can be generated realistically or to find violations (adversarial learning)
+If inputs can be computed from outputs, tests can be automated (simulation-based testing)
+58
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Metamorphic testing is an academic software engineering term that's not common in ML literature, it generalizes many concepts regularly reinvented
+Much of the security, safety and robustness literature in ML focuses on invariants
+​
+​
+​
+59 sur 75
+Property-based Testing
+59
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+60 sur 75
+How to Test Models for Generation Task?
+So far most of model testing techniques we discuss expect a "ground-truth" output.
+But what about "Generative AI", where no single ground-truth is available?
+E.g., an LLM-based quiz maker
+"Your goal is to create a well crafted set of four concise answers for a test for a specific question."
+​
+60
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+61 sur 75
+Property-based Testing
+Instead of writing unit tests, we can test properties a function should satisfy.
+​
+61
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+62 sur 75
+Property-based Testing For Models
+"Your goal is to create a well crafted set of four concise answers for a test for a specific question."
+There are only four answers
+Each generated answer should contain <15 words
+All answers should be relevant to the question
+All answers should be covered in the course material (provided as context)
+(Capabilities: what can the model do? Properties: what constraint should any output satisfy?)
+Some properties are easier to test with programs, but how to test "vaguer" properties?
+62
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Capability-based testing asks: "What can the model do?"
+Property-based testing asks: "What constraints should any output satisfy?"
+​
+63 sur 75
+Testing Properties with LLMs
+How to test "vaguer" properties? Use LLM as a judge!
+All answers should be relevant to the question
+"Is the answer relevant to the question? Answer yes or no."
+Need to make sure LLM judgments align with human judgments – This is a common pitfall for practitioners.
+LLMs prefer verbose responses, similar to what they would generate, sensitive to option ordering.
+Measure alignment between judge verdicts and human verdicts on a sample
+A judge that agrees with humans 70% of the time can still be useful for catching regressions at scale
+63
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+64 sur 75
+LLM-as-judge: prompt specifies criteria, provides context, requests verdict.
+Common patterns:
+Binary pass/fail. "Does this response contain hallucinated facts? Answer yes or no."
+Scoring. "Rate the helpfulness of this response from 1-5."
+Pairwise comparison. "Which response better answers the user's question, A or B?"
+Practical considerations: Cost, latency, reproducibility.
+When to use what.Use programmatic checks when possible, LLM judges for subjective criteria, humans for high-stakes validation.
+64
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+65 sur 75
+Breakout Discussion
+Write a few (n>=3) property-based tests for the following prompt:
+"Your task is to analyze project handouts. Summarize the handouts in a concise and clear manner, identifying key project goals, milestones, and risks. Output your findings as a short memo I can send to my team. The goal of the memo is to ensure my team stays aligned on the project’s objectives, timelines, and deliverables while also identifying potential bottlenecks or challenges that could impact progress. Make sure to include all relevant details in your summary and analysis."
+As a group, discuss what property-based tests you would write and how you would execute them.
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Property Test: …
+Test method: …
+Test prompt / program: ...
+65
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note: Can focus on specification (and concepts in the domain, such as leap days and month lengths) or can focus on implementation
+Will not randomly sample from distribution of all days
+​
+66 sur 75
+Other Testing Concepts
+66
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+67 sur 75
+Simulation-Based Testing
+In some cases it is easy to go from outputs to inputs:
+​
+​
+​
+​
+​
+​
+​
+Similar idea in machine-learning problems?
+67
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+68 sur 75
+Simulation-Based Testing
+Derive input-output pairs from simulation, esp. in vision systems
+Example: Vision for self-driving cars:
+Render scene → add noise → recognize → compare recognized result with simulator state
+Quality depends on quality of simulator:
+examples: render picture/video, synthesize speech, ...
+Less suitable where input-output relationship unknown, e.g., cancer prognosis, housing price prediction
+​
+68
+Further readings: Zhang, Mengshi, Yuqun Zhang, Lingming Zhang, Cong Liu, and Sarfraz Khurshid. "DeepRoad: GAN-based metamorphic testing and input validation framework for autonomous driving systems." In Proc. ASE. 2018.
+​
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+69 sur 75
+Test Coverage
+​
+​
+​
+​
+​
+minimum set of test cases to cover all lines? all decisions? all path?
+​
+​
+​
+69
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+70 sur 75
+Structural Testing ("white box")
+Test case creation is driven by the implementation, not the specification.
+Typically aiming to increase coverage.
+Automated test generation similarly maximizing coverage (or finding crashes)
+Several ML coverage metrics have been proposed
+All path of a decision tree?
+All neurons activated at least once in a DNN? (several papers "neuron coverage")
+Linear regression models??
+Often create artificial inputs, not realistic for distribution
+Adversarial learning techniques usually more efficient at finding invariant violations.
+70
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+71 sur 75
+Regression Testing
+Whenever bug detected and fixed, add a test case
+Make sure the bug is not reintroduced later
+Execute test suite after changes to detect regressions
+Ideally automatically with continuous integration tools
+Maps well to curating test sets for important populations in ML
+​
+71
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+72 sur 75
+Continuous Integration
+72
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+73 sur 75
+Continuous Integration for Model Quality
+Testing script
+Existing model: Automatically evaluate model on labeled training set; multiple separate evaluation sets possible, e.g., for slicing, regressions
+Training model: Automatically train and evaluate model, possibly using cross-validation; many ML libraries provide built-in support
+Report accuracy, recall, etc. in console output or log files
+May deploy learning and evaluation tasks to cloud services
+Optionally: Fail test below bound (e.g., accuracy <.9; accuracy < last accuracy)
+Version control test data, model and test scripts, ideally also learning data and learning code (feature extraction, modeling, ...)
+Continuous integration tool can trigger test script and parse output, plot for comparisons (e.g., similar to performance tests)
+Optionally: Continuous deployment to production server
+73
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+74 sur 75
+Summary
+Curating test data
+Analyzing specifications, capabilities
+Not all inputs are equal: Identify important inputs (inspiration from specification-based testing)
+Slice data for evaluation
+Identifying capabilities and generating relevant tests
+Automated random testing
+Feasible with invariants (e.g. metamorphic relations)
+Sometimes possible with simulation
+Automate the test execution with continuous integration
+74
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note
+75 sur 75
+Further readings
+Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. "Semantically equivalent adversarial rules for debugging NLP models." In Proc. ACL, pp. 856-865. 2018.
+Barash, Guy, Eitan Farchi, Ilan Jayaraman, Orna Raz, Rachel Tzoref-Brill, and Marcel Zalmanovici. "Bridging the gap between ML solutions and their business requirements using feature interactions." In Proc. FSE, pp. 1048-1058. 2019.
+Ashmore, Rob, Radu Calinescu, and Colin Paterson. "Assuring the machine learning lifecycle: Desiderata, methods, and challenges." arXiv preprint arXiv:1905.04223. 2019.
+Christian Kaestner. Rediscovering Unit Testing: Testing Capabilities of ML Models. Toward Data Science, 2021.
+D'Amour, Alexander, Katherine Heller, Dan Moldovan, Ben Adlam, Babak Alipanahi, Alex Beutel, Christina Chen et al. "Underspecification presents challenges for credibility in modern machine learning." arXiv preprint arXiv:2011.03395 (2020).
+Segura, Sergio, Gordon Fraser, Ana B. Sanchez, and Antonio Ruiz-Cortés. "A survey on metamorphic testing." IEEE Transactions on software engineering 42, no. 9 (2016): 805-824.
+75
+Machine Learning in Production • Bogdan Vasilescu & Christian Kaestner, Carnegie Mellon University • Fall 2026
+Note

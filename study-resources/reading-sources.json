@@ -1,0 +1,45 @@
+[
+  {
+    "title": "Making data science systems work",
+    "url": "https://journals.sagepub.com/doi/pdf/10.1177/2053951720939605",
+    "file": "readings/making-data-science-systems-work.pdf",
+    "bytes": 295487,
+    "sha256": "e22a1fb56e147750370c1bf6f1f192dae6779aed991fe52d8ed0276fcb94c5f0",
+    "local_source": "C:\\Users\\djibr\\Downloads\\passi-sengers-2020-making-data-science-systems-work.pdf",
+    "acquisition": "Copied from Downloads; original retained",
+    "pages": 13
+  },
+  {
+    "title": "Who Validates the Validators?",
+    "url": "https://arxiv.org/pdf/2404.12272",
+    "file": "readings/who-validates-the-validators.pdf",
+    "bytes": 2613163,
+    "sha256": "878149396d6ff3e025295192dda661d09894284d6790a4775de70eddad963f05",
+    "pages": 16
+  },
+  {
+    "title": "The ML Test Score",
+    "url": "https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/46555.pdf",
+    "file": "readings/ml-test-score.pdf",
+    "bytes": 500055,
+    "sha256": "8db5862dc7c7aaa2c55bb43bd42fc55531a0503782b7026b5811c00c98befd31",
+    "also_available_in_downloads": "C:\\Users\\djibr\\Downloads\\The ML Test Score.pdf",
+    "pages": 10
+  },
+  {
+    "title": "Data Cascades in High-Stakes AI",
+    "url": "https://www.shivanikapania.com/assets/chi2021paper.pdf",
+    "file": "readings/data-cascades.pdf",
+    "bytes": 997725,
+    "sha256": "c4f013fe5e4703e2e841822759f20ec12e61171607f3e2030edcb6af0c5b26e7",
+    "pages": 15
+  },
+  {
+    "title": "How Engineers Operationalize Machine Learning",
+    "url": "https://arxiv.org/pdf/2403.16795",
+    "file": "readings/how-engineers-operationalize-ml.pdf",
+    "bytes": 1624093,
+    "sha256": "d6a6c12246842f15222786e441f1ae80ac1d165e000e5eabc25daf8254027324",
+    "pages": 34
+  }
+]

@@ -1,0 +1,958 @@
+04 mistakes - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 106
+Planning for Mistakes
+1
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 106
+More Requirements to Understand Risks
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+3 sur 106
+Learning goals:
+Consider ML models as unreliable components
+Use safety engineering techniques STPA and FTA to anticipate and analyze possible mistakes
+Design strategies for mitigating the risks of failures due to ML mistakes
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 106
+Recall:
+ML Models = Unreliable Components
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 106
+Models make mistakes
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+https://x.com/justbhutani/status/1567226144197607424/photo/1
+6 sur 106
+Common excuse: Software mistake -- nobody's fault
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+[[Embedded tweet: "https://twitter.com/dhh/status/1192945019230945280]]
+7 sur 106
+Common excuse: The problem is just data
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 106
+What responsibility do designers have to anticipate problems?
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+9 sur 106
+9
+https://www.nytimes.com/2023/03/15/magazine/cfcs-inventor.html
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 106
+Unknown vs unknowable risks
+Anticipate problems early�and proactively
+Black swan events impossible�to foresee?
+Monitoring and reacting early
+https://www.nytimes.com/2023/03/15/magazine/cfcs-inventor.html
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Midley invented leaded gasoline and  chlorofluorocarbons enabling refrigeration – both great benefits (better running engines, refrigeration) but also really bad consequences
+Lead was known as a nerve toxin, ignored at the time
+Chlorofluorocarbons was new and only later identified as destroying the ozone layer
+11 sur 106
+Planning for �Mistakes
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+12 sur 106
+Planning for �Mistakes
+Two Parts:
+Anticipating Mistakes
+Mitigating Mistakes
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+13 sur 106
+The Gist: Living with ML mistakes
+No model is every "correct" (ML model = unreliable component)
+Some mistakes are unavoidable, but this is not an excuse
+Anticipate the eventual mistake
+Consider consequences (harms) of mistakes
+Decide if the risks are acceptable
+Make the system safer despite mistakes
+Consider the rest of the system (software + environment), not just the model (“better network cables are not enough”)
+Reduce risk to an acceptable level
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+14 sur 106
+Many different strategies
+Many mitigations around the model, from fault-tolerant design and human-computer interaction design
+We will cover today:
+Human in the loop
+Undoable actions
+Guardrails
+Mistake detection and recovery (monitoring, doer-checker, fail-over, redundancy)
+Containment and isolation
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+15 sur 106
+Scenario: Expense Management
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+16 sur 106
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+17 sur 106
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+18 sur 106
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+19 sur 106
+Today’s Running Example: �Automated Travel Expense Management
+Receipt intake and data extraction. The system must accept receipt images, PDFs, and emailed invoices from employees. It must read the merchant, date, amount, currency, and expense category from each receipt.
+Policy check. The system must compare each expense with the company travel policy. It must reject expenses that are not permitted (for example, alcohol or personal items). It must flag expenses that are more than the limit for the category (for example, hotel more than $250 per night).
+Approval and payment. The system must approve expenses automatically when they are in policy and less than $100. It must send all other expenses to the manager of the employee for review. After approval, it must send the payment to the employee in five business days or less.
+Audit and fraud detection. The system must keep a record of each decision, the receipt, and the reason for the decision. It must identify duplicate receipts, changed receipts, and unusual patterns of expenses. It must give a report to the finance team for each flagged case.
+19
+Example product: https://ramp.com/expense-management
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+20 sur 106
+Models involved
+OCR and document understanding (vision and language model, given photo → structured record)
+Merchant entity matching (embeddings and a nearest-neighbor search, given string, amount, and location → merchant id, confidence).
+Expense classification (text classifier, given merchant name, the line items, the amount, date → meal/lodging/airfare + confidence)
+Policy compliance (LLM classifier, given extracted expense report and textual policy → decision + reason)
+Anomaly and fraud detection (outlier model, given company-wide history; image forensics → risk score)
+Approval risk scoring (classifier + rules, given all outputs above + employee role + approval history → risk score)
+20
+For each model: What harms can come from model mistakes?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+21 sur 106
+Designing-for-Mistakes Strategy:�Human in the Loop
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 106
+Human-AI Interaction Design �(Human in the Loop)
+Common strategies:
+Automate: Take an action on user's behalf �(i.e., no human in the loop)
+Prompt: Ask the user if an action should be taken
+Organize, annotate, or augment: Add information to a display, but user decides whether and when to take action
+Or hybrid of these
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 106
+Human-AI Interaction Design �(Human in the Loop)
+Common strategies:
+Automate: Take an action on user's behalf �(i.e., no human in the loop)
+Prompt: Ask the user if an action should be taken
+Organize, annotate, or augment: Add information to a display, but user decides whether and when to take action
+Or hybrid of these
+23
+For expense management:
+One action you’d automate
+One action where you’d prompt
+One action where you’d augment
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+24 sur 106
+Human-AI Interaction Design �(Human in the Loop)
+Common strategies:
+Automate: Take an action on user's behalf �(i.e., no human in the loop)
+Prompt: Ask the user if an action should be taken
+Organize, annotate, or augment: Add information to a display, but user decides whether and when to take action
+Or hybrid of these
+24
+How would you deal with suspected fraud?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+25 sur 106
+Human in the Loop
+AI and humans are good at predictions in different settings
+AI better at statistics at scale and many factors
+Humans understand context and data generation process; often better with thin data
+AI for prediction, human for judgment?
+But be aware of:
+Notification fatigue, complacency, just following predictions; see Tesla autopilot
+Compliance/liability protection only?
+Deciding when and how to interact
+Lots of UI design and HCI problems
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+26 sur 106
+Human in the Loop - Examples
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 106
+Human in the Loop - Examples
+27
+Fall detection /
+crash detection
+with smartwatch
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+28 sur 106
+Explaining Model
+Explaining Predictions
+Fostering Mistrust
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+29 sur 106
+Clarifications
+Prompt: system has already decided on an action and asks for confirmation
+Organize/augment: system only provides information and the user formulates the action themselves
+"User feedback" or "user can report errors" is a form of contestation, where the human is not necessarily in the loop, but reports mistake after the fact. Human-in-the-loop usually involves humans in the decision BEFORE the action occurs.
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+30 sur 106
+Designing for Mistakes Strategy:�Undoable Actions
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 106
+Undoable actions
+Automating only actions that can be undone
+Design system to make actions undoable
+Designing a process to appeal decisions
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 106
+Undoable actions
+Automating only actions that can be undone
+Design system to make actions undoable
+Designing a process to appeal decisions
+32
+For expense management:
+One action that can be undone easily
+One action that can be designed to be undone
+One action where you’d design a formal appeals process
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+33 sur 106
+Undoable actions - �Examples
+Override thermostat setting
+Powerpoint design suggestions
+1-Click shopping with free return shipment
+Appeal process for banned "spammers" or "bots"
+Easy to repair bumpers on autonomous vehicles?
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+34 sur 106
+Undoable actions - Examples?
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 106
+Clarifications
+Undoing returns the system/world to a previous state
+Fixing the action of a system is not undoing, but repair/recovery
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+36 sur 106
+Designing for Mistakes Strategy:�Guardrails
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 106
+Guardrails
+Post-process ML predictions before taking actions
+Limit/truncate predictions to safe thresholds
+Manual overrides for certain values
+Backup models for known problematic conditions
+Hardware protections
+Ensures safe operation parameters despite wrong model predictions without having to detect mistakes
+Traditionally symbolic guardrails, today often another model to increase reliability
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 106
+Guardrails: Bollards
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note[[Embedded tweet: "https://twitter.com/WorldBollard/status/1534901378983796736]]
+​
+39 sur 106
+Guardrails: Bollards
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+[[Embedded tweet: "https://twitter.com/WorldBollard/status/1550067808742031361]]
+​
+40 sur 106
+Guardrails
+Post-process ML predictions before taking actions
+Limit/truncate predictions to safe thresholds
+Manual overrides for certain values
+Backup models for known problematic conditions
+Hardware protections
+Ensures safe operation parameters despite wrong model predictions without having to detect mistakes
+Traditionally symbolic guardrails, today often another model to increase reliability
+40
+For expense management:
+One model where you’d bound possible output values
+One model where you’d post-process predictions with another model
+One place where you’d put in handwritten rule-based overwrites of model outputs
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 106
+Guardrails
+Post-process ML predictions before taking actions
+Limit/truncate predictions to safe thresholds
+Manual overrides for certain values
+Backup models for known problematic conditions
+Hardware protections
+Ensures safe operation parameters despite wrong model predictions without having to detect mistakes
+Traditionally symbolic guardrails, today often another model to increase reliability
+41
+How would you deal with suspected fraud?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+42 sur 106
+Guardrails - Examples
+Thermal fuse in smart toaster
+maximum toasting time + extra heat sensor
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 106
+Guardrails - Examples
+43
+CC BY-SA 4.0 by Chabe01
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+44 sur 106
+Clarifications
+Guardrails apply the same constraint to ALL outputs without evaluating individual outputs
+Validating outputs is a form or active “detection” or redundancy, not guardrails.
+Boundary between concepts not always exact
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+45 sur 106
+Designing for Mistakes Strategy:�Detection and Recovery
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+46 sur 106
+Mistake detection and �recovery
+Design a recovery mechanism if mistakes are detectable, directly or indirectly
+Requires (1) a detection mechanism (e.g., external monitor, redundancy) and (2) a response
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 106
+Mistake detection
+An independent mechanism to detect problems (in the real world)
+Example: Gyrosensor to detect a train taking a turn too fast
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 106
+Mistake detection – many strategies
+Detect sensor failures with diagnostics
+Detect sensor failures with redundancies
+Monitor software for crashes
+Monitor for expected environmental conditions
+e.g., proper lighting of security camera footage
+Check the outcome of an action against expectation
+e.g., Vehicle accelerating, human clicking on something
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 106
+Mistake detection – many strategies
+Detect sensor failures with diagnostics
+Detect sensor failures with redundancies
+Monitor software for crashes
+Monitor for expected environmental conditions
+e.g., proper lighting of security camera footage
+Check the outcome of an action against expectation
+e.g., Vehicle accelerating, human clicking on something
+49
+For expense management:
+Any independent strategy to detect model mistakes?
+Any monitors/alerts you’d put in place?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+50 sur 106
+Doer-Checker Example: AV
+ML-based controller (doer): Generate commands to steer the vehicle
+Complex DNN; makes performance-optimal control decisions
+Safety controller (checker): Checks commands from ML controller; overrides it with a safe default command if the ML action is risky
+Simpler, based on verifiable, transparent logic; conservative control
+​
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 106
+Doer-Checker Example: AV
+Yellow region: Slippery road, ignored by ML -> Causes loss of traction
+Checker: Monitor detects lane departure; overrides ML with a safe steering command
+51
+Runtime-Safety-Guided Policy Repair, Zhou et al., Intl. Conference on Runtime Verification (2020)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 106
+Graceful Degradation (Fail-safe)
+Goal: When a component failure is detected, achieve system safety by reducing functionality and performance
+Switches operating mode when failure detected (e.g., slower, conservative)
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+53 sur 106
+Clarification
+Checking usually happens after the action occurs
+Humans can do the checking/detection part; contestation fits here too
+In doer-checker, the two components have DIFFERENT roles (one acts, one verifies).
+In redundancy, multiple components perform the SAME role independently (e.g., two captioning models, pick the one with higher confidence or majority vote)
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+54 sur 106
+Designing for Mistakes Strategy:�Redundancy
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 106
+Redundancy
+Useful for problem detection and response
+Redundant sensors
+Redundant models/subsystems
+Hot Standby: Standby watches & takes over when primary fails
+Voting: Select the majority decision
+Challenge: Software + models are rarely really independent
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+One is none, two is one…
+56 sur 106
+Redundancy
+Useful for problem detection and response
+Redundant sensors
+Redundant models/subsystems
+Hot Standby: Standby watches & takes over when primary fails
+Voting: Select the majority decision
+Challenge: Software + models are rarely really independent
+56
+For expense management:
+Where would you use more than one model for a prediction?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+One is none, two is one…
+57 sur 106
+Redundancy Example: Sensor Fusion
+Combine data from a wide range of sensors
+Provides partial information even when some sensor is faulty
+A critical part of modern self-driving vehicles
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+58 sur 106
+LLM-as-a-Judge
+“Analyze the text for problem and provide constructive feedback; be polite, unbiased, friendly, positive, and stick to the provided context.”
+Additional checks, each with a prompt:
+Politeness: Is the response respectful and considerate?
+Bias: Does the response show prejudice towards a particular group?
+Tone: Is the tone formal, friendly, or conversational?
+Sentiment: is the emotion expressed in the text positive, negative or neutral?
+Hallucinations: Does this response stick to the provided context?
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+59 sur 106
+Designing for Mistakes Strategy:�Containment and Isolation
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 106
+Containment: Decoupling & Isolation
+Design principle: Faults in a low-critical (LC) components should not impact high-critical (HC) components
+Example: Do not connect fly-by-wire software with plane's entertainment system
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 106
+Containment: Decoupling & Isolation
+Design principle: Faults in a low-critical (LC) components should not impact high-critical (HC) components
+Example: Do not connect fly-by-wire software with plane's entertainment system
+61
+For expense management:
+Any model mistakes we should prevent from spreading? (think tool-use agents)
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+62 sur 106
+Poor Decoupling: USS Yorktown (1997)
+​
+Invalid data entered into DB; divide-by-zero crashes entire network
+Required rebooting the whole system; ship dead in water for 3h
+Lesson: Handle expected component faults; prevent propagation
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+63 sur 106
+Recall: A Secure (but Less Useful?) Version
+def analyze_email(email):
+prompt = f"Rate sentiment: 1=positive, 0=neutral, -1=negative\n{email}"
+response = ai_model.generate(prompt)
+return int(response.strip()) if response.strip() in ['-1','0','1'] else 0
+def generate_report(email_batch):
+emails = split_emails(email_batch)
+scores = [analyze_email(email) for email in emails]
+positive = scores.count(1)
+negative = scores.count(-1)
+total = len(scores)
+return f"Sentiment Report: {positive}/{total} positive, {negative}/{total} negative"
+Note the clear separation between symbolic and neural reasoning
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+64 sur 106
+Containment in AI Agents?
+def react_agent(query):
+context = llm(f"Think: How to answer '{query}'?")
+while not is_final_answer(context):
+action = llm(f"Context: {context}\nAction:")
+if "get_email" in action:
+result = get_email(extract_date_range(action))
+elif "send_email" in action:
+result = send_email(extract_to_body(action))
+context = llm(f"Previous: {context}\n
+Action: {action}\nResult: {result}\nContext:")
+return llm(f"Final answer based on: {context}")
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+65 sur 106
+Poor Decoupling: Automotive Security
+​
+​
+​
+​
+​
+Main components connected through a common CAN bus
+Broadcast; no access control (anyone can read/write)
+Can control brake/engine by playing a malicious MP3
+​
+65
+Experimental Security Analysis of a Modern Automobile, Koscher et al., (2010)
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+66 sur 106
+Containment: Decoupling & Isolation
+Design principle: Faults in a low-critical (LC) components should not impact high-critical (HC) components
+Apply the principle of least privilege: LC components should have minimal necessary access
+Limit interactions across criticality boundaries: Deploy LC & HC components on different networks; add monitors/checks at interfaces
+Is an ML component in my system performing an LC or HC task? If HC, can we "demote" it into LC? Alternatively, if possible, replace/augment HC ML components with non-ML ones
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+67 sur 106
+Clarifications
+Guardrails constrain the OUTPUT of a component or the behavior of the entire system
+Containment limits how failures PROPAGATE between components
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+68 sur 106
+Design Strategies Summary
+Human in the loop
+Undoable actions
+Guardrails
+Mistake detection and recovery (monitoring, doer-checker, fail-over, redundancy)
+Containment and isolation
+​
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+69 sur 106
+Breakout
+Scenario: Fraud detection model in expense management system may falsely flag expenses
+Post an example for each of these kinds of mitigation:
+Human in the loop:
+Undoable actions
+Mistake detection and recovery
+Containment and isolation
+As a group, post to #lecture and tag all group members and @mlipbot. Follow up on @mlipbot comments.
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+70 sur 106
+Hazard Analysis:�Anticipating and Analyzing Risks
+70
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+71 sur 106
+What's the worst that could happen?
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+72 sur 106
+What’s the worst that could happen?
+72
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+73 sur 106
+What's the worst that could happen?
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+74 sur 106
+What to mitigate?
+Recall:
+We can reduce/eliminate many risks, but not for free
+We can only mitigate risks we know
+​
+Wait for problems to occur or be proactive?
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+75 sur 106
+Hazard Analysis for Risk Identification
+Proactively identifying potential problems before they occur
+Traditional safety engineering techniques
+Essentially “structured brainstorming”
+Resulting risks are subsequently analyzed and possibly mitigated
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+76 sur 106
+STPA
+76
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+77 sur 106
+STPA (system-theoretic process analysis)
+Identify stakeholders, including indirect ones
+Identify their stakes, values, goals
+For each value explore corresponding loss�(e.g., loss of life, injury, damage, loss of mission, loss of customer satisfaction, financial loss, environmental loss, information leakage)
+For each loss, identify requirement to prevent it
+Identify possible reasons for violating requirement
+…
+See also Leveson, Nancy G. Engineering a safer world: Systems thinking applied to safety. The MIT Press, 2016.
+STPA Handbook https://psas.scripts.mit.edu/home/materials/
+We only use the initial steps of �STPA for hazard identification here.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+78 sur 106
+STPA Example
+Stakeholders?
+Their values/goals?
+Losses of concern?
+Corresponding requirements?
+78
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+79 sur 106
+Expense Management Stakeholders (Example)
+Direct stakeholders interact with the system or its outputs:
+Employees who submit expenses.
+Managers who approve expenses.
+Finance and accounts-payable staff.
+Internal audit and compliance staff.
+The vendor that operates the system.
+Indirect stakeholders do not use the system but are affected by it:
+Tax authorities and external auditors. They depend on correct classification and complete records.
+Merchants and travel providers. Their names and transaction data go through the system. Wrong merchant matching can label a legitimate business as suspicious.
+Third parties who appear on receipts.
+…
+Society and labor. The system can replace clerical jobs. It can also create a norm of algorithmic surveillance of employees.
+79
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+80 sur 106
+Stakeholders Goals and Losses (Examples)
+80
+Stakeholder
+Goal
+Loss
+Employee
+Get paid quickly and in full
+Payment is delayed or too low; employee carries the cost personally
+Employee
+Spend little time on submission
+Employee must resubmit, correct extracted data, or answer many questions
+Manager
+Avoid blame for a bad approval
+Manager is held accountable for an automatic approval they did not see
+Finance / AP
+Correct and complete ledger
+Wrong amounts, categories, or currencies enter the ledger; restatement is needed
+Third party on receipt
+Data is not used for other purposes
+Name or details are used for analytics or fraud profiling without consent
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+81 sur 106
+Corresponding Requirements (Examples)
+Hazard/loss: Payment is delayed or too low; employee carries the cost personally
+Requirement: The system must send an approval or a rejection for each expense in 2 business days or less. The system must pay the approved amount in 5 business days or less. The system must extract the total amount with an accuracy of 99% or better.
+​
+Hazard/loss: Rejection has no reason or a wrong reason; employee cannot fix the problem
+Requirement: The system must give a reason for each rejection in plain language. The reason must name the policy section that applies and the value that caused the rejection. The system must tell the employee what action will correct the problem. The system must not give a reason that the policy text does not support.
+81
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+82 sur 106
+Judge the Risk of Losses
+“Rejection has no reason or a wrong reason; �employee cannot fix the problem”
+What’s the probability in the current system? What’s the harm?
+Is this acceptable or should it be mitigated?
+Rank risks and consider mitigations (like human in the loop, safeguards, undoable actions, …), focus on highest impact first
+Involve more people in the conversation, plan next steps
+82
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+83 sur 106
+STPA Advice
+Explore stakeholders broadly, both direct (e.g., train passengers, operators) and indirect (e.g., people living near tracks, city government) – often many
+Understand what they care about, see user goals (e.g., fast travel times, safety)
+Explore possible losses broadly, small and large, including financial, injuries, mental stress (e.g., late for work, injured in doors of train)
+Translation to requirements often straightforward (e.g., leave on time, do not trap passengers in doors)
+Be comprehensive but focus on more severe problems
+83
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+84 sur 106
+Hazard Analysis as Structured Brainstorming
+Lots of paperwork? Tedious?
+Reliable?
+LLM assistance?
+84
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+85 sur 106
+Other Risk Identification Strategies
+Brainstorm worst case scenarios and their causes �	(from the perspective of different stakeholders)
+Read about common risks in domains (e.g., web security risks, accounting) and accidents/failures in competing projects
+Expert opinions
+Early warning indicators, incident analysis, near-miss reporting
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+86 sur 106
+Recall: Unknown vs unknowable risks
+Anticipate problems early�and proactively
+Black swan events impossible�to foresee?
+Monitoring and reacting early
+https://www.nytimes.com/2023/03/15/magazine/cfcs-inventor.html
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Midley invented leaded gasoline and  chlorofluorocarbons enabling refrigeration – both great benefits (better running engines, refrigeration) but also really bad consequences
+Lead was known as a nerve toxin, ignored at the time
+Chlorofluorocarbons was new and only later identified as destroying the ozone layer
+87 sur 106
+Fault Tree Analysis
+87
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+88 sur 106
+Analyzing Possible Causes of Loss
+Risk identification with hazard analysis tells us what to avoid
+“Rejection has no reason or a wrong reason; �employee cannot fix the problem”
+Next: What can go wrong to lead to the loss? How can we prevent it?
+Technical defects? Wrong assumptions? Human error?
+Human in the loop? Safeguards? LLM as a Judge?
+88
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+89 sur 106
+Fault Tree Analysis (FTA)
+Fault tree: A diagram that displays relationships between a system failure (i.e., requirement violation) and potential causes.
+Identify event sequences that can result in failure
+Prioritize contributors leading to a failure
+Inform design decisions
+Investigate an accident & identify the root cause
+Often used for safety & reliability, but can also be used for other types of requirements (e.g., poor performance, security attacks...)
+89
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+90 sur 106
+Fault Trees: Basic Building Blocks
+Event: An occurrence of a fault or an undesirable action
+(Intermediate) Event: Explained in terms of other events
+Basic Event: No further development or breakdown; leaf (choice!)
+Gate: Logical relationship between an event & its immediate subevents
+AND: All of the sub-events must take place
+OR: Any one of the sub-events may result in the parent event
+90
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+91 sur 106
+Fault Tree Example
+​
+​
+​
+​
+​
+Every tree begins with a TOP event (typically a violation of a requirement)
+Every branch of the tree must terminate with a basic event
+91
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+92 sur 106
+Minimal Cut Set Analysis
+Cut set: A set of basic events whose simultaneous occurrence is sufficient to guarantee that the TOP event occurs.
+Minimal cut set: A cut set from which a smaller cut set can't be obtained by removing a basic event.
+​
+What are minimal cut sets here?
+​
+92
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+93 sur 106
+FTA Process
+Specify the system structure
+Environment entities & machine components
+Assumptions (ASM) & specifications (SPEC)
+Identify the top event as a requirement violation (REQ)
+Construct the fault tree
+Derive intermediate events from a violation of ASM or SPEC
+Decompose the intermediate events further down based on the knowledge of the domain or components
+Analyze the tree, identify all possible cause combinations that can lead to requirement violation (“minimal cut sets”)
+Consider design modifications
+Eliminate causes (subtrees, cutsets), or
+Increase the size number of conditions needed (new events with and connection, increase minimal cut sets)
+Repeat
+93
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+94 sur 106
+Example: False Fraud Accusation
+Top event: Employee reputation damage because of a false accusation of a fraudulent receipt
+Using a fault tree identify possible problems that could lead to this problem
+Hint: What assumptions and specifications might be violated?
+94
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+95 sur 106
+95
+OR
+AND
+Notation:
+Event
+​
+Basic event
+(not decomposed)
+​
+OR connector
+​
+AND connector
+Reputation damage
+Fraud flag visible to colleagues
+Falsely flagged
+Duplicate detector mistake
+Visual fraud detector mistake
+Shared receipt, �2 submitters
+not filtered by employee
+Poor light conditions
+…
+OR
+REQ
+SPEC
+ASM
+SPEC
+ASM
+AND
+AND
+Fraud model mistake
+…
+OR
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+96 sur 106
+96
+Shared receipt not marked
+Reputation damage
+Fraud flag visible to colleagues
+Falsely flagged
+Duplicate detector mistake
+Visual fraud detector mistake
+Shared receipt, �2 submitters
+not filtered by employee
+Poor light conditions
+…
+OR
+REQ
+SPEC
+ASM
+SPEC
+ASM
+AND
+AND
+Fraud model mistake
+…
+OR
+SPEC
+Image quality check failed
+AND
+False fraud detection
+Additional�mitigations
+Additional mitigation
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+97 sur 106
+97
+Mitigation so that vision failure alone does not cause violation (add AND event)
+Additional example: Safety system in train
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+98 sur 106
+98
+Terrible design, have�safe default
+Single point of failure?
+Additional example: Safety system in train
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+99 sur 106
+99
+Additional example: Safety system in train
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+100 sur 106
+100
+Eliminate software crash�as possible cause
+(remove event)
+Add redundancy to increase reliability (add AND event)
+Additional example: Safety system in train
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+101 sur 106
+Breakout: Fault Tree
+Expense management system REQ: The system reimburse the correct total amount of approved claims within 5 days.
+As a group,
+(a) draw a small fault tree involving at least 1 non-ML and one ML-related basic event
+(b) introduce a mitigation and highlight it in the diagram
+Use pen&paper or any software. As a group, post photo or screenshot to #lecture and tag all group members and @mlipbot. Follow up on @mlipbot comments.
+101
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+102 sur 106
+Aside: STPA View
+Most losses are caused by complex issues, not just single mistakes
+Consider the entire system, control structure, including humans and their training/oversight
+Systematically evaluate whether the controls are effective
+102
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+103 sur 106
+Zooming Out: �General Safety Engineering Strategies
+Identify possible hazards from stakeholder goals (STPA, early steps)
+Identify possible hazards from component failures (FMEA, HAZOP)
+Forward: from cause to hazard
+Analyze causes of anticipated/known hazards (FTA)
+Backward: from hazard to cause
+Analyze effectiveness of control mechanisms for anticipated/known hazards, including non-technical controls (STPA)
+103
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+104 sur 106
+Summary
+104
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+105 sur 106
+Summary
+Accept that a failure is inevitable
+ML components will eventually make mistakes, reasons barely matter
+Environment may evolve over time, violating assumptions
+Design strategies for mitigating mistakes
+Human in the loop, undoable actions, guardrails, mistake detection and recovery (monitoring, doer-checker, fail-over), redundancy, containment and isolation
+Use risk analysis to identify potential problems (STPA, FTA, …)
+105
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+106 sur 106
+Further readings
+🕮 Google PAIR. People + AI Guidebook. 2019, especially chapters “Errors + Graceful Failure” and “Mental Models.”
+🗎 Martelaro, Nikolas, Carol J. Smith, and Tamara Zilovic. “Exploring Opportunities in Usable Hazard Analysis Processes for AI Engineering.” In AAAI Spring Symposium Series Workshop on AI Engineering: Creating Scalable, Human-Centered and Robust AI Systems (2022).
+🗎 Qi, Yi, Philippa Ryan Conmy, Wei Huang, Xingyu Zhao, and Xiaowei Huang. “A Hierarchical HAZOP-Like Safety Analysis for Learning-Enabled Systems.” In AISafety2022 Workshop at IJCAI2022 (2022).
+🗎 Beachum, David Robert. “Methods for assessing the safety of autonomous vehicles.” MSc thesis, 2019.
+🗎 Amershi, Saleema, Dan Weld, Mihaela Vorvoreanu, Adam Fourney, Besmira Nushi, Penny Collisson, Jina Suh et al. “Guidelines for human-AI interaction.” In Proceedings of the 2019 CHI Conference on Human Factors in Computing Systems, 2019.
+🗎 Shneiderman, Ben. “Bridging the gap between ethics and practice: Guidelines for reliable, safe, and trustworthy Human-Centered AI systems.” ACM Transactions on Interactive Intelligent Systems (TiiS) 10, no. 4 (2020): 1–31.
+🗎 Rismani, Shalaleh, Renee Shelby, Andrew Smart, Edgar Jatho, Joshua Kroll, AJung Moon, and Negar Rostamzadeh. "From plane crashes to algorithmic harm: applicability of safety engineering frameworks for responsible ML." In Proceedings CHI, pp. 1-18. 2023.
+🗎 Hong, Yining, Christopher S. Timperley, and Christian Kästner. "From hazard identification to controller design: Proactive and llm-supported safety engineering for ml-powered systems." In Proc. CAIN, pp. 113-118. IEEE, 2025.
+🕮 Leveson, Nancy G. Engineering a safer world: Systems thinking applied to safety. The MIT Press, 2016.
+🗎 STPA Handbook https://psas.scripts.mit.edu/home/materials/
+106
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

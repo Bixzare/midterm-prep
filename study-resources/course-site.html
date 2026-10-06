@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLiP / AI Engineering</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-size: 1.5rem;
+      background: #fafafa;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .container {
+      max-width: 900px; 
+    }
+    @media (min-width: 1500px) {
+      nav .navbar-brand .navbar-item {
+        font-size: 4rem;
+      }
+      .navbar-brand { padding-left: 4.5rem }
+    }
+    html { scroll-behavior: smooth; }
+    main { margin-top: 2rem; }
+    .schedule-entry { border-left: 4px solid #dbdbdb; }
+    .schedule-entry.is-lecture { border-left-color: #48c78e; }
+    .schedule-entry.is-lab { border-left-color: #ffe08a; }
+    .schedule-entry.is-break { border-left-color: #b5b5b5; }
+    .schedule-entry.is-midterm { border-left-color: #3e8ed0; }
+    .schedule-entry .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+    .schedule-entry .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }  
+  </style>
+</head>
+<body>
+  <nav class="navbar is-danger" role="navigation" aria-label="main navigation">
+    <div class="container">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+          <strong>MLiP / AI Engineering</strong><br />
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="#schedule">Schedule</a>
+          <a class="navbar-item" href="#course-syllabus-and-policies">Syllabus</a>
+          <a class="navbar-item" href="https://canvas.cmu.edu/courses/55512">Canvas</a>
+          <a class="navbar-item" href="https://github.com/mlip-cmu/f2026" target="_blank" rel="noopener">
+            <span class="icon">
+              <i class="fab fa-github"></i>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main class="container">
+    
+    
+    <section class="section" id="machine-learning-in-production-17-445-17-645-17-745">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Machine Learning in Production (17-445/17-645/17-745)</h2>
+          <div class="content">
+          <h3 class="is-size-4">Fall 2026</h3><p>Plenty of courses teach you to beat a benchmark in a notebook, and plenty more teach you to pitch a demo, hackathon style. But a demo has no real customer, no real deployment, and no real stakes: Nobody depends on it, nothing breaks when it fails, nobody needs to maintain it. This CMU course is about the hard part that comes next: turning that prototype into a real <strong>AI-powered software system</strong> that provides benefits to actual customers, that you deploy in the real world, and that keeps running, keeps getting updated, and <em>doesn&#39;t go up in flames</em> with security holes, safety incidents, or silent quality collapse. </p>
+<p>You will learn <strong>AI engineering</strong> end to end, working across classic ML, LLMs, and increasingly <strong>AI agents that take actions in the real world</strong>: how to build the system around the model, ship it, know whether it actually works, anticipate the ways it will fail, and keep it operating and improving under real load. Because models make mistakes, and agents act on those mistakes, <strong>managing risk</strong> runs through the entire course, alongside <strong>MLOps</strong> and <strong>responsible AI</strong> (safety, security, explainability, fairness). </p>
+<p>For earlier offerings see the <a href="https://mlip-cmu.github.io">overview page</a>. This Fall 2026 offering is designed for students with some data science and GenAI experience (e.g., has taken a machine learning course, has used sklearn and LLMs) and basic programming skills (e.g., basic Python programming with libraries, can navigate a Unix shell), but will not expect a software engineering background (i.e., experience with testing, requirements, architecture, process, or teams is not required). Going forward we expect to offer this course regularly both in the spring and in the fall semester.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="who-this-course-is-for">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Who This Course Is For</h2>
+          <div class="content">
+          <p>This is a course for those who want to <strong>build and operate AI-powered software systems</strong>, going beyond benchmarks and one-off demos. A demo you present and walk away from is easy; it is not a product. We assume that you can already train a model, write prompts, or work with agents to build a demo. We start from there, exploring what it takes to turn that model into something a real customer depends on: to actually deploy it, know whether it works well enough, keep it from failing in embarrassing or dangerous ways, and successfully operate and improve it at scale, for weeks and months, as data and the world shift around it. Shipping something that survives contact with real users is what distinguishes an engineer teams can rely on, and startups and big tech alike are desperately hiring for it.</p>
+<p>The course is a strong fit for students heading toward roles like <strong>AI Engineer, ML Engineer, MLOps Engineer, AI Product Manager, Forward Deployed Engineer,</strong> or <strong>Applied Scientist</strong>, including software engineers who want to move from building conventional systems to building AI-powered ones.
+Building AI-powered systems is a team effort across <strong>software engineers</strong>, <strong>data scientists</strong>, and <strong>product managers</strong>. Each brings different expertise and priorities, and they succeed only with a shared understanding of one another&#39;s roles, concerns, and goals. The course speaks to all three: <strong>software engineers</strong> who want to build robust, responsible products despite the specific challenges of ML models, LLMs, and agents; <strong>data scientists</strong> who want to understand production requirements and get their prototype models shipped; and <strong>product managers</strong> who want to grasp the technical realities of what it takes to ship a deployable product.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="what-we-cover">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">What we cover</h2>
+          <div class="content">
+          <p>We cover topics such as:</p>
+<ul>
+<li><strong>How to design for wrong predictions the model may make?</strong> How to assure <em>safety</em> and <em>security</em> despite possible mistakes? How to anticipate mistakes before they occur and how to manage risks? How to design the <em>user interface</em> and the entire system to mitigate mistakes when operating in the real world? How can modern architectures like RAG and agentic systems help or hinder such efforts?</li>
+<li><strong>How to build and operate AI agents responsibly?</strong> As systems increasingly <em>take actions</em> through tools and APIs (e.g., via protocols like MCP or agent skill files), how do we design, evaluate, and <em>secure</em> agentic systems, and contain the new risks that arise once an AI can take actions with real consequences in the world?</li>
+<li><strong>How to reliably deploy, monitor, and update models in production?</strong> How can we <em>test</em> the entire machine learning pipeline? How can <em>MLOps</em> tools help to automate and scale the deployment process? How can we <em>experiment in production</em> (A/B testing, canary releases)? How do we detect <em>data quality</em> issues, <em>concept drift</em>, and <em>feedback loops</em> in production?</li>
+<li><strong>How to scale production AI systems?</strong> How do we design a system to process huge amounts of training data, telemetry data, and user requests? Should we use stream processing, batch processing, lambda architecture, or data lakes?</li>
+<li><strong>How to test and debug production AI systems?</strong> How can we <em>evaluate</em> the quality of a model/agent in ways that matter for a production system, going well beyond benchmark scores (slicing, rubrics, capabilities, LLM-as-a-judge, ...)? How can we know how well we are doing in production, while safeguarding against disasters? How can we <em>test</em> the entire AI system, rather than the model in isolation? What lessons can we learn from <em>software testing</em>, <em>automated test case generation</em>, <em>simulation</em>, and <em>continuous integration</em> for testing production AI systems?</li>
+<li><strong>Which qualities matter beyond a model’s prediction accuracy?</strong> How can we identify and measure important quality requirements, including <em>learning and inference latency, operating cost, scalability, explainablity, fairness, privacy, robustness</em>, and <em>safety</em>? Does the application need to be able to <em>operate offline</em> and how often do we need to update the models? How do we identify what’s important in an AI-powered product in a production setting for a business? How do we resolve <em>conflicts</em> and <em>tradeoffs</em>?</li>
+<li><strong>How to work effectively in interdisciplinary teams?</strong> How can we bring data scientists, software engineers, UI designers, product managers, project managers, domain experts, big data specialists, operators, legal council, and other roles together and develop a <em>shared understanding</em> and <em>team culture</em>?</li>
+</ul>
+<p><img src="overview.svg" alt="Course overview"></p>
+<p><strong>Production-ready tools.</strong> You will gain familiarity with production-quality infrastructure tools, including stream processing with Apache Kafka, test automation with GitHub actions, monitoring and experiment tracking with Prometheus, Grafana, DVC, and Weights and Biases, and deployment with Docker, Kubernetis and various MLOps tools. Familiarity with these has helped many past students through technical interviews.</p>
+<p><strong>Examples, case studies, projects.</strong> We explore real products with commercial potential, going beyond benchmark tasks. For example, instead of object detection in the abstract, we look at how to use it in delivery robots or for image search on a photo sharing site. Some of these products may be less flashy, but have real commercial potential today, such as customer support agents, insurance fraud investigation, content recommendation, creating meeting minutes from recordings, and diagnosing diseases.</p>
+<p>An extended group project takes you through building, deploying, evaluating, and maintaining a robust and scalable <em>movie recommendation service</em> under realistic “production” conditions serving 1 million active users. This is not a toy: your system runs live for several weeks, is graded on how it holds up under real load and changing environment conditions. You and your team will feel firsthand what breaks when a model meets production, and how to fix it.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="fall-2026-logistics-and-people">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Fall 2026: Logistics and People</h2>
+          <div class="content">
+          <p>17-445/17-645/17-745, 12 Units</p>
+<p>Lectures Tuesday/Thursday 3:30-4:50pm, in person, DH 2315</p>
+<p>Labs Friday 9:30-10:50am in DH 1211 (B) and 11-12:20pm in DH 2302 (C) and 12:30-1:50pm in PH 125C (D) and 2-3:20pm in DH 1112 (E) and 3:30-4:50pm in PH A18A (F). </p>
+<p>Instructors: <a href="https://bvasiles.github.io">Bogdan Vasilescu</a> and <a href="https://www.cs.cmu.edu/~ckaestne/">Christian Kaestner</a>.</p>
+<p>TAs: Vedika Agarwal, Yubo Chen, Ashritha Gonuguntla, Anshuman Mishra, Juan Ortega, Shreya Verma</p>
+<p>The course is the same under all course numbers, except for the PhD-level 17-745 number, which replaces two homework assignments with a mandatory <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/research_project.md">research project</a>.</p>
+<p>Open to all undergraduate and graduate students meeting the prerequisites. Remote sections are only available to students at the CMU-Africa campus after discussing parameters with the instructors.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="schedule">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Schedule</h2>
+          <div class="content">
+          <!-- Aug 25 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Aug 25</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1BpS3K6OFcKM6VRp2OeyVH_A-2quO5Ky4eLXzT_jglO8/edit?usp=sharing">Introduction and Motivation </a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/01/">1</a></p>
+  </div>
+</div>
+
+<!-- Aug 27 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Aug 27</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1GfH7wYM833xKFKmkrYqHWyUgctuaSFD6ACBbwu0O3jw/edit?usp=sharing">Correctness and Risk</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapters:</strong> <a href="https://mlip-cmu.github.io/book/02/">2</a>, <a href="https://mlip-cmu.github.io/book/03/">3</a>, <a href="https://mlip-cmu.github.io/book/15/">15</a></p>
+  </div>
+</div>
+
+<!-- Aug 28 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Aug 28</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab01.md">Stream processing: Apache Kafka</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Sep 1 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Sep 1</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I1_llm_features.md">I1: ML Product</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1Yt2QQS8AvkFp7W5yuw8oYDRQ92RrlPbhexzyG1SHxJ0/edit?usp=sharing">Setting Goals, Gathering Requirements </a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapters:</strong> <a href="https://mlip-cmu.github.io/book/05/">5</a>, <a href="https://mlip-cmu.github.io/book/06/">6</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://journals.sagepub.com/doi/full/10.1177/2053951720939605">Making data science systems work</a></p>
+  </div>
+</div>
+
+<!-- Sep 3 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Sep 3</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1v_LTMhbBJvZ-h2y-xxvBf79ad7G23Rrfxa5E_OJEwWA/edit?usp=sharing">Planning for Mistakes</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/07/">7</a></p>
+  </div>
+</div>
+
+<!-- Sep 4 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Sep 4</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab02.md">tbd</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Sep 8 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Sep 8</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I2_model.md">I2: Recommendation model</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1Pm8oH4JJVNCg01QzUpAsiemyknhkAF-7b5DxjbnnWmc/edit?usp=sharing">Model Quality</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/15/">15</a></p>
+  </div>
+</div>
+
+<!-- Sep 10 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Sep 10</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1CwF4Z-tsuW-SqXd9KItClmWB-_X5UroMPpfhsesjRYU/edit?usp=sharing">Behavioral Model Testing</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://dl.acm.org/doi/abs/10.1145/3654777.3676450">Who validates the validators? Aligning LLM-assisted evaluation of llm outputs with human preferences</a></p>
+  </div>
+</div>
+
+<!-- Sep 11 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Sep 11</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab03.md">Collaboration with git</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Sep 15 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Sep 15</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I3_risks.md">I3: Risk</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1JtFBCB2Zm6Dy0s8E98rmGUzLit03zVhyTVGzv0XkYrA/edit?usp=sharing">Fostering Interdisciplinary (Student) Teams</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/15/">15</a></p>
+  </div>
+</div>
+
+<!-- Sep 17 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Sep 17</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1GcZdFHrTh-NHHsZE4go6Zqxn06sJAdVS1HkrGxFKWtg/edit?usp=sharing">Testing and Experimenting in Production</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/19/">19</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/46555.pdf">The ML Test Score</a></p>
+  </div>
+</div>
+
+<!-- Sep 18 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Sep 18</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab04.md">Model testing</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Sep 22 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Sep 22</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1RpM4bfnefP_jda0UQTBRSLK6BY7W3unB4vSbjBQh7mM/edit?usp=sharing ">Deploying a Model</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/10/">10</a></p>
+  </div>
+</div>
+
+<!-- Sep 24 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Sep 24</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1IuspK3yVIuvCySZuMqoLc4o8WS3AEVxwnKiT8FOgYP4/edit?usp=sharing">Automating and Testing ML Pipelines</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapters:</strong> <a href="https://mlip-cmu.github.io/book/11/">11</a>, <a href="https://mlip-cmu.github.io/book/18/">18</a>, <a href="https://mlip-cmu.github.io/book/19/">19</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Supplementary code/materials:</strong> <a href="https://github.com/mlip-cmu/pipeline-testing">https://github.com/mlip-cmu/pipeline-testing</a></p>
+  </div>
+</div>
+
+<!-- Sep 25 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Sep 25</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab05.md">Containers: Docker</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Sep 29 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Sep 29</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/project.md">M1: Modeling and First Deployment</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1gP7GbYW9iEEAAI87eaLF4IYmZx3FWeT7b9KxEviHInU/edit?usp=sharing">Data Quality</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/16/">16</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Supplementary code/materials:</strong> <a href="https://github.com/mlip-cmu/data-quality/">https://github.com/mlip-cmu/data-quality/</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://dl.acm.org/doi/abs/10.1145/3411764.3445518">Data Cascades in High-Stakes AI</a></p>
+  </div>
+</div>
+
+<!-- Oct 1 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Oct 1</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/157-zNSoxfOsG93JWdjK1OTBN4GvxznvpwOqOMuV1QFk/edit?usp=sharing">Scaling the System</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/12/">12</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Supplementary code/materials:</strong> <a href="https://github.com/mlip-cmu/scaling">https://github.com/mlip-cmu/scaling</a></p>
+  </div>
+</div>
+
+<!-- Oct 2 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Oct 2</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/labs/lab06.md">Continuous Integration</a></p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Oct 6 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Oct 6</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> <a href="https://docs.google.com/presentation/d/1u9OSCalPWSgEKZpMIuXj_t_E_PDt-8otF5WgtarZf5E/edit?usp=sharing">Planning for Operations</a></p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/13/">13</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://dl.acm.org/doi/abs/10.1145/3653697">How Engineers Operationalize Machine Learning</a></p>
+  </div>
+</div>
+
+<!-- Oct 8 -->
+<div class="box schedule-entry is-midterm mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Oct 8</p>
+  <p class="title is-4 mb-0"><span class="tag is-info is-medium mr-2">Midterm</span> <a href="https://github.com/mlip-cmu/f2026/tree/main/exams">Midterm</a></p>
+</div>
+
+<!-- Oct 9 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Oct 9</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> No lab (happy Fall break)</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Oct 13 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Oct 13</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Fall break, no classes</p>
+</div>
+
+<!-- Oct 15 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Oct 15</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Fall break, no classes</p>
+</div>
+
+<!-- Oct 16 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Oct 16</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Fall break, no classes</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Oct 20 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Oct 20</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> ML Security</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/28/">28</a></p>
+  </div>
+</div>
+
+<!-- Oct 22 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Oct 22</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> System Security</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/28/">28</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://www.generalanalysis.com/blog/supabase-mcp-blog">Supabase MCP can leak your entire SQL database</a></p>
+  </div>
+</div>
+
+<!-- Oct 23 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Oct 23</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> Agents and MCP</p>
+</div>
+
+<!-- Oct 26 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Mon, Oct 26</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> </p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Oct 27 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Oct 27</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/project.md">M2: Infrastructure Quality</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Safety</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/27/">27</a></p>
+  </div>
+</div>
+
+<!-- Oct 29 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Oct 29</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Process & Technical Debt</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapters:</strong> <a href="https://mlip-cmu.github.io/book/20/">20</a>, <a href="https://mlip-cmu.github.io/book/22/">22</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://proceedings.neurips.cc/paper_files/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf">Hidden Technical Debt in Machine Learning Systems</a></p>
+  </div>
+</div>
+
+<!-- Oct 30 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Oct 30</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> Monitoring: Prometheus, Grafana</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Nov 3 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Nov 3</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I4_agent_security.md">I4: MCP and Security</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Democracy day, no classes</p>
+</div>
+
+<!-- Nov 5 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Nov 5</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Versioning, Provenance, and Reproducibility</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/24/">24</a></p>
+  </div>
+</div>
+
+<!-- Nov 6 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Nov 6</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> Provenance: DVC vs Roar</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Nov 10 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Nov 10</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Explainability</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/25/">25</a></p>
+  </div>
+</div>
+
+<!-- Nov 12 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Nov 12</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Transparency</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/29/">29</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://dl.acm.org/doi/abs/10.1145/3359206">"Hello AI": Uncovering the Onboarding Needs...</a></p>
+  </div>
+</div>
+
+<!-- Nov 13 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Nov 13</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> Model explainability tools</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Nov 17 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Nov 17</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/project.md">M3: Monitoring and CD</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Accountability and Ethics</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapters:</strong> <a href="https://mlip-cmu.github.io/book/23/">23</a>, <a href="https://mlip-cmu.github.io/book/26/">26</a></p>
+  </div>
+</div>
+
+<!-- Nov 19 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Nov 19</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Measuring Fairness</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/26/">26</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://dl.acm.org/doi/pdf/10.1145/3178876.3186138">Human Perceptions of Fairness in Algorithmic Decision Making</a></p>
+  </div>
+</div>
+
+<!-- Nov 20 -->
+<div class="box schedule-entry is-lab mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Nov 20</p>
+  <p class="title is-4 mb-0"><span class="tag is-warning is-medium mr-2">Lab</span> tbd</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Nov 24 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Nov 24</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I5_explainability.md">I5: Explainability</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Building Fairer Systems</p>
+  <div class="mt-2">
+    <p class="is-size-5 has-text-grey mb-1"><strong>Corresponding book chapter:</strong> <a href="https://mlip-cmu.github.io/book/26/">26</a></p>
+    <p class="is-size-5 has-text-grey mb-1"><strong>Required reading:</strong> <a href="https://users.umiacs.umd.edu/~hal3//docs/daume19fairness.pdf">Improving Fairness in Machine Learning Systems</a></p>
+  </div>
+</div>
+
+<!-- Nov 26 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Nov 26</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Thanksgiving break, no classes</p>
+</div>
+
+<!-- Nov 27 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Nov 27</p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> Thanksgiving break, no classes</p>
+</div>
+
+<div class="mt-6"></div>
+
+<!-- Dec 1 -->
+<div class="box schedule-entry is-lecture mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Tue, Dec 1</p>
+  <p class="title is-4 mb-0"><span class="tag is-success is-medium mr-2">Lecture</span> Explainability Discussion / Summary / Review</p>
+</div>
+
+<!-- Dec 3 -->
+<div class="box schedule-entry is-midterm mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Thu, Dec 3</p>
+  <p class="title is-4 mb-0"><span class="tag is-info is-medium mr-2">Midterm</span> <a href="https://github.com/mlip-cmu/f2026/tree/main/exams">Midterm</a></p>
+</div>
+
+<!-- Dec 4 -->
+<div class="box schedule-entry is-break mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">Fri, Dec 4</p>
+  <p class="title is-4 mb-2"><span class="tag is-danger is-medium mr-2">Due</span> <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/project.md">M4: Fairness, Security and Feedback Loops</a></p>
+  <p class="title is-4 mb-0"><span class="tag is-light is-medium mr-2">Break</span> No lab</p>
+</div>
+
+<!-- tbd -->
+<div class="box schedule-entry is-midterm mb-4 p-4">
+  <p class="is-size-5 has-text-grey-dark mb-1">tbd</p>
+  <p class="title is-4 mb-0"><span class="tag is-info is-medium mr-2">Final</span> Final project presentations in registrar-assigned final exam slot (to be announced)</p>
+</div>
+
+
+
+
+
+<p>(We may adjust covered content per lecture throughout the semester.)</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="resources">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Resources</h2>
+          <div class="content">
+          <p>For researchers, educators, or others interested in this topic, we share all course material, including slides and assignments, under a creative commons license on GitHub (<a href="https://github.com/mlip-cmu">https://github.com/mlip-cmu</a>).</p>
+<ul>
+<li>Slides, labs, and assignments linked in the schedule of each semester</li>
+<li><a href="https://www.youtube.com/playlist?list=PLDS2JMJnJzdmubSKnanmIwzr08cionWm_">Video recordings</a> of the lectures from the Spring 2026 semester.</li>
+<li><a href="https://mlip-cmu.github.io/book/">Textbook</a> with chapters corresponding to almost every lecture.</li>
+<li>An article describing the rationale and the initial design of this course: <a href="https://arxiv.org/abs/2001.06691">Teaching Software Engineering for AI-Enabled Systems</a>.</li>
+<li>An <a href="https://github.com/ckaestne/seaibib">annotated bibliography</a> on research in this field.</li>
+</ul>
+<p>We would be happy to see this course or a similar version taught at other universities -- reach out if interested.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+
+    <section class="section" id="course-syllabus-and-policies">
+      <div class="card">
+        <div class="card-content">
+          <h2 class="title is-2 has-text-danger">Course Syllabus and Policies</h2>
+          <div class="content">
+          <p>The course uses Canvas for homework submission, grading, and supplementary documents; slides will be posted here; Slack is used for announcements and discussions; GitHub is used to coordinate group work. All public course materials can be found in the course’s <a href="https://github.com/mlip-cmu/f2026">GitHub repository</a>.</p>
+<p><strong>Communication:</strong> We are happy to answer questions over Slack (preferred) and by email, meet in person, and will jump on a quick Zoom call if you ask us. We strongly recommend to turn on notifications for Slack at least for direct messages and the announcements channel throughout the semester. We also always arrive 5 to 10 min early to class and stay longer for discussions and questions. If you have questions about assignments and logistics, we prefer that you ask them publicly on Slack.</p>
+<p><strong>Prerequisites:</strong> The course does not have formal prerequisites, but we describe background knowledge that will help you be successful in the course. In a nutshell, we expect basic exposure to machine learning and basic programming skills, but do not require software engineering experience. </p>
+<p><em>Machine learning (some experience recommended):</em> We suggest that you have basic familiarity with the process of extracting features, building and evaluating models, prompting LLMs, and a basic understanding of how and when different kinds of learning techniques work. Familiarity with Python and Jupyter notebooks is helpful. Courses such as 10-301, 10-315, and 05-434 will prepare you well, but project experience or self-learning from books or online courses will likely be sufficient for our purposes. For example, if you have no prior experience, we recommend the book <a href="https://cmu.primo.exlibrisgroup.com/permalink/01CMU_INST/6lpsnm/alma991019665684604436">Hands-On Machine Learning</a> to get practical experience in training and evaluating models prior to taking this course. We have set up a <em><a href="https://forms.gle/JcS61Uao7wHSFQen8">prerequisite knowledge check</a></em> as a Google Form, where we ask 10 questions on machine learning, which help you assess your background – this is set up as an anonymous and ungraded quiz, where you can compare your knowledge against what we believe is useful for you to be successful in this course (click on <em>“view score”</em> after submitting your answer). After submitting your answers, the system will give specific pointers to readings and exercises that may help you fill gaps in background knowledge. </p>
+<p><em>Programming (basic proficiency required):</em> The course has a substantial programming component in all individual assignments and in the team project, so basic programming skills will be needed. Familiarity with <em>LLMs/coding agents</em> will be very useful, but if you take the course without programming experience or solely rely on LLMs/agents for all your coding, you will significantly struggle and will likely cause conflicts within the group project. We expect that you meet the following criteria: (1) basic fluency in a programming language like Python, (2) ability to install and learn libraries in that language, (3) ability to ssh into a Unix machine and perform basic command line operations, and (4) ability to install and learn new developer tools like Docker. We do not prescribe a programming language, but almost all student teams decide to work primarily in Python. We will provide some introductions and examples for essential tools like Git, Docker, Grafana, and Kafka in labs, but we expect that you will be able to pick up new tools and libraries on your own. If you are worried whether your technical background is sufficient, we recommend that you look at (or even try) <a href="https://github.com/mlip-cmu/f2026/blob/main/assignments/I1_mlproduct.md">homework I1</a> before the semester.</p>
+<p><em>Software engineering (no experience required):</em> Many students will have some software engineering experience beyond basic programming skills from software engineering courses, from internships, or from working in industry. This may include experience with requirements engineering, software design/architecture, software testing, distributed systems, continuous deployment, or managing teams. No such experience is expected as a prerequisite; we will cover these topics in the course.</p>
+<p>Email the instructors if you would like to further talk to us about prerequisites.</p>
+<p><strong>In-person teaching and lecture recordings:</strong> The course will be taught in person, with limited exceptions for students at the CMU-Africa campus. We will record lectures and publicly share the recordings. We do <em>not</em> provide a synchronous remote option, and we do not record labs. </p>
+<p>We consider in-class participation and active participation in labs an important part of the learning experience and encourage it strongly. However, we will give you the choice whether you want your participation to be graded (see below).</p>
+<p>We regularly use Slack for in-class activities. Please make sure that you have access to Slack on a laptop, tablet, or mobile phone during class. </p>
+<p>If you are sick, please do not come to class. If you cannot attend class due to a medical issue, family emergency, interview, or other unforeseeable reason, please contact us about possible accommodations. We try to be as flexible as we can, but will handle these cases individually.</p>
+<p><strong>Exams:</strong> The course has two midterms and a final project presentation. The project presentation will happen in the registrar-assigned timeslot of the final exam (to be announced about halfway through the semester <a href="https://www.cmu.edu/hub/docs/final-exams.pdf">here</a>). The midterms are during the normal class period as per schedule. The second midterm is not comprehensive, and only covers material after the first midterm. Examples of past midterms can be found in the <a href="https://github.com/mlip-cmu/f2026/tree/main/exams">course repository</a>.</p>
+<p><strong>Grading:</strong> Evaluation will be based on the following distribution: 35% individual assignments, 30% group project, 25% midterms and participation (see below), 10% labs. No final exam.</p>
+<p>We strive to provide clear specifications and clear point breakdowns for all homework to set clear expectations and take the guessing out of homework. We often give you choices to self-direct your learning, deciding what to work on and how to address a problem (e.g., we never prescribe a programming language). Clear specifications and point breakdowns allow you to intentionally decide to skip parts of assignments with clear upfront consequences. All parts will be graded pass/fail for the points indicated, no partial credit. Some parts of the grading rubric will require you to verbally explain your solution to a member of the course staff or verbally answer their questions -- usually in person during any office hours within one or two weeks of submitting the assignment.  For opportunities to redo work, see <em>resubmissions</em> below. Some assignments have a small amount of bonus points. </p>
+<p>Since we give flexibility to resubmit assignments, we set grade boundaries fairly high. We do not round points for grading. You can plan with the following grade boundaries:</p>
+
+    <div class="table-container">
+      <table class="table is-striped is-hoverable is-fullwidth">
+        <thead><tr><th>Grade</th><th>Cutoff</th></tr></thead>
+        <tbody><tr><td>A+</td><td>≥99%</td></tr><tr><td>A</td><td>≥96%</td></tr><tr><td>A-</td><td>≥94%</td></tr><tr><td>B+</td><td>≥91%</td></tr><tr><td>B</td><td>≥86%</td></tr><tr><td>B-</td><td>≥82%</td></tr><tr><td>C</td><td>≥75%</td></tr><tr><td>D</td><td>≥60%</td></tr></tbody>
+      </table>
+    </div>
+  <p><strong>Participation:</strong> Design and engineering content strongly benefits from active engagement with the material and discussions of judgment decisions on specific scenarios and cases. We strongly believe in in-class discussions and in-class exercises and want all students to participate, e.g., answering or asking questions in class, sharing own experiences, presenting results, or participating in in-class votes and surveys. We will give many opportunities for participation in every lecture and lab, including at least one breakout session in every single lecture.</p>
+<p>Students in the class can <em>opt in</em> to having their participation reflected in the grade. If they do, the midterms count for 15% and participation for 10%. If they do not, midterms count for 25% and participation is not graded.</p>
+<p>For participation grading, we note student engagement with in-class activities to include as a component in grading. We also consider inauthentic participation in in-class activities (e.g., asking others to cover for you and pretend you participated) as an academic integrity violation (see below).  Please talk to us if you need accommodations.</p>
+<p>For students opting into in-class participation, we assign participation grades as follows:</p>
+<ul>
+<li>100%: Participates actively at least once in most lectures (4 lectures waived, no questions asked)</li>
+<li>80%: Participates actively at least once in two thirds of the lectures</li>
+<li>60%: Participates actively at least once in over half of the lectures</li>
+<li>30%: Participates actively at least once in one quarter of the lectures</li>
+<li>0%: Participation in less than one quarter of the lectures.</li>
+</ul>
+<p><strong>Labs:</strong> Labs typically introduce tools and have a task with multiple clear deliverables. Each deliverable is graded pass/fail. You receive a grade by showing your work to the TA during that week&#39;s lab session (your own section). Typically showing your work involves showing source code, demoing executions, and verbally answering a few questions to demonstrate your understanding. The TA may ask a few questions to probe your understanding. While labs are generally in person as scheduled by the registrar, we may offer additional opportunities to show your work to a TA <em>online</em> the evening before the lab sessions.</p>
+<p>Lab assignments are designed to take about 1 to 2 hours of work. We encourage you to start the lab before the lab session, but you can continue to work on it during the lab session. We encourage collaboration on labs: You can work together with other students both before the lab session and during the lab session. While we do not recommend it, you may look at and even copy other solutions. However, you will have to present and explain your solution to the TA on your own.</p>
+<p>We intend labs to be low stakes – this is your first practical engagement with the material and mistakes are a normal part of the learning process. Deliverables are graded pass/fail on whether they meet the stated expectations for the deliverables. If your solution does not meet the expectations you can continue working on it during the lab session until it does. For example, the TA may ask you to revisit your solution or look up documentation if not satisfied with your explanation. Outside of explicit accommodations (e.g., medical issues) or using tokens (see below), we do not accept lab solutions after the end of your lab session.</p>
+<p><strong>Textbook, reading assignments, and reading quizzes:</strong> The book &quot;<a href="https://mlip-cmu.github.io/book/">Machine Learning in Production</a>&quot; aligns closely with the lecture content -- available for free <a href="https://mlip-cmu.github.io/book/">online</a> and in print through <a href="https://mitpress.mit.edu/9780262049726/machine-learning-in-production/">MIT Press</a> or anywhere where books are sold. We will not assign chapters from our own textbook, but we always point to the corresponding chapter for each lecture. You might find these useful to review concepts from the lectures.</p>
+<p>We will assign various additional readings, including blog posts and academic papers, throughout the semester, typically one per week. We expect that you read the assigned readings before that lecture and that you will be able to discuss them during the lecture or in in-class activities.</p>
+<p><strong>Teamwork:</strong> Teamwork is an essential part of this course. The course contains a multi-milestone group project to be done in teams of 3-6 students. Teams will be assigned by the instructor. A TA will serve as a mentor for each team. We will help teams throughout the semester and cover some specific content on teamwork as part of the course. Peer rating will be performed for team assignments with regard to <em>team citizenship</em> (i.e., being active and cooperative members), following a procedure adapted from <a href="https://www.cs.tufts.edu/~nr/cs257/archive/teaching/barbara-oakley/JSCL-collaboration.pdf">this article</a>, which we will further explain in an early lecture. Use <a href="https://mlip-cmu.github.io/f2026/assignments/peergrading.html">this form</a> to preview the expected grade adjustments for peer ratings. Each team must schedule a 30 minute meeting with their team mentor in the week after every milestone to discuss their solution, debrief on teamwork, and explore possible strategies to improve teamwork. </p>
+<p><strong>Late work policy and resubmissions:</strong> We understand that students will have competing deadlines, unusual events, interviews for job searches, and other activities that compete with coursework. We therefore build flexibility and a safety net directly into the rubric. If you need additional accommodations for exceptional circumstances, please contact us.</p>
+<p>In addition, we expect that the pass/fail grading scheme without partial credit, may lead to harsh point deductions for missing small parts of the requirements, so we provide a mechanism to resubmit work to regain most lost points.</p>
+<p>Every student receives <em>8 individual tokens</em> that they can spend throughout the semester in the following ways:</p>
+<ul>
+<li>For each token, a student can submit a homework assignment 1 day late without any grading penalty (with 2 tokens a student can submit two homeworks one day late each or a single homework up to two days late). If a student runs out of tokens, late individual assignments receive a penalty of 15% per started day. </li>
+<li>For <em>three</em> tokens, a student can resubmit (i.e., improve or redo) an individual homework assignment. If the grade for the resubmitted assignment is higher than the original grade, 90% of the difference is added to the original grade. For example, if the original assignment was 80 points and the resubmitted one was 100 points, the resulting grade is 80+(100-80)*.9 = 98 points. Resubmissions can be made at any time in the semester up to the final project presentation (see schedule). – Note that this technically allows a student to blow the original deadline (no submission necessary, receiving 0 points initially) and then resubmit the homework arbitrarily late for three tokens and a 10% penalty.</li>
+<li>For one token, a student can complete a lab late or redo a lab (any time before the final presentation) by showing the work to a TA during office hours.</li>
+<li>Penalties for late/missing team formation survey and late/missing teamwork peer assessment surveys can be waived for one token each.</li>
+<li>Remaining individual tokens at the end of the semester are counted as one participation day each.</li>
+</ul>
+<p>Every team independently receives <em>8 team tokens</em> that they can spend for extensions of any milestone deadline (1 token per day per milestone, except final presentation deadline) or to resubmit any milestone  (3 tokens each, resubmitted any time before the final presentation; same 10% tax on regained points as for individual assignments). If a team runs out of tokens, late submissions in group assignments receive a penalty of 15% per started day.</p>
+<p>Individual tokens and team tokens are entirely separate; it is not possible to use individual tokens for teamwork or vice versa. The team should make collective decisions about how to use team tokens.</p>
+<p>In general, late submissions and resubmissions can be done at any point in the semester before the final presentations. Submit them in Canvas as a &quot;new attempt&quot;. </p>
+<p>Exceptions to this policy will be made at the discretion of the instructor in important circumstances, almost always involving a family or medical emergency and an email from your advisor. You can ask your academic advisor or the Dean of Student Affairs to request the exception on your behalf. Where issues affect teamwork, please communicate proactively with your team.</p>
+<p><strong>Auditing:</strong> Due to the high demand for this course, we do <em>not</em> allow official forms of auditing. If you like to self-study, all course materials are online. We welcome interested students and visitors to sit in for lectures as long as the room capacity allows it. </p>
+<p><strong>Time management:</strong> This is a 12-unit course, and it is our intention to manage it so that you spend close to 12 hours a week on the course, on average. In general, 3 hours/week will be spent in class, about 1-2 hour for the labs, and 7 hours on assignments. Notice that much homework is done in groups, so please account for the overhead and decreased time flexibility that comes with groupwork. Please give the course staff feedback if the time the course is taking for you differs significantly from our intention.</p>
+<p><strong>Use of content generation AI tools and external sources:</strong> Given the nature of this course, we are open to using AI tools for completing work. We actually strongly recommend it for many tasks. Except for two restrictions (see below), we place no restrictions on the use of content generation tools, such as ChatGPT, Claude, Claude Code, Co-Pilot, or Cursor. You may also reuse code from external sources, such as StackOverflow or tutorials, without acknowledgment. In any case, you will be solely responsible for the correctness of the solution. Note that content generation tools often create plausible-looking but incorrect answers, which will not receive credit. Using code generation tools without understanding the generated code will likely create challenges when answering TA questions for labs or assignments and will likely create teamwork problems. You are also responsible for complying with any applicable licenses. </p>
+<p>There are two settings where AI use is strictly prohibited: (1) exams and any on-paper quizzes we designate as strictly offline, and (2) live conversations with course staff, whether over Zoom or in person. Using any form of AI to generate answers in these settings is considered cheating.</p>
+<p>While we will provide resources for models to be integrated into solutions developed in this course, we do not provide resources or assistance for AI tools used to complete the work (e.g., Claude Code). Students likely will want to use commercial AI tools during the course and should expect subscription costs of $20-100 per month (roughly comparable to the cost of traditional textbooks). </p>
+<p><strong>Academic honesty and collaboration:</strong> The usual policies apply, especially the <a href="https://www.cmu.edu/policies/student-and-student-life/academic-integrity.html">University Policy on Academic Integrity</a>. Many parts of the work will be done in groups. We expect that group members collaborate with one another, but that groups work independently from other groups, not exchanging results with other groups. Within groups, we expect that you are honest about your contribution to the group&#39;s work. <strong>This implies not taking credit for others&#39; work and not covering for team members that have not contributed to the team.</strong> <strong>This also applies to in-class discussions, where indicating working with others who did not participate in the discussion is considered an academic honesty violation.</strong> Otherwise, our expectations regarding academic honesty and collaboration for group and pair work are the same as for individual work, elevated to the level of the &quot;group.&quot;</p>
+<p>Beyond that, the key guiding principle of academic honesty in this course is: <em>&quot;You may not copy any part of a solution to a problem that was written by another student (in this or prior iterations of the class), or was developed together with another student, or was delegated to another person. You may not look at another student&#39;s solution, even if you have completed your own, nor may you knowingly give your solution to another student or leave your solution where another student can see it.</em>&quot; Note that this implies that you cannot publicly post your solutions on GitHub (e.g., as part of a portfolio during job applications). While the use of AI content generation tools is okay (see above) using the work from other students is not. Discussing challenges and solution strategies with others at a high level is okay, sharing code or text is not.</p>
+<p>You may collaborate with other students on labs, but not on homeworks and exams.</p>
+<p>We also expect and respect honesty when communicating with the course staff.</p>
+<p>Any violation of this policy is cheating. The minimum penalty for cheating will be a zero grade for the whole assignment. For cheating on participation, the minimum penalty is -100% on the participation grade. Cheating incidents will also be reported through University channels, with possible additional disciplinary action (see the University Policy on Academic Integrity). There is no statute of limitations for violations of the collaboration policy; penalties may be assessed (and referred to the university disciplinary board) after you have completed the course, and some requirements of the collaboration policy (such as restrictions on you posting your solutions) extend beyond your completion of the course.</p>
+<p>If you have any question about how this policy applies in a particular situation, ask the instructors for clarification.</p>
+<p><strong>Research in this Course:</strong> We are conducting academic research in this course. This research will involve analyzing student work on assignments. You will not be asked to do anything above and beyond the normal learning activities and assignments that are part of this course. You are free not to participate in this research, and your participation will have no influence on your grade for this course or your academic career at CMU. If you do not wish to participate, please send an email to Nadia Nahar (<a href="mailto:nadian@andrew.cmu.edu">nadian@andrew.cmu.edu</a>). Participants will not receive any compensation or extra credit. The data collected as part of this research will not include student grades. All analyses of data from participants’ coursework will be conducted after the course is over and final grades are submitted -- instructors will not know who chooses not to participate before final grades are submitted. All data will be analyzed in de-identified form and presented in the aggregate, without any personal identifiers. If you have questions pertaining to your rights as a research participant, or to report concerns to this study, please contact Nadia Nahar (<a href="mailto:nadian@andrew.cmu.edu">nadian@andrew.cmu.edu</a>) or the Office of Research Integrity and Compliance at Carnegie Mellon University (<a href="mailto:irb-review@andrew.cmu.edu">irb-review@andrew.cmu.edu</a>; phone: 412-268-4721).</p>
+<p><strong>Accommodations for students with disabilities:</strong> If you have a disability with an accommodations letter from the Disability Resources office, we encourage you to discuss your accommodations and needs with us as early in the semester as possible. Please come and talk to us and do not rely on automated emails from the Disability Resources office. We will work with you to ensure that accommodations are provided as appropriate. If you suspect that you may have a disability and would benefit from accommodations but are not yet registered with the Office of Disability Resources, we encourage you to contact them at <a href="mailto:access@andrew.cmu.edu">access@andrew.cmu.edu</a>.</p>
+<p><strong>A note on self care.</strong> Please take care of yourself. Do your best to maintain a healthy lifestyle this semester by eating well, exercising, avoiding drugs and alcohol, getting enough sleep and taking some time to relax. This will help you achieve your goals and cope with stress. All of us benefit from support during times of struggle. You are not alone. There are many helpful resources available on campus and an important part of the college experience is learning how to ask for help. Asking for support sooner rather than later is often helpful.
+If you or anyone you know experiences any academic stress, difficult life events, or feelings like anxiety or depression, we strongly encourage you to seek support. Counseling and Psychological Services (CaPS) is here to help: call 412-268-2922 and visit their website at <a href="http://www.cmu.edu/counseling/">http://www.cmu.edu/counseling/</a>. Consider reaching out to a friend, faculty or family member you trust for help getting connected to the support that can help.
+If you are worried about affording food or feeling insecure about food, there are resources on campus that can help, such as the <a href="https://www.cmu.edu/student-affairs/resources/cmu-pantry/">CMU Pantry</a>.</p>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get all "navbar-burger" elements
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      // Add a click event on each of them
+      $navbarBurgers.forEach(el => {
+        el.addEventListener('click', () => {
+          // Get the target from the "data-target" attribute
+          const target = el.dataset.target;
+          const $target = document.getElementById(target);
+          // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+          el.classList.toggle('is-active');
+          $target.classList.toggle('is-active');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

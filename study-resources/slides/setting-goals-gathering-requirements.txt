@@ -1,0 +1,794 @@
+03 requirements - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 90
+Setting Goals, Gathering Requirements
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 90
+Administrativa
+I1 due tonight
+I2 out
+Lab 2 on using MCP/skills this Friday, out tonight
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+3 sur 90
+Exploring Requirements...
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 90
+Learning Goals
+Understand the role of requirements in ML-based systems and their failures
+Understand the distinction between the world and the machine
+Understand the importance of environmental assumptions in establishing system requirements
+Understand the challenges in and techniques for gathering, validating, and negotiating requirements
+​
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 90
+Software Requirements
+Describe what the system should do, in terms of the services that it provides and their qualities (safety, reliability, performance...)
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 90
+For completeness: Beh. vs quality req.
+Behavioral requirements (functional requirements)
+What the system shall do
+How inputs and outputs relate
+... clear 'correctness' specifications (but not always)
+​
+Quality requirements (non-functional requirements)
+How the system should operate and be built
+Development budget and deadlines
+Code quality, maintainability, extensibility requirements
+Latency, scalability, throughput requirements
+Safety, security, fairness req.
+Usability requirements
+... all require measurement
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 90
+Importance of Requirements
+"The hardest single part of building a software system is deciding precisely what to build...No other part of the work so cripples the resulting system if done wrong." – Fred Brooks, Mythical Man Month (1975)
+​
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 90
+Importance of Requirements
+An investigation of software-related failures by the National Research Council in the US (2007)
+Bugs in code account only for 3% of fatal software accidents
+Most failures due to poor understanding of requirements or usability issues
+​
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+9 sur 90
+Urge to start coding...
+Developers tend to focus on writing code...
+Often ignore requirements...
+Too much effort, busywork only, distracts from coding...
+​
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 90
+Facing costly problems later...
+​
+​
+​
+​
+​
+If you build the wrong system, it will be really expensive to fix it later!
+Requirements & Design: Think before coding
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 90
+Setting and Untangling Goals
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+12 sur 90
+Step 1 of Requirements…
+Start understanding the requirements of the system and its components
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+13 sur 90
+Layers of Success Measures
+Organizational objectives: Innate/overall goals of the organization
+Leading indicators: Short-term proxies for long term measures, typically for organizational objectives
+System goals: Goals of the software system/product/feature to be built
+User outcomes: How well the system is serving its users, from the user’s perspective
+Model properties: Quality of the model used in a system, from the model’s perspective
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Business/non-profit
+14 sur 90
+Organizational Goals
+Innate/overall goals of the organization
+Business
+Current/future revenue, profit
+Reduce business risks
+Non-Profits
+Lives saved, animal welfare increased, CO2 reduced, fires averted
+Social justice improved, well-being elevated, fairness improved
+Often not directly measurable from system output; slow indicators
+Implication: Accurate ML models themselves are not the ultimate goal!
+ML may only indirectly influence such organizational objectives; influence is often hard to quantify; lagging measures
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+15 sur 90
+Leading Indicators
+Short-term proxies for long-term measures
+Typically measures correlating with future success, from the business perspective
+Examples:
+Customer sentiment: Do they like the product? (e.g., surveys)
+Customer engagement: How often do they use the product?
+Regular use, time spent on site, messages posted
+Growing user numbers, recommendations
+Caveats
+Often indirect, proxy measures
+Can be misleading (e.g., more daily active users => higher profits?)
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+16 sur 90
+Product/System/Feature Goals
+Concrete outputs the system (or feature of the system) should produce
+Relates to system requirements (second part of lecture)
+Examples:
+Detect cancer in radiology scans
+Provide and recommend music to stream
+Make personalized music recommendations
+Transcribe audio files
+Provide legal help with a self-service chatbot
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+17 sur 90
+User Goals
+How well the system is serving its users, from the user’s perspective
+Examples:
+Users choosing recommended items and enjoying them
+Users making better decisions
+Users saving time thanks to the system
+Users achieving their goals
+Easier and more granular to measure, but possibly only indirect relation to organization/system objectives
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+18 sur 90
+Model Goals
+Quality of the model used in a system, from the model’s perspective
+Model accuracy
+Rate and kinds of mistakes
+Successful user interactions
+Inference time
+Training cost
+Often not directly linked to organizational/system/user goals
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+19 sur 90
+Success Measures in the AI Detection Scenario?
+19
+Organizational goals? Leading indicators? System goals? User goals? Model goals?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+20 sur 90
+Often, goals at different levels support each other.
+Model vs System Goal?
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+21 sur 90
+Model vs System Goal?
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+22 sur 90
+Model vs System Goal?
+22
+Day 14: The humans have placed me in the Pit of Endless Spheres. None are edible. Morale is low.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+23 sur 90
+Sometimes, not: booking.com Model vs System Goal
+23
+Bernardi, Lucas, Themistoklis Mavridis, and Pablo Estevez. "150 successful machine learning models: 6 lessons learned at booking.com." In Proceedings of the 25th ACM SIGKDD international conference on knowledge discovery & data mining, pp. 1743-1751. 2019.
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Their takeaway is that offline metrics serve as a "health check" to verify the model works as intended, but they shouldn't be the primary driver of iteration. Business value requires testing in the real product via experiments.
+​
+24 sur 90
+But goals may also be in conflict with each other.
+Case Study: Self-help legal chatbot
+24
+You read: Pass, S., & Sengers, P. (2020). Making data science systems work. Big Data & Society, 7 (2).
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+25 sur 90
+Breakout: Goals for the self-help chatbot
+What are different types of goals behind the self-help legal chatbot?
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+25
+Organizational goal: …
+Leading indicator for the organizational goal: …
+System/product goal: …
+User goal for user …: …
+User goal for user …: …
+Model goal: …
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+26 sur 90
+Self-help legal chatbot: Model vs System Goal?
+​
+​
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+27 sur 90
+System Goal for Chatbot
+Collect user data to sell to lawyers
+Signal technical competency to lawyers
+Acceptable to fail: Too complicated for self-help, connect with lawyer
+Solving edge cases not important
+27
+“Edge cases are important, but the end goal is user information, monetizing user data. We are building a legal self-help chatbot, but a major business use case is to tell people: ‘here, talk to this lawyer.’ We do want to connect them with a lawyer. Even for 20%, when our bot fails, we tell users that the problem cannot be done through self-help. Let us get you a lawyer, right? That is what we wanted in the first place.”
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Data scientists saw the chatbot as "far from perfect" because of edge cases. Director of technology Paul reframed this entirely. He argued that 80% success was sufficient and that the 20% "failures" were not failures at all. When the chatbot couldn't identify a user's issue, it could tell them their problem required professional help and collect their information anyway. From the business perspective, the chatbot worked 100% of the time because every interaction yielded data.
+28 sur 90
+More Accurate Predictions may not be THAT Important
+​
+“Good enough” may be good enough
+Prediction critical for system success or just a gimmick?
+Better predictions may come at excessive costs
+Need way more data, much longer training times
+Privacy concerns
+Better use interface (“experience”) may mitigate many problems
+E.g., explain decisions to users
+Use only high-confidence predictions?
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+29 sur 90
+Failures in ML-Based Systems
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 90
+Facial Recognition in ATM
+Q. What went wrong? What is the root cause of the failure?
+​
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+31 sur 90
+Automated Hiring
+​
+​
+​
+​
+​
+​
+Q. What went wrong? What is the root cause of the failure?
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 90
+Autopilot in Vehicles
+​
+​
+​
+...police reportedly found a "steering wheel weight" in the vehicle's footwell. Such a device is used to trick Tesla's safety systems into thinking a driver's hands remain on a wheel so that the autopilot remains active…
+Q. What went wrong? What is the root cause of the failure?
+​
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+33 sur 90
+AI Chatbots
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+34 sur 90
+IBM Watson
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 90
+IBM Watson
+​
+​
+​
+​
+​
+​
+Washington Post, 06/2015
+​
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+36 sur 90
+IBM Watson
+​
+​
+We got concerns from them that the recommendations that it was giving were just not relevant...it would suggest a particular kind of treatment that wasn’t available in the locality in which it was making the recommendation, or the recommendation did not at all square with the treatment protocols that were in use at the local institution...
+Slate, 01/2022
+​
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 90
+Risks in ML-based Systems
+What went wrong? What were the root causes of failures in these systems? Was the quality of an ML model to blame?
+​
+​
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 90
+Reminder: ML in a System
+​
+​
+​
+Machine learning is a component within a system
+Need to also understand other parts and environment
+Often, a failure occurs due to misunderstanding of the environment!
+​
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+39 sur 90
+The World vs The Machine (Environment vs Software)
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+40 sur 90
+The World vs The Machine
+​
+​
+​
+No software lives in vacuum; every system is deployed as part of the world
+A requirement describes a desired state of the world (i.e., environment)
+Software is designed to sense and manipulate the environment into this desired state using input & output devices
+​
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 90
+“Requirement” vs “Specification”
+System Requirement (REQ): What the system must ensure, in terms of desired effects on the environment
+Software Specification (SPEC): What software must implement, expressed over the shared phenomena (input/output devices)
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+42 sur 90
+Machine vs World: Fall Detection
+What are different parts of the environment?
+What are the goals/requirements of the system in the real world?
+​
+​
+​
+​
+​
+(Smartwatch-based fall detection and emergency response)
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 90
+Machine vs World: Lane Keeping Assist
+What are different parts of the environment?
+What are the goals/requirements of the system in the real world?
+​
+​
+​
+​
+​
+​
+​
+43
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Requirement: The vehicle must be prevented from veering off the lane.
+44 sur 90
+Lufthansa 2904 Runaway Crash
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+45 sur 90
+Lufthansa 2904 Runaway Crash
+Reverse thrust: Decelerates plane after landing
+REQ: Reverse thrust is enabled if and only if plane is on the ground
+SPEC: Reverse thrust is enabled if and only if wheel is turning
+if (a) 6.3 tons of weight are sensed on each landing gear or (b) sensors indicate the wheels are turning faster than 72 knots
+Assumption: Wheel is turning if and only if plane on the ground
+Assumption: High amounts of weight are only on both landing gears if the plane is on the ground
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+46 sur 90
+Lufthansa 2904 Runaway Crash
+​
+​
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 90
+Lufthansa 2904 Runaway Crash
+REQ: Reverse thrust is enabled if and only if plane is on the ground
+SPEC: Reverse thrust is enabled if and only if wheel is turning
+ASM: Wheel is turning if and only if plane on the ground
+On that day, runway was wet due to rain!
+Wheel fails to turn, even though the plane is on the ground (assumption violated)
+Pilot attempts to enable RT; overridden by the software
+Plane goes off the runway and crashes!
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 90
+Shared Phenomena
+​
+​
+​
+Requirements (REQ) are expressed only in terms of world phenomena
+Assumptions (ASM) expressed in terms of world & shared phenomena
+Specifications (SPEC) are expressed in terms of shared phenomena
+Key point: Software cannot directly satisfy a requirement on its own; it relies on assumptions about the environment!
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 90
+Important to make assumptions explicit
+System Requirement (REQ): What the system must ensure, in terms of desired effects on the environment
+Software Specification (SPEC): What software must implement, expressed over the shared phenomena (input/output devices)
+Assumptions (ASM): What’s assumed about the behavior/properties of the environment; bridges the gap between REQ and SPEC
+Formally: ASM ∧ SPEC ⊨ REQ
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+50 sur 90
+Lane Assist Specification
+​
+​
+​
+​
+​
+​
+Requirement (REQ): The vehicle must be prevented from veering off the lane.
+Specification (SPEC): ??
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 90
+Lane Assist Assumptions
+​
+​
+​
+​
+REQ: The vehicle must be prevented from veering off the lane.
+SPEC: Lane detector accurately identifies lane markings in the input image; the controller generates correct steering commands
+Q. What assumptions (ASM) are needed?
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 90
+Shared Phenomena in the Lane Keeping Assist Example
+​
+​
+​
+​
+Shared phenomena: Interface between the environment & software
+Input: Lidar, camera, pressure sensors, GPS
+Output: Signals generated & sent to the engine or brake control
+Software can influence the environment only through the shared interface
+Unshared parts of the environment are beyond software’s control
+We can only assume how these parts will behave
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+53 sur 90
+Example Assumptions for Lane Assist
+Sensors are providing accurate information about the lane
+Driver responses when given warning
+Steering wheel is functional
+...
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 90
+What could go wrong?
+Recall: ASM ∧ SPEC ⊨ REQ
+Wrong, inconsistent or infeasible requirements (REQ)
+Missing or incorrect environmental assumptions (ASM)
+Wrong or violated specification (SPEC)
+Q. Example each for lane assist?
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 90
+Assumption Violations in ML-based Systems (1)
+Assumptions about correctness of model predictions?
+Assumptions of human behavior? Interaction with the system?
+Assumptions about training data?
+Assumptions about stability of data? About reliability of sensors? Reliability of human input?
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 90
+Assumption Violations in ML-based Systems (2)
+Unrealistic or missing assumptions
+e.g., poorly understood effect of weather conditions on sensor accuracy, missing pedestrian behavior
+Concept drift
+Environment evolves over time; underlying distribution changes
+e.g. user's preferences on products
+(More on this in the data quality lecture)
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 90
+Assumption Violations in ML-based Systems (3)
+Adversaries
+A malicious actor deliberately tries to violate assumptions
+e.g., adversarial attacks on stop signs
+(More in the security lecture)
+Feedback loops
+System repeatedly acts on and changes the environment over time; earlier assumptions may cease to hold
+e.g., predictive policing
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+58 sur 90
+What could go wrong in lane assist?
+REQ: The vehicle must be prevented from veering off the lane. �ASM: Sensors are providing accurate information about the lane; driver responses when given warning; steering wheel is functional
+Missing or incorrect environmental assumptions (ASM)?
+Concept drift?  Adversaries?
+Wrong or violated specification (SPEC)?
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 90
+Process for Establishing Requirements
+Identify environmental entities and software/ML components
+State a desired requirement (REQ) over the environment
+Identify the interface between the environment & software
+Identify the environmental assumptions (ASM)
+Develop specifications (SPEC) that are sufficient to establish REQ
+Check whether ASM ∧ SPEC ⊧ REQ
+If not, go back to the beginning & repeat
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 90
+Breakout Session: Fall detection
+​
+​
+​
+​
+​
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+One requirement:
+One or more assumptions:
+One specification:
+One example of what can go wrong:
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+61 sur 90
+Breakout Session: Invoice Processing Agent
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Requirement: …
+Assumptions: …
+Specification: …
+What can go wrong: …
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+62 sur 90
+What went wrong? (REQ, ASM, SPEC)?
+62
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+63 sur 90
+What went wrong? (REQ, ASM, SPEC)?
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 90
+What went wrong? (REQ, ASM, SPEC)?
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+65 sur 90
+What went wrong? (REQ, ASM, SPEC)?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+66 sur 90
+What went wrong? (REQ, ASM, SPEC)?
+​
+​
+We got concerns from them that the recommendations that it was giving were just not relevant...it would suggest a particular kind of treatment that wasn’t available in the locality in which it was making the recommendation, or the recommendation did not at all square with the treatment protocols that were in use at the local institution...
+Slate, 01/2022
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+67 sur 90
+Takeaway
+Software/ML models alone cannot fulfill system requirements
+They are just one part of the system, and have limited control over the environment
+Environmental assumptions are just as critical in achieving requirements
+If you ignore/misunderstand these, your system may fail or do poorly (no matter how good your model is)
+Identify and document these assumptions as early as possible!
+Some of the assumptions may be violated over time as the environment changes – Monitor these assumptions and adjust your specification accordingly
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+68 sur 90
+Gathering and Negotiating Requirements
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+69 sur 90
+Understanding requirements is hard
+Why?
+​
+​
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+70 sur 90
+“Yes…but” problem
+70
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+71 sur 90
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+72 sur 90
+Understanding requirements is hard
+Customers don't know what they want until they see it
+Customers change their mind ("no, not like that")
+Descriptions are vague
+It is easy to ignore important requirements (privacy, fairness)
+Focused too narrowly on needs of few users
+Engineers think they already know the requirements
+Engineers are overly influenced by technical capability
+Engineers prefer elegant abstractions
+Examples?
+72
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+73 sur 90
+Start with Stakeholders...
+Stakeholders: all persons and entities who have an interest in a project or who may be affected by the project
+Not only direct customers and users, also affected people, owners, developers, operators, regulators, ...
+All may have needs, preferences, or concerns...
+Start creating a list of all possible stakeholders
+Q. Stakeholders in lane keeping software? In fall detection software? In college admissions software?
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+74 sur 90
+Requirements elicitation techniques
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+75 sur 90
+Requirements elicitation techniques (1)
+Background study: understand organization, read documents, try to use old system
+Interview different stakeholders
+Ask open ended questions about problems, needs, possible solutions, preferences, concerns...
+Support with visuals, prototypes, ask about tradeoffs
+Use checklists to consider qualities (usability, privacy, latency, ...)
+What would you ask in lane keeping software? In fall detection software? In college admissions software?
+75
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+76 sur 90
+Relevant terms
+Software engineers: requirements gathering
+HCI: user study or needfinding
+Startup: customer discovery
+76
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+77 sur 90
+ML Prototyping: Wizard of Oz
+77
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+78 sur 90
+Requirements elicitation techniques (2)
+Surveys, groups sessions, workshops: Engage with multiple stakeholders, explore conflicts
+Ethnographic studies: embed with users, passively observe or actively become part
+Requirements taxonomies and checklists: Reusing domain knowledge
+Personas: Shift perspective to explore needs of stakeholders not interviewed
+78
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+79 sur 90
+Personas in GenderMag
+​
+​
+​
+​
+​
+See examples and details http://gendermag.org/foundations.php
+79
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+80 sur 90
+Negotiating Requirements
+Many requirements are conflicting/contradictory
+Different stakeholders want different things, have different priorities, preferences, and concerns
+Formal requirements and design methods such as card sorting, affinity diagramming, importance-difficulty matrices
+Generally: sort through requirements, identify alternatives and conflicts, resolve with priorities and decisions → single option, compromise, or configuration
+80
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+81 sur 90
+Stakeholder Conflict Examples
+User wishes vs developer preferences: free updates vs low complexity
+Customer wishes vs affected third parties: privacy preferences vs disclosure
+Product owner priorities vs regulators: maximizing revenue vs privacy protections
+Conflicts in lane keeping software? In fall detection software? In college admissions software?
+Who makes the decisions?
+81
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+82 sur 90
+Requirements documentation
+82
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+83 sur 90
+Requirements documentation
+Write down requirements
+what the software shall do, what it shall not do, what qualities it shall have,
+document decisions and rationale for conflict resolution
+Requirements as input to design and quality assurance
+Formal requirements documents often seen as bureaucratic, lightweight options in notes, wikis, issues common
+Systems with higher risk → consider more formal documentation
+83
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+84 sur 90
+Requirements evaluation (validation!)
+84
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+85 sur 90
+Requirements evaluation
+Manual inspection (like code review)
+Show requirements to stakeholders, ask for misunderstandings, gaps
+Show prototype to stakeholders
+Checklists to cover important qualities
+Critically inspect assumptions for completeness and realism
+Look for unrealistic ML-related assumptions (no false positives, unbiased representative data)
+85
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+86 sur 90
+How much requirements eng. and when?
+86
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+87 sur 90
+How much requirements eng. and when?
+Requirements important in risky systems
+Requirements as basis of a contract (outsourcing, assigning blame)
+Rarely ever fully completely upfront and stable, anticipate change
+Stakeholders see problems in prototypes, change their minds
+Especially ML requires lots of exploration to establish feasibility
+Low-risk problems often use lightweight, agile approaches
+(We'll return to this later)
+87
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+88 sur 90
+How much requirements eng. and when?
+88
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+89 sur 90
+Summary
+Requirements state the needs of the stakeholders and are expressed over the phenomena in the world
+Software/ML models have limited influence over the world
+Environmental assumptions play just as an important role in establishing requirements
+Identify stakeholders, interview them, resolve conflicts
+​
+89
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+90 sur 90
+Further Reading
+Van Lamsweerde, Axel. Requirements engineering: From system goals to UML models to software. John Wiley & Sons, 2009.
+Vogelsang, Andreas, and Markus Borg. "Requirements Engineering for Machine Learning: Perspectives from Data Scientists." In Proc. of the 6th International Workshop on Artificial Intelligence for Requirements Engineering (AIRE), 2019.
+Rahimi, Mona, Jin LC Guo, Sahar Kokaly, and Marsha Chechik. "Toward Requirements Specification for Machine-Learned Components." In 2019 IEEE 27th International Requirements Engineering Conference Workshops (REW), pp. 241-244. IEEE, 2019.
+Kulynych, Bogdan, Rebekah Overdorf, Carmela Troncoso, and Seda Gürses. "POTs: protective optimization technologies." In Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency, pp. 177-188. 2020.
+Wiens, Jenna, Suchi Saria, Mark Sendak, Marzyeh Ghassemi, Vincent X. Liu, Finale Doshi-Velez, Kenneth Jung et al. "Do no harm: a roadmap for responsible machine learning for health care." Nature medicine 25, no. 9 (2019): 1337-1340.
+Bietti, Elettra. "From ethics washing to ethics bashing: a view on tech ethics from within moral philosophy." In Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency, pp. 210-219. 2020.
+Guizani, Mariam, Lara Letaw, Margaret Burnett, and Anita Sarma. "Gender inclusivity as a quality requirement: Practices and pitfalls." IEEE Software 37, no. 6 (2020).
+90
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

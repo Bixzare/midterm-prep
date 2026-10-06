@@ -1,0 +1,715 @@
+08 testing in production - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 81
+Testing in Production
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 81
+Logistics
+VM information sent out
+VMs are already receiving recommendation requests
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+3 sur 81
+Logistics
+Project M1 due tonight, peer feedback due 24h after submitting
+Schedule debriefing meetings with your TA mentor this week
+Midterm exam next week Wednesday (Feb 25), regular time and place for lectures, see #announcements for details
+Questions based on shared scenario, apply concepts
+All lectures and readings in scope, focus on concepts with opportunity to practice (e.g., recitations, homeworks, in-class exercises, reading quizzes)
+Closed book, but 6 sheets of notes (sorry, no ChatGPT)
+No lab next week (Feb 27), enjoy Spring Break!
+Milestone M2 planned for 2 weeks but scheduled over 4 weeks due to midterm and Spring break, don’t start last minute
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 81
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 81
+Back to QA...
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 81
+Learning Goals
+Design telemetry for evaluation in practice
+Understand the rationale for beta tests and chaos experiments
+Plan and execute experiments (chaos, A/B, shadow releases, ...) in production
+Conduct and evaluate multiple concurrent A/B tests in a system
+Perform canary releases
+Examine experimental results with statistical rigor
+Support data scientists with monitoring platforms providing insights from production data
+6
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 81
+From Unit Tests to Testing in Production
+(in traditional software systems)
+​
+7
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 81
+Unit Test, Integration Tests, System Tests
+These are all testing before deployment – Manual or automated
+​
+​
+​
+8
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Testing before release. Manual or automated.
+9 sur 81
+Beta Testing: Move towards testing during deployment
+Early release to select users, asking them to send feedback or report issues.
+​
+9
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Early release to select users, asking them to send feedback or report issues. No telemetry in early days.
+10 sur 81
+Crash Telemetry: "Bugs" in Production
+Telemetry: The automated collection, transmission, and analysis of data about the performance, behavior, and usage of an application or system in real time.
+With internet availability, send crash reports home to identify problems "in production".
+​
+​
+10
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 81
+Model Assessment in Production
+Ultimate held-out evaluation data: Unseen real user data
+​
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 81
+Recap: Limitations of Offline Model Eval
+Training and test data drawn from the same population
+i.i.d.: independent and identically distributed
+leakage and overfitting problems quite common
+Is the population representative of production data?
+If not or only partially or not anymore: Does the model generalize beyond training data?
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 81
+Model Assessment in Production
+Live observation in the running system
+Need telemetry to evaluate quality – automated collection and monitoring of data on model performance, data quality, and user behavior to ensure continuous model accuracy, detect drift, and maintain system health in real-time.
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+14 sur 81
+(Re)Introducing Dishpatch
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+15 sur 81
+(Re)Introducing Dishpatch
+15
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+16 sur 81
+(Re)Introducing Dishpatch
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+17 sur 81
+(Re)Introducing Dishpatch
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+18 sur 81
+(Re)Introducing Dishpatch
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+19 sur 81
+(Re)Introducing Dishpatch
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+20 sur 81
+(Re)Introducing Dishpatch
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+21 sur 81
+Breakout: Design Telemetry in Production
+​
+Discuss how to collect telemetry without being too intrusive and harming user experience. Discuss the metric to monitor, and how to operationalize.
+Explicit vs implicit feedback
+Explicit: Labeled by the users directly, or by third parties
+Implicit:
+Proxy signals of success & failure
+Also recall last week’s discussion of invariants and properties
+​
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Model quality metric:
+Data to collect:
+Computation:
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: More:
+SmartHome: Does it automatically turn of the lights/lock the doors/close the window at the right time?
+Profanity filter: Does it block the right blog comments?
+News website: Does it pick the headline alternative that attracts a user’s attention most?
+Autonomous vehicles: Does it detect pedestrians in the street?
+​
+​
+22 sur 81
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+23 sur 81
+How to collect data?
+How do you gather data without being intrusive (i.e., labeling outcomes), without harming user experience?
+Was the house price predicted correctly?
+Was the ranking of search results good?
+Was the meeting summary good?
+Was there cancer in the image?
+Was a Spotify playlist good?
+Was the weather prediction good?
+Was the translation correct?
+Did the self-driving car break at the right moment? Did it detect the pedestrians?
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: More:
+SmartHome: Does it automatically turn of the lights/lock the doors/close the window at the right time?
+Profanity filter: Does it block the right blog comments?
+News website: Does it pick the headline alternative that attracts a user’s attention most?
+Autonomous vehicles: Does it detect pedestrians in the street?
+​
+​
+24 sur 81
+Telemetry strategy: “Manually” Label Production Samples
+Akin to labeling learning and testing data, have human/AI annotators
+​
+​
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+SurgeAI, ScaleAI, LabelBox more common than MTurk these days, which is waning; reliability issues.  New companies combining LLM labeling with dedicated labeling workforces (humans), plus various toolkits for model evaluation.
+25 sur 81
+Telemetry strategy: Explicit Report
+Expect only sparse feedback and expect negative feedback over-proportionally
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Expect only sparse feedback and expect negative feedback over-proportionally.
+​
+Yes, skype for biz has been retired for Teams
+26 sur 81
+Telemetry strategy: Implicit Feedback
+Collect user editing ("human-AI collaboration"); Can have indicators for low confidence predictions
+​
+​
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Clever UI design allows users to edit transcripts. UI already highlights low-confidence words, can
+27 sur 81
+Telemetry strategy: Wait-and-See (Retrospective)
+27
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Can just wait 7 days to see actual outcome for all predictions
+28 sur 81
+Summary: Telemetry Strategies
+Ordered by how much efforts needed:
+Manual/crowdsourced labeling on production samples
+Explicit report: Ask users or allow users to complain
+Observe user reaction (implicit feedback)
+Wait and see
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+29 sur 81
+Measuring Model Quality with Telemetry
+Three steps, again on measurements: (1) Metric, (2) Data collection (telemetry), (3) Operationalization
+Telemetry can provide insights for correctness
+sometimes very accurate labels for real unseen data
+sometimes only mistakes
+sometimes delayed
+often just samples
+often just weak proxies for correctness
+Often sufficient to approximate precision/recall or other model-quality measures
+Mismatch to (static) eval set may indicate stale or unrepresentative data
+Trend analysis can provide insights even for inaccurate proxy measures
+29
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+30 sur 81
+Breakout: Design Telemetry in Production
+Discuss how to collect telemetry (manual/crowdsourced labeling, wait and see, ask users, observe user reaction), the metric to monitor, and how to operationalize. Scenarios:
+Front-left: Amazon: Shopping app detects the shoe brand from photos
+Front-right: Google: Tagging uploaded photos with friends' names
+Back-left: Spotify: Recommended personalized playlists
+Back-right: Zoom: automatic meeting summary
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Model quality metric:
+Data to collect:
+Operationalization:
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: about 30 minutes to here
+31 sur 81
+Monitoring Model Quality in Production
+Monitor model quality together with other quality attributes (e.g., uptime, response time, load)
+Set up automatic alerts …
+When model quality drops
+Watch for jumps after releases (roll back after negative jump)
+Watch for slow degradation (Stale models, data drift, feedback loops, adversaries)
+Debug common or important problems
+Monitor characteristics of requests
+Mistakes uniform across populations?
+Challenging problems → refine training, add regression tests
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+32 sur 81
+Monitoring services: Prometheus and Grafana
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Prometheus is a time-series database and monitoring system originally built at SoundCloud around 2012, now a graduated (cloud-native computing foundation) CNCF project (same foundation as Kubernetes). Pull-based metrics collection; scrapes HTTP endpoints that services expose via instrumentation that exposes a /metrics endpoint. Prometheus pulls from those endpoints on a schedule, typically every 15–30 seconds.
+Data model:  labeled time series. Every metric has a name and a set of key-value labels. Has a query language, can compute rates, percentiles, and aggregations over those time series.
+Four metrics types: counters, gauges, histograms, summaries
+​
+33 sur 81
+Grafana screenshot from Movie Recommendation Service
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Grafana: visualization and dashboarding layer that sits on top of Prometheus (and many other data sources). It doesn't collect or store any data itself.  Makes it easy to create real-time dashboards with auto-refresh, set up alerting thresholds.
+Prometheus: "what's happening right now and over the last N hours/days”;  traditional experiment tracking tools like MLflow and W&B answer "how did this model perform during training and offline evaluation."  Prometheus/Grafana close the loop by tracking the model after it's deployed.
+Prometheus is designed for operational metrics, not high-cardinality data. Don’t log individual prediction; use a logging pipeline. Better for aggregate signals.
+​
+34 sur 81
+Many commercial solutions
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Azure’s machine learning dashboard.  Blends operational health metrics (response time, error rate, cache hit rate) with ML-specific ones (total predictions, data error rate as distinct from system error rate). Distinction between "data errors" and "system errors" reflects reality that in ML serving, you need to monitor both whether the infrastructure is healthy and whether the data coming in looks reasonable.
+35 sur 81
+Many different monitoring possibilities, e.g. Detecting Drift
+Deploy monitoring at …
+Training data
+Schema & distribution of incoming data
+Distribution of labels
+Requests & predictions
+Schema & distribution of requests
+Distribution of predictions
+Quality of predictions
+35
+Image source: Joel Thomas and Clemens Mewald. Productionizing Machine Learning: From Deployment to Drift Detection. Databricks Blog, 2019
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+monitoring distributions and schemas, not individual data points. Can track the distribution of predictions in Prometheus using histograms (like confidence) and counters without storing each prediction individually. So the real-time alerting triggers on aggregate signals, and separate logging/warehousing captures per-prediction detail needed for more analysis. Databricks says the same thing.
+​
+36 sur 81
+What measures would you track for this?
+The nightly job that copies restaurant menus into the agent's search index fails silently. Every day more of the index is out of date.
+36
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+37 sur 81
+What measures would you track for this?
+The nightly job that copies restaurant menus into the agent's search index fails silently. Every day more of the index is out of date.
+Watch: Completions ⬇️, judge failures by mode (wrong item) ⬆️, refund rate ⬆️, invariant violations per order (item_not_on_menu, price_mismatch) ⬆️, refund rate ⬆️
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+38 sur 81
+What measures would you track for this?
+A new city (Honolulu) ramps to 30% of traffic over three days, with cuisines and requests the agent rarely saw.
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+39 sur 81
+What measures would you track for this?
+A new city (Honolulu) ramps to 30% of traffic over three days, with cuisines and requests the agent rarely saw.
+Watch: Drift score by city / cuisine ⬆️, requests by city, judge failures by mode (unhelpful reply, wrong item) ⬆️
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+40 sur 81
+What measures would you track for this?
+“Surprise me” retrains nightly. Without random exploration it learns only from orders it caused itself (feedback loop).
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+41 sur 81
+What measures would you track for this?
+“Surprise me” retrains nightly. Without random exploration it learns only from orders it caused itself (feedback loop).
+Watch: restaurants recommended at least once ⬇️, share going to top 5 ⬆️, repeat recommendation rate ⬆️
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+42 sur 81
+Monitoring without Ground Truth: Invariants/Assertions to Assure with Telemetry
+Consistency between multiple sources
+e.g., multiple models agree, multiple sensors agree
+e.g., text and image agree
+Physical domain knowledge
+e.g., cars in video shall not flicker,
+e.g., earthquakes should appear in sensors grouped by geography
+Domain knowledge about unlikely events
+e.g., unlikely to have 3 cars in same location
+Stability
+e.g., object detection should not change with video noise
+Input conforms to schema (e.g. boolean features)
+And all invariants from model quality lecture, including capabilities
+42
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+43 sur 81
+Telemetry for Training: The ML Flywheel
+Every night the most common judge-flagged failure (e.g., give_me_more_loop, ignored_allergy, unhelpful_reply, wrong_item) becomes new eval cases and few-shot examples. This helps make that failure rarer.
+graphic by CBInsights
+43
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Telemetry is also important for strategic advantage
+44 sur 81
+Engineering Challenges for Telemetry
+Data volume and operating cost
+e.g., record "all AR live translations"?
+reduce data through sampling
+reduce data through summarization (e.g., extracted features rather than raw data; extraction client vs server side)
+Isolating feedback for specific ML component + version
+Biased sampling / Rare events
+Privacy (related: Offline deployments)
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Data volume and operating cost. Google Translate processes something on the order of 100 billion words a day; can’t record all inputs/outputs. Sampling vs. summarization tradeoff: Sampling means keeping, say, 1% of raw requests at random, which preserves individual examples you can inspect later but may miss rare events. Summarization means computing aggregates on the fly, like "average confidence score per minute" or "distribution of predicted classes this hour," and only storing those.
+Client-vs-server-side: extracting features or computing summaries on the device reduces bandwidth and server cost, but you lose the ability to reprocess raw data later.
+Isolating feedback for specific ML component + version (e.g., search engine with a query understanding model, a ranking model, and a re-ranking model), user feedback like "I didn't find what I wanted" is about the whole pipeline. If you just rolled out v3 of the ranking model but v2 of query understanding is still running, you need your telemetry tagged with version metadata so you can slice results accordingly.  Connects to feature flags. Also especially tricky for agentic systems/LLMs (rags, etc).
+Biased sampling / rare events. Uniform random sampling sounds fair, but systematically underrepresents rare classes. In practice, teams use stratified sampling (over-sample low-frequency categories) or trigger-based logging (log the full request whenever the model's confidence is below a threshold, or whenever two models in a shadow deployment disagree). (consider telemetry strategies).
+Privacy. Design tension (also don’t collect what you don’t need). Better telemetry means better models, but bad for privacy. Concrete techniques include differential privacy for aggregated metrics, on-device summarization, and federated evaluation.
+"offline deployments": some ML systems run entirely on-device (medical devices, military, industrial settings with no connectivity), so you can't do any real-time telemetry at all. Those systems have to rely on periodic sync or purely offline evaluation, which is a fundamentally different engineering constraint.
+​
+45 sur 81
+Engineering Challenges for Telemetry?
+Discuss: Cost, privacy, rare events, bias
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+46 sur 81
+Breakout: Engineering Challenges in Telemetry
+Discuss: Cost, privacy, rare events, bias
+Scenarios:
+Front-left: Amazon: Shopping app feature that detects the shoe brand from photos
+Front-right: Google: Tagging uploaded photos with friends' names
+Back-left: Spotify: Recommended personalized playlists
+Back-right: Zoom: automatic meeting summary
+(can update Slack, but not needed)
+46
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+47 sur 81
+Revisiting Model Quality vs System Goals
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 81
+Model Quality vs System Goals
+Telemetry can approximate model accuracy
+Telemetry can directly measure system qualities, leading indicators, user outcomes
+define measures for "key performance indicators"
+clicks, buys, signups, engagement time, ratings
+operationalize with telemetry
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 81
+Model Quality vs System Quality: booking.com
+What's the system goal?
+​
+49
+Bernardi, Lucas, et al. "150 successful machine learning models: 6 lessons learned at Booking.com." In Proc. Int'l Conf. Knowledge Discovery & Data Mining, 2019.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: The conversion rate is a key performance metric used to measure the effectiveness of marketing efforts, advertising campaigns, or sales processes. It represents the percentage of users or visitors who complete a desired action (a "conversion") out of the total number of users who were exposed to an offer, website, or advertisement.
+​
+​
+50 sur 81
+Possible causes of model vs system conflict?
+Observed no correlation between offline performance gain vs. business value gain, across many different models with different goals.
+Possible reasons:
+Value Performance Saturation
+Uncanny Valley effect (e.g., "creepy AIs")
+Proxy Over-optimization (e.g., click-through rate approximating conversion)
+50
+Bernardi, Lucas, et al. "150 successful machine learning models: 6 lessons learned at Booking.com." In Proc. Int'l Conf. Knowledge Discovery & Data Mining, 2019.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: hypothesized
+model value saturated, little more value to be expected
+segment saturation: only very few users benefit from further improvement
+overoptimization on proxy metrics not real target metrics
+uncanny valley effect from "creepy AIs"
+Also: with LLM-based systems, model cost (inference at deployment) is another key consideration; will often choose a cheaper model even if it’s worse.
+51 sur 81
+What key performance indicator of the system to collect?
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+52 sur 81
+Design Telemetry in Production
+Discuss: What key performance indicator of the system to collect?
+Scenarios:
+Front-left: Amazon: Shopping app feature that detects the shoe brand from photos
+Front-right: Google: Tagging uploaded photos with friends' names
+Back-left: Spotify: Recommended personalized playlists
+Back-right: Zoom: automatic meeting summary
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+System-level KPIs for zoom are interesting — if it’s too long or detailed, it might still be useless.
+53 sur 81
+Experimenting in Production
+A/B experiments
+Shadow releases / traffic teeing
+Blue/green deployment
+Canary releases
+Chaos experiments
+​
+53
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 81
+A/B Experiments: What if...?
+... we hand plenty of subjects for experiments
+... we could randomly assign to treatment/ control group without them knowing
+... we could analyze small individual changes and keep everything else constant
+​
+​
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Usage observable online, telemetry allows testing in production.
+Picture source: https://www.designforfounders.com/ab-testing-examples/
+​
+55 sur 81
+Bing Experiment
+Experiment: Ad display at Bing
+Suggestion deprioritized and left in the backlog for over 6 months
+Implemented & A/B tested in production
+Within 2h revenue-too-high alarm triggered.
+Typically suggest serious bug (e.g., double billing)
+But valid here: Revenue increase by 12% - $100M annually in US
+Did not hurt user-experience metrics
+Simple adjustment became one of the most profitable ideas in Bing’s history!
+​
+From: Kohavi, Ron, Diane Tang, and Ya Xu. "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing."  2020.
+​
+55
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+56 sur 81
+A/B Experiment?
+E.g., prompt v2-upsell suggests sides and drinks
+56
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+57 sur 81
+A/B Experiment?
+E.g., prompt v2-upsell suggests sides and drinks
+(See notebook)
+Discussion (model vs. system goals). The upsell prompt raises order value, but users complete fewer conversations and and request more refunds; the agent asks for humans more often.
+57
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+58 sur 81
+A/B Experiment for ML Components?
+New product recommendation algorithm for web store?
+New language model in audio transcription service?
+New (offline) model to detect falls on smart watch?
+​
+​
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 81
+Implementing A/B Testing
+Implement alternative versions of the system
+using feature flags (decisions in implementation)
+separate deployments (decision in router/load balancer)
+Map users to treatment group
+Randomly from distribution
+Static user - group mapping
+Online service (e.g., launchdarkly, split)
+Monitor outcomes per group
+Telemetry, sales, time on site, server load, crash rate
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: divide them into groups
+​
+​
+60 sur 81
+Feature Flags (Boolean flags)
+Good practices: tracked explicitly, documented, keep them localized and independent
+External mapping of flags to customers, who should see what configuration
+e.g., 1% of users sees one_click_checkout, but always the same users; or 50% of beta-users and 90% of developers and 0.1% of all users
+60
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: mapping somewhere One way of doing this randomly is hashing user ID random but stable same users always in the same group some offset to get a new sample for telemetry you need to know what group a user was in. Once you have a mapping from flags here then it's easier you can also use a load balancer to manage this you need an if statement somewhere chrome, facebook, if statements are in the backend/code
+​
+61 sur 81
+Feature Flags as a Service
+61
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: There are companies that do this as a service exposre your database. "boolean option as a service" most groups in the past have done it themselves
+launch darkley, pslit IO, open source libraries gets complicated when you want to do multiple experiments, factorial design gets complicated the bing team wrote a whole book
+62 sur 81
+Confidence in A/B Experiments (statistical tests)
+Group A
+classic personalized content recommendation model
+2158 Users
+average 3:13 min time on site
+​
+Group B
+updated personalized content recommendation model
+10 Users
+average 3:24 min time on site
+​
+62
+What's the problem of comparing the average?
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: What's the problem here? t test assumes a normal distribution
+statistical tests to see if it's random event
+who here knows about the t test?  It's one of the standard tests for this kind of thing.
+​
+63 sur 81
+Analyzing Results: Stats 101
+All the data have some distribution.
+Normal distribution is very common (e.g. students tend to get average score, not full score).
+When we draw samples from the same distribution, we can get different samples just by chance.
+Statistics tells us whether “interesting" patterns we observe actually exist in the samples, or whether it’s just sampling noise — use some numbers to express uncertainty.
+Confidence interval: if we can compute the average of some samples (average on-site time of 10 users), what’s the average of the population (whole user group)?
+63
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+64 sur 81
+Analyzing Results: Stats 101
+Significance testing also helps with comparison. When most of the confidence intervals overlap, we’d know there’s no actual differences between groups.
+This is quantified by p-value:
+Misconception: “what is the probability a difference between two samples is by chance?” (lower = higher likelihood of a sig. difference)
+Reality: the p-value starts with the assumption that there's no real difference (null hypothesis), then asks "how likely would our observed data be in that scenario?"
+64
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Conditional probability confusion: A p-value of 0.03 doesn't mean there's a 3% chance the difference is due to chance. It means that if there were no real difference, we'd see data this extreme only 3% of the time.�The p-value can't tell us the probability of our hypothesis being correct because it assumes one particular hypothesis (no difference) from the start.
+65 sur 81
+Stats 101: How to compute p-value?
+Parametric tests: Assume comparing normally distributed groups that have the same variances.
+Tests: t-test, ANOVA, & linear regression.
+For: model accuracy, human click streams
+More sensitive and powerful when the requirement is met.
+Non-parametric tests: Does not assume normal distribution.
+For: categorical data like Likert Scale rating
+Tests: Wilcoxon signed-rank test compare users’ nominal Likert Scale ratings
+​
+65
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+66 sur 81
+t-test
+We will ask for statistical test in M3 – Many libraries implement it!
+​
+66
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+67 sur 81
+Decision tree of tests
+Many many other factors, e.g., dependent vs. independent measures
+​
+67
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+68 sur 81
+How many samples needed?
+Too few?
+Noise and random results!
+​
+Too many?
+Risk of spreading bad designs!
+​
+68
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: 50/50? New model vs. old model about 1:10 to here inherently risky, so you don't want too many  in experiment
+69 sur 81
+Some factors that affect your sample size
+69
+Different effect size, same deviations
+Effect size: the magnitude of the difference between groups
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+70 sur 81
+Some factors that affect your sample size
+70
+Same effect size, different deviations
+Less noise --> Easier to recognize
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+71 sur 81
+Concurrent A/B testing
+Multiple experiments at the same time
+Independent experiments on different populations – interactions not explored
+Multi-factorial designs, well understood but typically too complex, e.g., not all combinations valid or interesting
+Grouping in sets of experiments (layers)
+​
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+72 sur 81
+Other Experiments in Production
+Chaos experiments
+Shadow releases / traffic teeing
+Canary releases
+​
+72
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+73 sur 81
+Canary Releases
+Release new version to small percentage of population (like A/B testing)
+Automatically roll back if quality measures degrade
+Automatically and incrementally increase deployment to 100% otherwise
+​
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+74 sur 81
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+75 sur 81
+Chaos Experiments: deliberate faults in production to test robustness
+​
+75
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Deliberate introduction of faults in production to test robustness. This picture is dated, but it’s key to the history of the concept.
+76 sur 81
+Chaos Experiments for ML Components?
+76
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: Artificially reduce model quality, add delays, insert bias, etc to test monitoring and alerting infrastructure
+77 sur 81
+77
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+78 sur 81
+Shadow releases / traffic teeing
+Run both models in parallel
+Use predictions of old model in production
+Compare differences between model predictions
+If possible, compare against ground truth labels/telemetry
+Examples?
+​
+78
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+79 sur 81
+Advice for Experimenting in Production
+Minimize blast radius (canary, A/B, chaos expr)
+Automate experiments and deployments
+Allow for quick rollback of poor models (continuous delivery, containers, load balancers, versioning)
+Make decisions with confidence, compare distributions
+Monitor, monitor, monitor
+79
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+80 sur 81
+Summary
+Production data is ultimate unseen validation data
+Both for model quality and system quality
+Telemetry is key and challenging (design problem and opportunity)
+Monitoring and dashboards
+Many forms of experimentation and release (A/B testing, shadow releases, canary releases, chaos experiments, ...) to minimize "blast radius"; gain confidence in results with statistical tests
+80
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+81 sur 81
+Further Readings
+On canary releases: Alec Warner and Štěpán Davidovič. “Canary Releases.” in The Site Reliability Workbook, O’Reilly 2018
+Everything on A/B testing: Kohavi, Ron. Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing. Cambridge University Press, 2020.
+A/B testing critiques: Josh Constine. The Morality Of A/B Testing. Blog 2014; the Center of Humane Technology; and the Netflix documentary The Social Dilemma
+Jens Meinicke, Chu-Pan Wong, Bogdan Vasilescu, and Christian Kästner. Exploring Differences and Commonalities between Feature Flags and Configuration Options. In Proceedings of the Proc. International Conference on Software Engineering ICSE-SEIP, pages 233–242, May 2020.
+LLM validation: Shankar et al.  Who Validates the Validators? Aligning LLM-Assisted Evaluation of LLM Outputs with Human Preferences. In Proc of ACM Symposium on User Interface Software and Technology (UIST '24), 2024.
+81
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note

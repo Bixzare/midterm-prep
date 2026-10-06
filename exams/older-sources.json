@@ -1,0 +1,44 @@
+[
+  {
+    "file": "older/F2019-practice_midterm.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/F2019/other_material/practice_midterm.pdf",
+    "bytes": 93790,
+    "sha256": "4901b9f5e6ee707430913ceb66934a6bbbfb0a6e41db7e57aaeb76f979b0fdb8"
+  },
+  {
+    "file": "older/F2019-midterm.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/F2019/other_material/midterm.pdf",
+    "bytes": 614470,
+    "sha256": "228685dce6f2c0c4c4be3d375b023e90793dd82c81d1fe1bad2f6af1ec0c56f6"
+  },
+  {
+    "file": "older/F2019-final_exam.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/F2019/other_material/final_exam.pdf",
+    "bytes": 697282,
+    "sha256": "835274ab5de6e4f05b99177b7f8bd02e65d6b1203bd4f7648eaecfd028d89f84"
+  },
+  {
+    "file": "older/S2020-midterm.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/S2020/exams/midterm.pdf",
+    "bytes": 60053,
+    "sha256": "71c7ef494c57e0173691e46830debfaf5e747d75499f780b6c2a4427e9818b2d"
+  },
+  {
+    "file": "older/F2020-midterm_f20.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/F2020/exams/midterm_f20.pdf",
+    "bytes": 123178,
+    "sha256": "4f4faf427147ef654c0aa46de78e1df178074b8f6ff2eb6d3c9962876b4f3e05"
+  },
+  {
+    "file": "older/S2022-midterm-s22.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/S2022/exams/midterm-s22.pdf",
+    "bytes": 700718,
+    "sha256": "e1d40f011066f852eb30d1146573f4207e475b8b14ab1608ef5c7d6e8aba968b"
+  },
+  {
+    "file": "older/F2022-midterm-f22.pdf",
+    "source": "https://raw.githubusercontent.com/ckaestne/seai/F2022/exams/midterm-f22.pdf",
+    "bytes": 2996622,
+    "sha256": "0685adb63d87a7b63716108dcf796943b9c18ae43dda36a6a101d7dd38cfee25"
+  }
+]

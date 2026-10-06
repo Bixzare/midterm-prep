@@ -1,0 +1,905 @@
+09 deploying - Google SlidesImpossible d'ouvrir ce fichier car JavaScript n'est pas activé dans votre navigateur. Activez-le, puis rechargez la page.
+1 sur 92
+Deploying a Model
+Machine Learning in Production
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+2 sur 92
+Administrativa
+Last day to change participation opt-in �	(confirm status with `/participation status`)
+All teams should have their VMs�	Requests are coming in right now�	Security is your responsibility
+2
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+3 sur 92
+Exploring architecture and design...
+3
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+4 sur 92
+Learning Goals
+Understand important quality considerations when deploying ML components
+Follow a design process to explicitly reason about alternative designs and their quality tradeoffs
+Gather data to make informed decisions about what ML technique to use and where and how to deploy it
+Understand the power of design patterns for codifying design knowledge
+Create architectural models to reason about relevant characteristics
+Critique the decision of where an AI model lives (e.g., cloud vs edge vs hybrid), considering the relevant tradeoffs
+Deploy models locally and to the cloud
+Document model inference services
+4
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+5 sur 92
+Deploying a Model is Easy
+5
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+6 sur 92
+Deploying a Model is Easy
+Model inference component as function/library
+​
+​
+6
+from sklearn.linear_model import LogisticRegression
+model = … # learn model or load serialized model ...
+def infer(feature1, feature2):
+return model.predict(np.array([[feature1, feature2]])
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+7 sur 92
+Deploying a Model is Easy
+Model inference component as a service
+​
+7
+from flask import Flask, escape, request
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+detector_model = … # load model…
+​
+# inference API that returns JSON with classes
+# found in an image
+@app.route('/get_objects', methods=['POST'])
+def pred():
+uploaded_img = request.files["images"]
+coverted_img = … # feature encoding of uploaded img
+result = detector_model(converted_img)
+return jsonify({"response":
+result['detection_class_entities']})
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+8 sur 92
+Deploying a Model is Easy
+LLM wrapper as a service
+​
+8
+app = Flask(__name__)
+client = anthropic.Anthropic()
+​
+PROMPT = """You are a {role}. Summarize in
+{n} sentences. ... Text: {text}"""
+​
+@app.route('/summarize', methods=['POST'])
+def pred():
+p = PROMPT.format(role="news editor", n=2,
+text=request.json["text"])
+result = client.messages.create(
+model="claude-sonnet-5", max_tokens=200,
+messages=[{"role": "user", "content": p}])
+return jsonify({"response": result.content[0].text})
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+9 sur 92
+Deploying a Model is Easy
+Packaging a model inference service in a container
+​
+9
+FROM python:3.8-buster
+RUN pip install uwsgi==2.0.20
+RUN pip install tensorflow==2.7.0
+RUN pip install flask==2.0.2
+RUN pip install gunicorn==20.1.0
+COPY models/model.pf /model/
+COPY ./serve.py /app/main.py
+WORKDIR ./app
+EXPOSE 4040
+CMD ["gunicorn", "-b 0.0.0.0:4040", "main:app"]
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+10 sur 92
+Deploying a Model is Easy
+Self-hosting an open-weights LLM on GPU
+​
+10
+FROM vllm/vllm-openai:v0.11.0
+CMD ["--model", "Qwen/Qwen3-8B",
+"--tensor-parallel-size", "2",   # split over 2 GPUs
+"--max-model-len", "32768",      # context window
+"--gpu-memory-utilization", "0.9",
+"--enable-prefix-caching",
+"--port", "8000"]
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+11 sur 92
+Deploying a Model is Easy
+Model inference component as a service in the cloud
+Package in container or other infrastructure
+Deploy in cloud infrastructure, optionally with GPUs
+Auto-scaling with demand ("Stateless Serving Functions Pattern")
+MLOps infrastructure to automate all of this (more on this later)
+BentoML (low code service creation, deployment, model registry),
+Cortex (automated deployment and scaling of models on AWS),
+TFX model serving (tensorflow GRPC services)
+Seldon Core (no-code model service and many many additional services for monitoring and operations on Kubernetes)
+11
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+12 sur 92
+But is it really easy?
+Offline use?
+Deployment at scale?
+Hardware needs and operating cost?
+Frequent updates?
+Integration of the model into a system? (pipelines, RAG)
+Long running tasks? (agents)
+Meeting system requirements?
+Every system is different!
+12
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+13 sur 92
+What qualities do we want from a �model deployment?
+13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+14 sur 92
+Every System is Different
+Personalized music recommendations for Spotify
+Cancer prognosis
+AI detection startup
+Agentic travel receipt processing
+Smart keyboard for mobile device
+14
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+15 sur 92
+Inference is a Component within a System
+15
+Database
+User accounts
+Doc upload
+Payment
+System: AI detector service
+Legend:          Non-ML component,          ML component,          system boundary
+Environment
+observes
+triggers
+learns & deploys
+share
+User data
+uses
+Model inference:�AI-text classifier
+telemetry
+observes
+scales with
+data collection
+Generation harness: Prompt frontier models, mirror human corpora
+Cloud processing
+Logging
+Monitoring
+Model monitoring
+End-user �user interface
+Training data
+Feature store
+ML pipeline
+Text extract
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+16 sur 92
+Case Study: Augmented Reality Translation
+16
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: Image: https://pixabay.com/photos/nightlife-republic-of-korea-jongno-2162772/
+​
+17 sur 92
+Case Study: Augmented Reality Translation
+17
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+18 sur 92
+Case Study: Augmented Reality Translation
+​
+18
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+19 sur 92
+Case Study: Augmented Reality Translation
+​
+19
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+20 sur 92
+System Qualities of Interest?
+20
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+21 sur 92
+Where Should the Models Live?
+Cloud? Phone? Glasses?
+What qualities are relevant for the decision?
+21
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+22 sur 92
+Considerations
+How much data is needed as input for the model?
+How much output data is produced by the model?
+How fast/energy consuming is model execution?
+What latency is needed for the application?
+How big is the model? How often does it need to be updated?
+Cost of operating the model? (distribution + execution)
+Opportunities for telemetry?
+What happens if users are offline?
+22
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+23 sur 92
+Breakout: Latency and Bandwidth Analysis
+Estimate latency and bandwidth requirements between components
+Discuss tradeoffs among different deployment models
+​
+​
+​
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:
+Recommended deployment for OCR (with justification):
+Recommended deployment for Translation (with justification):
+​
+23
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+​
+​
+​
+Notes: Identify at least OCR and Translation service as two AI components in a larger system. Discuss which system components are worth modeling (e.g., rendering, database, support forum). Discuss how to get good estimates for latency and bandwidth.
+Some data: 200ms latency is noticable as speech pause; 20ms is perceivable as video delay, 10ms as haptic delay; 5ms referenced as cybersickness threshold for virtual reality 20ms latency might be acceptable
+bluetooth latency around 40ms to 200ms
+bluetooth bandwidth up to 3mbit, wifi 54mbit, video stream depending on quality 4 to 10mbit for low to medium quality
+google glasses had 5 megapixel camera, 640x360 pixel screen, 1 or 2gb ram, 16gb storage
+​
+​
+24 sur 92
+24
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+25 sur 92
+“Edge” Computing: Mites in TCS
+25
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+26 sur 92
+Excursion:�Architectural Modeling �and Reasoning
+26
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+27 sur 92
+Architectural Expertise as Differentiator?
+As code becomes cheap to produce…
+Easy to build the wrong system fast…
+Easy to build prototype, deploy model, but will it scale?
+Boosts senior engineers who steer AI to good architecture
+Architecture requires larger thinking and planning, judgement, taste
+27
+See also Russinovich & Hanselman, CACM, April 2026
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+28 sur 92
+Architectural concerns
+Buy, train, or prompt a model? Cost-benefit tradeoffs
+What deployment is feasible with 10k monthly users? Cost-accuracy tradeoffs
+Cloud vs on-prem vs on-device deployment? One large model or many small ones? Latency-cost-privacy-stability tradeoffs
+Linear pipeline, agent, or RAG? Cost-capability-security tradeoff
+What breaks when model provider updates or is not available?�What data leaves your trust boundary?�Who owns the safeguards? Who controls versioning?
+28
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+29 sur 92
+Architectural concerns
+Buy, train, or prompt a model? Cost-benefit tradeoffs
+What deployment is feasible with 10k monthly users? Cost-accuracy tradeoffs
+Cloud vs on-prem vs on-device deployment? One large model or many small ones? Latency-cost-privacy-stability tradeoffs
+Linear pipeline, agent, or RAG? Cost-capability-security tradeoff
+What breaks when model provider updates or is not available?�What data leaves your trust boundary?�Who owns the safeguards? Who controls versioning?
+29
+Movie recommendations?
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+30 sur 92
+30
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+31 sur 92
+31
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+32 sur 92
+32
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+33 sur 92
+Analysis-Specific Abstractions
+All maps were abstractions of the same real-world construct
+All maps were created with different goals in mind
+Different relevant abstractions
+Different reasoning opportunities
+Architectural models are specific system abstractions, for reasoning about specific qualities
+No uniform notation
+33
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+34 sur 92
+What can we reason about?
+34
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+35 sur 92
+What can we reason about?
+35
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+36 sur 92
+What can we reason about?
+36
+Peng, Zi, Jinqiu Yang, Tse-Hsun Chen, and Lei Ma. "A first look at the integration of machine learning models in complex autonomous driving systems: a case study on Apollo." In Proc. FSE, 2020.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+37 sur 92
+Suggestions for Graphical Notations
+Use notation suitable for analysis
+Document meaning of boxes and edges in legend
+Graphical or textual both okay; whiteboard sketches often sufficient
+Formal notations available
+37
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+38 sur 92
+Basic Common Deployment Patterns
+38
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+39 sur 92
+Design Patterns are Codified Design Knowl.
+Vocabulary of design problems and solutions
+​
+​
+​
+​
+Example: Observer pattern object-oriented design pattern describes a solution how objects can be notified when another object changes without strongly coupling these objects to each other
+Agents are well versed in common patterns
+39
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+40 sur 92
+Common Architectural Patterns �(for traditional non-ML systems)
+Client-server architecture
+Multi-tier architecture
+Service-oriented architecture and microservices
+Event-based architecture
+Data-flow architecture
+Micro-service architecture
+40
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+41 sur 92
+Microservices
+41
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+42 sur 92
+Common Deployment Designs
+Static intelligence in the product
+Client-side intelligence (user-facing devices)
+Server-centric intelligence
+Back-end cached intelligence
+Hybrid models
+Consider: Offline use, inference latency, model updates, application updates, operating cost, scalability, protecting intellectual property
+42
+Hulten, Geoff. "Building Intelligent Systems: A Guide to Machine Learning Engineering." Apress, 2018, Chapter 13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Notes: From the reading:
+Static intelligence in the product
+difficult to update
+good execution latency
+cheap operation
+offline operation
+no telemetry to evaluate and improve
+Client-side intelligence
+updates costly/slow, out of sync problems
+complexity in clients
+offline operation, low execution latency
+Server-centric intelligence
+latency in model execution (remote calls)
+easy to update and experiment
+operation cost
+no offline operation
+Back-end cached intelligence
+precomputed common results
+fast execution, partial offline
+saves bandwidth, complicated updates
+Hybrid models
+​
+​
+43 sur 92
+Common Deployment Designs
+Static intelligence in the product
+difficult to update
+good execution latency
+cheap operation
+offline operation
+no telemetry to evaluate and improve
+Client-side intelligence
+updates costly/slow, out of sync problems
+complexity in clients
+offline operation, low execution latency
+Server-centric intelligence
+latency in model execution (remote calls)
+easy to update and experiment
+operation cost
+no offline operation
+Back-end cached intelligence
+precomputed common results
+fast execution, partial offline
+saves bandwidth, complicated updates
+43
+Hulten, Geoff. "Building Intelligent Systems: A Guide to Machine Learning Engineering." Apress, 2018, Chapter 13
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+44 sur 92
+Another cold-start problem
+How long for the first prediction when launching a container?
+Loading large models into GPU memory may take a while…
+44
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+45 sur 92
+Where Should Feature Encoding Happen?
+Should feature encoding happen server-side or client-side? Trade-offs?
+45
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note: When thinking of model inference as a component within a system, feature encoding can happen with the model-inference component or can be the responsibility of the client. That is, the client either provides the raw inputs (e.g., image files; dotted box in the figure above) to the inference service or the client is responsible for computing features and provides the feature vector to the inference service (dashed box). Feature encoding and model inference could even be two separate services that are called by the client in sequence. Which alternative is preferable is a design decision that may depend on a number of factors, for example, whether and how the feature vectors are stored in the system, how expensive computing the feature encoding is, how often feature encoding changes, how many models use the same feature encoding, and so forth. For instance, in our stock photo example, having feature encoding being part of the inference service is convenient for clients and makes it easy to update the model without changing clients, but we would have to send the entire image over the network instead of just the much smaller feature vector for the reduced 300 x 300 pixels.
+​
+​
+46 sur 92
+Deploying a Model is Easy
+Model inference component as a service
+​
+46
+from flask import Flask, escape, request
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+detector_model = … # load model…
+​
+# inference API that returns JSON with classes
+# found in an image
+@app.route('/get_objects', methods=['POST'])
+def pred():
+uploaded_img = request.files["images"]
+coverted_img = … # feature encoding of uploaded img
+result = detector_model(converted_img)
+return jsonify({"response":
+result['detection_class_entities']})
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+47 sur 92
+Reusing Feature Engineering Code
+Avoid training–serving skew
+47
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+48 sur 92
+The Feature Store Pattern
+Central place to store, version, and describe feature engineering code
+Can be reused across projects
+Possible caching of expensive features
+Many open source and commercial offerings, e.g.,  Feast, Tecton, AWS SageMaker Feature Store
+48
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+49 sur 92
+Patterns for ML-Enabled Systems
+Stateless/serverless Serving Function Pattern
+Feature-Store Pattern
+Batched/precomputed serving pattern
+Two-phase prediction pattern
+Batch Serving Pattern
+Decouple-training-from-serving pattern
+49
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+50 sur 92
+Anti-Patterns
+Big Ass Script Architecture
+Dead Experimental Code Paths
+Glue code
+Multiple Language Smell
+Pipeline Jungles
+Plain-Old Datatype Smell
+Undeclared Consumers
+50
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+51 sur 92
+Compound AI Systems
+51
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+52 sur 92
+Modern ML Systems beyond a Single Model
+Still provide a simple interface: input -> answer, but with complex internals:
+Prompt + LLM
+Feature engineering, guardrails, and other processing
+Multiple prompts in a sequence and routing
+Retrieval augmented generation (RAG)
+Tool-use agents, subagents
+Memory
+52
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+53 sur 92
+Caching
+Cache full response to a prompt? Precompute outputs for common inputs?
+Semantic caching for similar responses?
+​
+​
+Prefix caching to avoid repeat computations for large prompts and in chat mode�	Lower cost of cached tokens, faster response�	At provider side, possibly locally with low-level LLM access
+53
+[ tools ] [ system ] [ patterns ] [ examples ] || [ this claim ]
+└──────────── cached prefix ──────────┘    └─ pays full ─┘
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+54 sur 92
+Composing Models: Ensemble and Metamodels
+54
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+55 sur 92
+Variation: Parallel work and aggregate
+55
+Travel Receipts
+Policy check
+Approval decision
+Data extraction
+decision
+Duplication check
+Outlier detection
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+56 sur 92
+Composing Models: Decomposing the problem, sequential
+56
+Different models or prompts specialize in different aspects
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+57 sur 92
+Composing Models: Decomposing the problem, sequential
+​
+57
+Breakout answer
+Response writing
+LLM-as-a-judge checks
+feedback
+json
+Different models or prompts specialize in different aspects
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+58 sur 92
+Real-Time Serving; Many Models
+58
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+59 sur 92
+Composing Models: Cascade/two-phase prediction
+59
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+60 sur 92
+Small Language Models (SLM)
+Increasing interest in smaller, specialized models
+Cheaper to run, faster answers, on-prem deployment
+In agents, tailored harnesses can make up for many weaknesses for specific problems
+Tradeoffs between frontier vs small language models (engineering effort, runtime cost, accuracy, …)
+60
+Belcak, Peter, et al. "Small language models are the future of agentic ai." arXiv preprint arXiv:2506.02153 (2025).
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+61 sur 92
+Composing Models: Decomposing the problem, sequential
+​
+61
+Breakout answer
+Response writing
+LLM-as-a-judge checks
+feedback
+json
+Different models or prompts specialize in different aspects
+if (offtopic)
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+62 sur 92
+Prompt optimization
+62
+e.g., dspy
+​
+Can also optimize over chains
+Travel Receipt�Data
+Decision
+Past case decisions
+Prompt optimizer
+Initial prompt for fraud detection
+Prompt
+LLM
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+63 sur 92
+Composing Models: �Retrieval Augmented Generation (RAG)
+​
+63
+https://www.promptingguide.ai/research/rag
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+64 sur 92
+Composing Models: �Retrieval Augmented Generation (RAG)
+​
+64
+Travel Receipt�Data
+LLM judge
+Retriever / search
+compliance
+Prompt�with relevant policy excerpt
+80 page travel policy
+Entire policy is too big for prompt, but retriever and find relevant parts (e.g., by country)
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+65 sur 92
+Tool-use agents
+Inversion of control(!)
+65
+def react_agent(query):
+context = llm(f"Think: How to answer '{query}'?")
+while not is_final_answer(context):
+action = llm(f"Context: {context}\nAction:")
+if "get_email" in action:
+result = get_email(extract_date_range(action))
+elif "send_email" in action:
+result = send_email(extract_to_body(action))
+context = llm(f"Previous: {context}\n
+Action: {action}\nResult: {result}\nContext:")
+return llm(f"Final answer based on: {context}")
+https://www.ibm.com/think/topics/react-agent
+Connections to various components and external systems, even humans
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+The production engineering concerns are analogous to traditional ML pipelines +new twists. Concerns: prompt template versioning, retrieval quality degradation, tool-calling failures, and the combinatorial explosion of possible execution paths in agent loops. The "inversion of control" note is the key architectural distinction.
+66 sur 92
+Tool-use agents
+​
+66
+Travel Receipt�Data
+LLM
+Investigator agent
+Report
+Creative tool use to interact with environment
+Web/maps search tool
+Fraud database search tool
+Past claims database tool
+Airline/flights database tool
+Currency conversion tool
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+67 sur 92
+Memory
+67
+Travel Receipt�Data
+Investigator agent
+Trace and report
+Update state based on each/some executions
+Recent common fraud patterns
+Prompt template
+Auditor prompt
+update
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+68 sur 92
+Automated agent harness adaptation
+68
+Travel Receipt�Data
+Trace and report
+Update also tools, prompts, and skills
+Harness: Tools, skills, memory, …
+Tool-use agents
+Trace audit
+update
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+69 sur 92
+Many of these are well known architectural patterns
+Chaining is a pipeline
+Routing is a broker
+Orchestrator and workers are leader-worker systems
+Evaluator and optimizer is a control loop
+69
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+70 sur 92
+Compound AI Systems change Architecture Considerations
+Memory, caching undermine stateless assumptions�	→ more complex deployments�	→ risks of malicious attacks
+LLMs, sequencing and agents can provide extensive latency �	→ from services to event-based systems
+70
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+71 sur 92
+Operational Robustness
+Redundancy for availability?
+Load balancer for scalability?
+Can mistakes be isolated?
+Local error handling?
+Telemetry to isolate errors to component?
+Logging and log analysis for what qualities?
+71
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+72 sur 92
+Many considerations
+Buy, host, train decisions for each model separately
+Small vs large model
+Qualities beyond accuracy: inference cost, latency (incl. first token latency and inter-token latency), GPU needs, token costs, bandwidth, privacy
+72
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+73 sur 92
+Breakout 2: Sketch an Architecture
+You try to automate most support emails for an airline. 40,000 emails per day. Decide: response or escalate.
+Requirements: Median reply under 30 seconds, under $0.02 per response, wrong answers can have consequences
+As a group, post and follow up in #lecture, tagging group members and @mlipbot:�	Sketch the architecture and name which patterns to use
+73
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+74 sur 92
+AI Components within a Systems
+74
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+75 sur 92
+Recall: Inference is a Component within a System
+75
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+76 sur 92
+Separating Models and Business Logic
+76
+Based on: Yokoyama, Haruki. "Machine learning system architectural pattern for improving operational stability." In Int'l Conf. Software Architecture Companion, pp. 267-274. IEEE, 2019.
+​
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+77 sur 92
+Separating Models and Business Logic
+Clearly divide responsibilities
+Allows largely independent and parallel work, assuming stable interfaces
+Plan location of non-ML safeguards and other processing logic
+77
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+78 sur 92
+More Considerations for Deployment Decisions
+Coupling of ML pipeline parts
+Coupling with other parts of the system
+Ability for different developers and analysts to collaborate
+Support online experiments
+Ability to monitor
+78
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+79 sur 92
+Documenting Model Inference Interfaces
+79
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+80 sur 92
+Why Documentation
+Model inference between teams:
+Data scientists developing the model
+Other data scientists using the model, evolving the model
+Software engineers integrating the model as a component
+Operators managing model deployment
+Will this model work for my problem?
+What problems to anticipate?
+​
+80
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+81 sur 92
+Classic API Documentation
+81
+/**
+* compute deductions based on provided adjusted
+* gross income and expenses in customer data.
+*
+* see tax code 26 U.S. Code A.1.B, PART VI
+*/
+float computeDeductions(float agi, Expenses expenses);
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+82 sur 92
+What to document for models?
+82
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+83 sur 92
+Documenting Input/Output Types for Inference Components
+From Google’s public object detection API.
+​
+83
+{
+"mid": string,
+"languageCode": string,
+"name": string,
+"score": number,
+"boundingPoly": {
+object (BoundingPoly)
+}
+}
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+84 sur 92
+Documentation beyond I/O Types
+Intended use cases, model capabilities and limitations
+Supported target distribution (vs preconditions)
+Accuracy (various measures), incl. slices, fairness
+Latency, throughput, availability (service level agreements)
+Model qualities such as explainability, robustness, calibration
+Ethical considerations (fairness, safety, security, privacy)
+Example for OCR model? How would you describe these?
+84
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+85 sur 92
+Model Cards
+Proposal and template for documentation from Google
+Intended use, out-of-scope use
+Training and evaluation data
+Considered demographic factors
+Accuracy evaluations
+Ethical considerations
+1-2 page summary
+Focused on fairness
+Widely discussed, but not frequently adopted
+85
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+86 sur 92
+86
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+87 sur 92
+87
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+88 sur 92
+FactSheets
+Proposal and template for documentation from IBM; intended to communicate intended qualities and assurances
+Longer list of criteria, including
+Service intention, intended use
+Technical description
+Target distribution
+Own and third-party evaluation results
+Safety and fairness considerations, explainability
+Preparation for drift and evolution
+Security, lineage and versioning
+88
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+89 sur 92
+Documenting Models for Agents?
+89
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+90 sur 92
+Recall: Correctness vs Fit
+Without a clear specification a model is difficult to document
+Need documentation to allow evaluation for fit
+Description of target distribution is a key challenge
+​
+90
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+91 sur 92
+Summary
+Model deployment seems easy, but involves many design decisions
+What models to use?
+Where to deploy?
+How to design feature encoding and feature engineering?
+How to compose with other components?
+How to document?
+How to collect telemetry?
+Problem-specific modeling and analysis: Gather estimates, consider design alternatives, make tradeoffs explicit
+91
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
+92 sur 92
+Further Readings
+Lakshmanan, Valliappa, Sara Robinson, and Michael Munn. Machine learning design patterns. O’Reilly Media, 2020.
+Mitchell, Margaret, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman, Ben Hutchinson, Elena Spitzer, Inioluwa Deborah Raji, and Timnit Gebru. “Model cards for model reporting.” In Proceedings of the conference on fairness, accountability, and transparency, pp. 220–229. 2019.
+Arnold, Matthew, Rachel KE Bellamy, Michael Hind, Stephanie Houde, Sameep Mehta, Aleksandra Mojsilović, Ravi Nair, Karthikeyan Natesan Ramamurthy, Darrell Reimer, Alexandra Olteanu, David Piorkowski, Jason Tsay, and Kush R. Varshney. “FactSheets: Increasing trust in AI services through supplier’s declarations of conformity.” IBM Journal of Research and Development 63, no. 4/5 (2019): 6–1.
+Yokoyama, Haruki. “Machine learning system architectural pattern for improving operational stability.” In 2019 IEEE International Conference on Software Architecture Companion (ICSA-C), pp. 267–274. IEEE, 2019.
+92
+Machine Learning in Production • Christian Kaestner & Bogdan Vasilescu, Carnegie Mellon University • Fall 2026
+Note
